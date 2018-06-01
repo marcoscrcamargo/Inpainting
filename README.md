@@ -4,5 +4,6 @@ O objetivo é remover objetos de imagens que foram inseridos artificialmente com
 
 
 ### Autores
-Victor Luiz Roquete Forbes - @VictorXjoeY
-Marcos Cesar Ribeiro de Camargo - @marcoscrcamargo
+[Victor Luiz Roquete Forbes](https://github.com/VictorXjoeY/)
+
+[Marcos Cesar Ribeiro de Camargo](https://github.com/marcoscrcamargo/)
