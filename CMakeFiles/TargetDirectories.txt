@@ -1,0 +1,3 @@
+/home/forbes/Documents/Processamento de Imagens/Projeto/CMakeFiles/rebuild_cache.dir
+/home/forbes/Documents/Processamento de Imagens/Projeto/CMakeFiles/main.dir
+/home/forbes/Documents/Processamento de Imagens/Projeto/CMakeFiles/edit_cache.dir
