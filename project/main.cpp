@@ -88,8 +88,8 @@ Mat extract_mask(Mat &original, int mode){
 	int threshold, x, y;
 	Mat mask;
 
-	// Alocando a máscara.
-	mask = Mat(original.rows, original.cols, CV_8UC3);
+	// Alocando a máscara com zeros.
+	mask = Mat::zeros(original.rows, original.cols, CV_8UC3);
 		
 	printf("Counting frequency...\n");
 	
@@ -105,10 +105,7 @@ Mat extract_mask(Mat &original, int mode){
 		for (x = 0; x < original.rows; x++){
 			for (y = 0; y < original.cols; y++){
 				// Se a frequência dessa cor RGB for menor ou igual ao threshold, marque com branco. Caso contrário, marque com preto.
-				if (from_vec3b(original.at<Vec3b>(x, y)) == p){
-					mask.at<Vec3b>(x, y)[0] = mask.at<Vec3b>(x, y)[1] = mask.at<Vec3b>(x, y)[2] = 0;
-				}
-				else{
+				if (from_vec3b(original.at<Vec3b>(x, y)) != p){
 					mask.at<Vec3b>(x, y)[0] = mask.at<Vec3b>(x, y)[1] = mask.at<Vec3b>(x, y)[2] = 255;
 				}
 			}
@@ -123,9 +120,6 @@ Mat extract_mask(Mat &original, int mode){
 				// Se a frequência dessa cor RGB for menor ou igual ao threshold, marque com branco. Caso contrário, marque com preto.
 				if (freq[from_vec3b(original.at<Vec3b>(x, y))] <= threshold){
 					mask.at<Vec3b>(x, y)[0] = mask.at<Vec3b>(x, y)[1] = mask.at<Vec3b>(x, y)[2] = 255;
-				}
-				else{
-					mask.at<Vec3b>(x, y)[0] = mask.at<Vec3b>(x, y)[1] = mask.at<Vec3b>(x, y)[2] = 0;
 				}
 			}
 		}
@@ -292,6 +286,49 @@ Mat brute_force(Mat &original, Mat &mask){
 	return ans;
 }
 
+/* Algoritmo Gerchberg-Papoulis com filtragem espacial. */
+Mat gerchberg_papoulis(Mat &original, Mat &mask, int T){
+	std::vector<Mat> g, G;
+	int k, x, y, i;
+	Mat M, mean;
+
+	// Alocando arrays para as imagens e transformadas de cada iteração.
+	g.resize(T + 1); // Domínio espacial.
+	G.resize(T + 1); // Domínio da frequência.
+
+	// Obtendo o filtro da média.
+	mean = Mat::zeros(original.rows, original.cols, CV_32FC3);
+
+	// Obtendo o tamanho ideal para o filtro.
+	k = extract_window_size(mask);
+
+	// Preenchendo o filtro.
+	for (x = 0; x < k; x++){
+		for (y = 0; y < k; y++){
+			mean.at<Vec3f>(x, y)[0] = mean.at<Vec3f>(x, y)[1] = mean.at<Vec3f>(x, y)[2] = 1.0 / ((double)(k * k));
+		}
+	}
+
+	// Obtendo o filtro no domínio das frequências.
+	dft(mean, mean); // <--- Dá pau aqui.
+
+	// Obtendo a máscara no domínio das frequências.
+	dft(mask, M);
+
+	// Inicializando.
+	g[0] = original;
+
+	for (i = 1; i <= T; i++){
+		// Obtendo a transformada da imagem obtida na iteração anterior. 
+		dft(g[i - 1], G[i]);
+
+		// ...
+		printf("%d %d\n", G[i].rows, G[i].cols);
+	}
+
+	return mean;
+}
+
 int main(int argc, char *argv[]){
 	Mat original, ans, mask;
 
@@ -322,7 +359,8 @@ int main(int argc, char *argv[]){
 	printf("Inpainting image...\n");
 
 	// Roda o algoritmo de brute force.
-	ans = brute_force(original, mask);
+	// ans = brute_force(original, mask);
+	ans = gerchberg_papoulis(original, mask, 1);
 
 	// Escrevendo a imagem em um arquivo.
 	imwrite(argv[2], ans);

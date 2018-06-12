@@ -1,15 +1,18 @@
-import imageio
 import numpy as np
+import imageio
 
 def inside(x, y):
 	return 0 <= x and x < f.shape[0] and 0 <= y and y < f.shape[1]
 
 RATIO = 0.02
 
+filename_in = input()
+filename_out = input()
+
 print("Reading image...")
 
 # Reading image.
-f = imageio.imread("in.bmp")
+f = imageio.imread(filename_in)
 f = f[:,:,:3]
 mask = np.zeros((f.shape[0], f.shape[1]), np.uint8)
 ans = np.empty(f.shape, np.uint8)
@@ -45,8 +48,9 @@ k = 5
 a = (k - 1) // 2
 
 for bad_x in range(f.shape[0]):
+	print("Inpainting line", bad_x)
+	
 	for bad_y in range(f.shape[1]):
-		print("Inpainting pixel", (bad_x, bad_y))
 
 		if mask[bad_x][bad_y] == 0:
 			best_dist = -1
@@ -96,4 +100,4 @@ for bad_x in range(f.shape[0]):
 			ans[bad_x, bad_y,:] = f[bad_x, bad_y,:]
 
 print("Writing image...")
-imageio.imwrite("out.bmp", ans)
+imageio.imwrite(filename_out, ans)
