@@ -89,7 +89,7 @@ Mat extract_mask(Mat &original, int mode){
 	Mat mask;
 
 	// Alocando a máscara com zeros.
-	mask = Mat::zeros(original.rows, original.cols, CV_8UC3);
+	mask = Mat::zeros(original.rows, original.cols, CV_8UC1);
 		
 	printf("Counting frequency...\n");
 	
@@ -105,8 +105,8 @@ Mat extract_mask(Mat &original, int mode){
 		for (x = 0; x < original.rows; x++){
 			for (y = 0; y < original.cols; y++){
 				// Se a frequência dessa cor RGB for menor ou igual ao threshold, marque com branco. Caso contrário, marque com preto.
-				if (from_vec3b(original.at<Vec3b>(x, y)) != p){
-					mask.at<Vec3b>(x, y)[0] = mask.at<Vec3b>(x, y)[1] = mask.at<Vec3b>(x, y)[2] = 255;
+				if (from_vec3b(original.at<Vec3b>(x, y)) == p){
+					mask.at<uchar>(x, y) = 255;
 				}
 			}
 		}
@@ -118,8 +118,8 @@ Mat extract_mask(Mat &original, int mode){
 		for (x = 0; x < original.rows; x++){
 			for (y = 0; y < original.cols; y++){
 				// Se a frequência dessa cor RGB for menor ou igual ao threshold, marque com branco. Caso contrário, marque com preto.
-				if (freq[from_vec3b(original.at<Vec3b>(x, y))] <= threshold){
-					mask.at<Vec3b>(x, y)[0] = mask.at<Vec3b>(x, y)[1] = mask.at<Vec3b>(x, y)[2] = 255;
+				if (freq[from_vec3b(original.at<Vec3b>(x, y))] > threshold){
+					mask.at<uchar>(x, y) = 255;
 				}
 			}
 		}
@@ -131,7 +131,7 @@ Mat extract_mask(Mat &original, int mode){
 /* Função recursiva (DFS) que preenche a matriz de distâncias até um pixel bom. */
 int fill_dist(Mat &mask, std::vector<std::vector<int> > &dist, int x, int y){
 	// Casos base.
-	if (!inside(x, y, mask.rows, mask.cols) or mask.at<Vec3b>(x, y)[0] != 0){
+	if (!inside(x, y, mask.rows, mask.cols) or mask.at<uchar>(x, y) == 0){
 		return 0;
 	}
 
@@ -167,7 +167,7 @@ int extract_window_size(Mat &mask){
 	for (x = 0; x < mask.rows; x++){
 		for (y = 0; y < mask.cols; y++){
 			// Se o pixel (x, y) for um pixel ruim.
-			if (mask.at<Vec3b>(x, y)[0] == 0){
+			if (mask.at<uchar>(x, y) != 0){
 				ans = max(ans, fill_dist(mask, dist, x, y));
 			}
 		}
@@ -199,7 +199,7 @@ Mat brute_force(Mat &original, Mat &mask){
 		for (bad_y = 0; bad_y < original.cols; bad_y ++){
 
 			// Se o pixel for ruim.
-			if (mask.at<Vec3b>(bad_x, bad_y)[0] == 0){
+			if (mask.at<uchar>(bad_x, bad_y) != 0){
 				// Inicializando a melhor distância como uma distância inválida.
 				best_dist = -1.0;
 
@@ -207,7 +207,7 @@ Mat brute_force(Mat &original, Mat &mask){
 				for (x = 0; x < original.rows; x++){
 					for (y = 0; y < original.cols; y++){
 						// Se o pixel for bom.
-						if (mask.at<Vec3b>(x, y)[0] != 0){
+						if (mask.at<uchar>(x, y) == 0){
 							// Inicializando a distância da janela centrada em (x, y) para a janela centrada em (bad_x, bad_y) com 0.0.
 							dist = 0.0;
 							used = 0;
@@ -221,7 +221,7 @@ Mat brute_force(Mat &original, Mat &mask){
 									// Se o pixel (bad_x + i, bad_y + j) estiver dentro da imagem.
 									if (inside(bad_x + i, bad_y + j, original.rows, original.cols)){
 										// Se o pixel (bad_x + i, bad_y + j) for ruim, não usaremos ele.
-										if (mask.at<Vec3b>(bad_x + i, bad_y + j)[0] == 0){
+										if (mask.at<uchar>(bad_x + i, bad_y + j) != 0){
 											use = false;
 										}
 										else{
@@ -236,7 +236,7 @@ Mat brute_force(Mat &original, Mat &mask){
 									// Se o pixel (x + i, y + j) estiver dentro da imagem.
 									if (inside(x + i, y + j, original.rows, original.cols)){
 										// Se o pixel (x + i, y + j) for ruim, não usaremos ele.
-										if (mask.at<Vec3b>(x + i, y + j)[0] == 0){
+										if (mask.at<uchar>(x + i, y + j) != 0){
 											use = false;
 										}
 										else{
@@ -286,18 +286,75 @@ Mat brute_force(Mat &original, Mat &mask){
 	return ans;
 }
 
+/* Extracts a single channel from an image. */
+Mat extract_channel(Mat &img, int c){
+	Mat channel;
+	int x, y;
+
+	// Aloca o canal.
+	channel = Mat(img.rows, img.cols, CV_32FC1);
+
+	// Copia pixel por pixel.
+	for (x = 0; x < img.rows; x++){
+		for (y = 0; y < img.cols; y++){
+			channel.at<float>(x, y) = img.at<Vec3b>(x, y)[c];
+		}
+	}
+
+	// Retorna o canal.
+	return channel;
+}
+
+/* Função que dá um merge dos canais RGB. */
+Mat merge_channels(Mat &c0, Mat &c1, Mat &c2){
+	int x, y;
+	Mat img;
+
+	img = Mat(c0.rows, c0.cols, CV_8UC3);
+
+	// Copiando pixel por pixel.
+	for (x = 0; x < img.rows; x++){
+		for (y = 0; y < img.cols; y++){
+			img.at<Vec3b>(x, y)[0] = round(c0.at<float>(x, y));
+			img.at<Vec3b>(x, y)[1] = round(c1.at<float>(x, y));
+			img.at<Vec3b>(x, y)[2] = round(c2.at<float>(x, y));
+		}
+	}
+
+	return img;
+}
+
+/* Função que normaliza uma imagem entre [l, r]. */
+void normalize(Mat &img, double l, double r){
+	double img_min, img_max;
+	int x, y;
+
+	// Recuperando o mínimo e o máximo da imagem.
+	minMaxLoc(img, &img_min, &img_max);
+
+	// Normalizando pixel por pixel.
+	for (x = 0; x < img.rows; x++){
+		for (y = 0; y < img.cols; y++){
+			img.at<float>(x, y) = ((img.at<float>(x, y) - img_min) / (img_max - img_min)) * (r - l) + l;
+		}
+	}
+}
+
 /* Algoritmo Gerchberg-Papoulis com filtragem espacial. */
 Mat gerchberg_papoulis(Mat &original, Mat &mask, int T){
-	std::vector<Mat> g, G;
-	int k, x, y, i;
-	Mat M, mean;
+	Mat M, mean, mask_term_1, mask_term_2;
+	double M_max, M_min, G_max, G_min;
+	std::vector<Mat> g[3], G[3];
+	int k, x, y, c, i;
 
 	// Alocando arrays para as imagens e transformadas de cada iteração.
-	g.resize(T + 1); // Domínio espacial.
-	G.resize(T + 1); // Domínio da frequência.
+	for (c = 0; c < 3; c++){
+		g[c].resize(T + 1); // Domínio espacial.
+		G[c].resize(T + 1); // Domínio da frequência.
+	}
 
 	// Obtendo o filtro da média.
-	mean = Mat::zeros(original.rows, original.cols, CV_32FC3);
+	mean = Mat::zeros(original.rows, original.cols, CV_32FC1);
 
 	// Obtendo o tamanho ideal para o filtro.
 	k = extract_window_size(mask);
@@ -305,28 +362,73 @@ Mat gerchberg_papoulis(Mat &original, Mat &mask, int T){
 	// Preenchendo o filtro.
 	for (x = 0; x < k; x++){
 		for (y = 0; y < k; y++){
-			mean.at<Vec3f>(x, y)[0] = mean.at<Vec3f>(x, y)[1] = mean.at<Vec3f>(x, y)[2] = 1.0 / ((double)(k * k));
+			mean.at<float>(x, y) = 1.0 / ((double)(k * k));
 		}
 	}
 
 	// Obtendo o filtro no domínio das frequências.
-	dft(mean, mean); // <--- Dá pau aqui.
+	dft(mean, mean);
 
 	// Obtendo a máscara no domínio das frequências.
-	dft(mask, M);
+	mask.convertTo(M, CV_32FC1);
+	dft(M, M);
 
-	// Inicializando.
-	g[0] = original;
+	// Alocando termos auxiliares.
+	mask_term_1 = Mat(mask.rows, mask.cols, CV_32FC1);
+	mask_term_2 = Mat(mask.rows, mask.cols, CV_32FC1);
 
-	for (i = 1; i <= T; i++){
-		// Obtendo a transformada da imagem obtida na iteração anterior. 
-		dft(g[i - 1], G[i]);
-
-		// ...
-		printf("%d %d\n", G[i].rows, G[i].cols);
+	// Preenchendo termos auxiliares constantes.
+	for (x = 0; x < mask.rows; x++){
+		for (y = 0; y < mask.cols; y++){
+			mask_term_1.at<float>(x, y) = 1.0 - (double)mask.at<uchar>(x, y) / 255.0;
+			mask_term_2.at<float>(x, y) = (double)mask.at<uchar>(x, y) / 255.0;
+		}
 	}
 
-	return mean;
+	// Para cada canal:
+	for (c = 0; c < 3; c++){
+		g[c][0] = extract_channel(original, c);
+
+		// Para cada iteração.
+		for (i = 1; i <= T; i++){
+			// Obtendo a transformada da imagem obtida na iteração anterior.
+			G[c][i] = Mat(original.rows, original.cols, CV_32FC1);
+			dft(g[c][i - 1], G[c][i]);
+
+			// Recuperando o G_max e o M_max.
+			minMaxLoc(G[c][i], &G_min, &G_max);
+			minMaxLoc(M, &M_min, &M_max);
+
+			// Zerando coeficientes.
+			for (x = 0; x < original.rows; x++){
+				for (y = 0; y < original.cols; y++){
+					if (G[c][i].at<float>(x, y) >= 0.9 * M_max and G[c][i].at<float>(x, y) <= 0.01 * G_max){
+						G[c][i].at<float>(x, y) = 0.0;
+					}
+				}
+			}
+
+			// Realizando a convolução com o filtro de média 7x7 e obtendo a parte real da inversa.
+			dft(G[c][i].mul(mean), g[c][i], DFT_REAL_OUTPUT);
+			// dft(G[c][i].mul(mean), g[c][i], DFT_INVERSE);
+			// idft(G[c][i].mul(mean), g[c][i]);
+
+			// Renormalizando a imagem entre 0 e 255.
+			normalize(g[c][i], 0, 255);
+
+			// Inserindo pixels conhecidos, um por um.
+			/*for (x = 0; x < original.rows; x++){
+				for (y = 0; y < original.cols; y++){
+
+				}
+			}*/
+			
+			// Inserindo pixels conhecidos.
+			g[c][i] = mask_term_1.mul(g[c][0]) + mask_term_2.mul(g[c][i]);
+		}
+	}
+
+	return merge_channels(g[0][T], g[1][T], g[2][T]);
 }
 
 int main(int argc, char *argv[]){
@@ -360,7 +462,7 @@ int main(int argc, char *argv[]){
 
 	// Roda o algoritmo de brute force.
 	// ans = brute_force(original, mask);
-	ans = gerchberg_papoulis(original, mask, 1);
+	ans = gerchberg_papoulis(original, mask, 20);
 
 	// Escrevendo a imagem em um arquivo.
 	imwrite(argv[2], ans);
