@@ -10,7 +10,7 @@ MOST_FREQUENT = 0
 MINIMUM_FREQUENCY = 1
 ORIGINAL_PATH = "./images/original/"
 DETERIORATED_PATH = "./images/deteriorated/"
-INPAINTED_PATH = "./images/inpainted/"
+INPAINTED_PATH = "./images/inpainted/Gerchberg Papoulis/"
 MASKS_PATH = "./images/masks/"
 
 # Retorna a frequência das cores de uma imagem.
@@ -82,16 +82,59 @@ def extract_mask(f, mode):
 def normalize(f, l, r):
 	return ((f - f.min()) / (f.max() - f.min())) * (r - l) + l
 
+# Função que retorna True se (x, y) estiver dentro da imagem f.
+def inside(x, y, f):
+	return 0 <= x and x < f.shape[0] and 0 <= y and y < f.shape[1]
+
+# Retorna o tamanho ideal da janela para o filtro da média.
+def extract_window_size(mask):
+	# Alocando matriz de distâncias.
+	dist = np.array([[0 if mask[i][j] == 0 else mask.shape[0] * mask.shape[1] for j in range(mask.shape[1])] for i in range(mask.shape[0])])
+	changes = 1
+
+	# (Bellman-Ford) Enquanto não convergir.
+	while changes > 0:
+		changes = 0
+
+		# Relaxando as arestas.
+		for x in range(mask.shape[0]):
+			for y in range(mask.shape[1]):
+				if inside(x - 1, y, mask) and dist[x - 1][y] + 1 < dist[x][y]: # Up.
+					dist[x][y] = dist[x - 1][y] + 1;
+					changes += 1;
+
+				if inside(x + 1, y, mask) and dist[x + 1][y] + 1 < dist[x][y]: # Down.
+					dist[x][y] = dist[x + 1][y] + 1;
+					changes += 1;
+
+				if inside(x, y - 1, mask) and dist[x][y - 1] + 1 < dist[x][y]: # Left.
+					dist[x][y] = dist[x][y - 1] + 1;
+					changes += 1;
+
+				if inside(x, y + 1, mask) and dist[x][y + 1] + 1 < dist[x][y]: # Right.
+					dist[x][y] = dist[x][y + 1] + 1;
+					changes += 1;
+
+	# Retornando o "diâmetro" + 1.
+	return 2 * dist.max() + 1
+
 # Algoritmo Gerchberg-Papoulis com filtragem espacial.
 def gerchberg_papoulis(img, mask, T):
 	# Alocando arrays para as imagens e transformadas de cada iteração.
 	g = [0 for i in range(T + 1)] # Domínio espacial.
 	G = [0 for i in range(T + 1)] # Domínio da frequência.
 
-	# Obtendo o filtro da média 7x7 no domínio das frequências.
-	# COLOCAR O EXTRACT WINDOW SIZE AQUI PRA DETERMINAR O K.
+	print("Extracting ideal k...")
+
+	# Extraindo o k ideal.
+	k = extract_window_size(mask)
+
+	print("k =", k)
+	print("Inpainting...")
+
+	# Obtendo o filtro da média kxk no domínio das frequências.
 	mean = np.zeros((img.shape[0], img.shape[1]))
-	mean[:7, :7] = 1 / (7**2)
+	mean[:k, :k] = 1 / (k**2)
 	mean = np.fft.fft2(mean)
 
 	# Obtendo a Transformada de Fourier da máscara.
@@ -129,14 +172,16 @@ def gerchberg_papoulis(img, mask, T):
 	return np.round(ans).astype(np.uint8)
 
 def main():
-	# Lendo os nomes dos arquivos de entrada e saída.
-	filename_in = sys.argv[1]
-	filename_out = sys.argv[2]
+	# Obtendo os nomes dos arquivos de entrada e saída.
+	filename_in, filename_out = (sys.argv[1], sys.argv[2])
 
 	print("Reading image...")
 
 	# Lendo a imagem.
 	f = imageio.imread(DETERIORATED_PATH + filename_in)
+
+	# Setando o limite da recursão.
+	sys.setrecursionlimit(f.shape[0] * f.shape[1] + 10)
 
 	# Extraindo a máscara.
 	mask = extract_mask(f, MOST_FREQUENT)
@@ -145,8 +190,6 @@ def main():
 
 	# Escrevendo a máscara em um arquivo.
 	imageio.imwrite(MASKS_PATH + filename_out, mask)
-
-	print("Inpainting...")
 
 	# Aplicando o algoritmo de Gerchberg-Papoulis
 	ans = gerchberg_papoulis(f, mask, 10)

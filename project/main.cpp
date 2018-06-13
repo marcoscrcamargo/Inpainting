@@ -132,61 +132,139 @@ Mat extract_mask(Mat &original, int mode){
 	return mask;
 }
 
-/* Função recursiva (DFS) que preenche a matriz de distâncias até um pixel bom. */
-int fill_dist(Mat &mask, std::vector<std::vector<int> > &dist, int x, int y){
-	// Casos base.
-	if (!inside(x, y, mask.rows, mask.cols) or mask.at<uchar>(x, y) == 0){
-		return 0;
-	}
-
-	// Se essa distância já foi calculada.
-	if (dist[x][y] != -1){
-		return dist[x][y];
-	}
-
-	dist[x][y] = 1 + fill_dist(mask, dist, x - 1, y); // Up.
-	dist[x][y] = min(dist[x][y], 1 + fill_dist(mask, dist, x + 1, y)); // Down.
-	dist[x][y] = min(dist[x][y], 1 + fill_dist(mask, dist, x, y - 1)); // Left.
-	dist[x][y] = min(dist[x][y], 1 + fill_dist(mask, dist, x, y + 1)); // Right.
-
-	return dist[x][y];
-}
-
 /* Função que extrai o tamanho ideal da janela para o Brute Force. */
 int extract_window_size(Mat &mask){
 	std::vector<std::vector<int> > dist;
-	int ans, x, y;
+	int changes, ans, x, y;
 
 	// Alocando matriz de distâncias.
 	dist.resize(mask.rows);
 
+	// Inicializando.
 	for (x = 0; x < mask.rows; x++){
-		dist[x].assign(mask.cols, -1);
-	}
+		dist[x].assign(mask.cols, mask.rows * mask.cols);
 
-	// Inicializando o "raio".
-	ans = 0;
-
-	// Para cada pixel (x, y).
-	for (x = 0; x < mask.rows; x++){
 		for (y = 0; y < mask.cols; y++){
-			// Se o pixel (x, y) for um pixel ruim.
-			if (mask.at<uchar>(x, y) != 0){
-				ans = max(ans, fill_dist(mask, dist, x, y));
+			// Se o pixel (x, y) é bom.
+			if (mask.at<uchar>(x, y) == 0){
+				dist[x][y] = 0;
 			}
 		}
 	}
 
-	// Retornando o "diâmetro" + 1.
+	// (Bellman-Ford) Enquanto não convergir.
+	do{
+		changes = 0;
+
+		// Relaxando as arestas.
+		for (x = 0; x < mask.rows; x++){
+			for (y = 0; y < mask.cols; y++){
+				if (inside(x - 1, y, mask.rows, mask.cols) and dist[x - 1][y] + 1 < dist[x][y]){ // Up.
+					dist[x][y] = dist[x - 1][y] + 1;
+					changes++;
+				}
+
+				if (inside(x + 1, y, mask.rows, mask.cols) and dist[x + 1][y] + 1 < dist[x][y]){ // Down.
+					dist[x][y] = dist[x + 1][y] + 1;
+					changes++;
+				}
+
+				if (inside(x, y - 1, mask.rows, mask.cols) and dist[x][y - 1] + 1 < dist[x][y]){ // Left.
+					dist[x][y] = dist[x][y - 1] + 1;
+					changes++;
+				}
+
+				if (inside(x, y + 1, mask.rows, mask.cols) and dist[x][y + 1] + 1 < dist[x][y]){ // Right.
+					dist[x][y] = dist[x][y + 1] + 1;
+					changes++;
+				}
+			}
+		}
+	}while (changes > 0);
+
+	// Inicializando o "raio".
+	ans = 0;
+
+	// Recuperando a distância máxima.
+	for (x = 0; x < mask.rows; x++){
+		for (y = 0; y < mask.cols; y++){
+			ans = max(ans, dist[x][y]);
+		}
+	}
+
+	// Retornando o "diâmetro" + 3.
 	return 2 * ans + 3;
+}
+
+double distance(Mat &original, Mat &mask, int xi, int yi, int xf, int yf, int k){
+	int used, a, i, j;
+	Vec3b pi, pf;
+	double dist;
+	bool use;
+
+	// Definindo o "raio" da janela K x K.
+	a = (k - 1) / 2;
+	dist = 0.0;
+	used = 0;
+
+	// Percorrendo as janelas (xf + i, yf + j) e (xi + i, yi + j).
+	for (i = -a; i <= a; i++){
+		for (j = -a; j <= a; j++){
+			// Flag que dirá se eu vou usar esse pixel para o cálculo da distância ou não.
+			use = true;
+
+			// Se o pixel (xi + i, yi + j) estiver dentro da imagem.
+			if (inside(xi + i, yi + j, original.rows, original.cols)){
+				// Se o pixel (xi + i, yi + j) for ruim, não usaremos ele.
+				if (mask.at<uchar>(xi + i, yi + j) != 0){
+					use = false;
+				}
+				else{
+					pi = original.at<Vec3b>(xi + i, yi + j);
+				}
+			}
+			else{
+				// Se o pixel (xi + i, yi + j) estiver fora da imagem, consideramos que é um pixel preto.
+				pi[0] = pi[1] = pi[2] = 0;
+			}
+
+			// Se o pixel (xf + i, yf + j) estiver dentro da imagem.
+			if (inside(xf + i, yf + j, original.rows, original.cols)){
+				// Se o pixel (xf + i, yf + j) for ruim, não usaremos ele.
+				if (mask.at<uchar>(xf + i, yf + j) != 0){
+					use = false;
+				}
+				else{
+					pf = original.at<Vec3b>(xf + i, yf + j);
+				}
+			}
+			else{
+				// Se o pixel (xf + i, yf + j) estiver fora da imagem, consideramos que é um pixel preto.
+				pf[0] = pf[1] = pf[2] = 0;
+			}
+
+			// Se o pudermos calcular a distância entre (xi + i, yi + j) e (xf + i, yf + j).
+			if (use){
+				// Soma a distância entre dois pixels e incrementa o número de pixels usados.
+				dist += pixel_distance(pi, pf);
+				used++;
+			}
+		}
+	}
+
+	// Se algum pixel foi usado, retorne a distância normalizada.
+	if (used){
+		return dist / (double)used;
+	}
+
+	// Se não, retorne a máxima distância sqrt(3 * 256^2)
+	return 256.0 * sqrt(3.0);
 }
 
 /* Função que faz um Brute Force para fazer Inpainting em cada pixel. */
 Mat brute_force(Mat &original, Mat &mask){
-	int threshold, x, y, bad_x, bad_y, used, k, a, i, j;
+	int threshold, x, y, bad_x, bad_y, k;
 	double dist, best_dist;
-	Vec3b p, bad_p, best_p;
-	bool use;
 	Mat ans;
 
 	// Inicializando a imagem final.
@@ -194,90 +272,89 @@ Mat brute_force(Mat &original, Mat &mask){
 
 	// Obtendo as dimensões da janela ideal para o Brute Force.
 	k = extract_window_size(mask);
-	a = (k - 1) / 2;
+
+	printf("k = %d\n", k);
 
 	// Para cada pixel ruim (bad_x, bad_y).
 	for (bad_x = 0; bad_x < original.rows; bad_x++){
 		printf("Inpainting line %d\n", bad_x);
 		
-		for (bad_y = 0; bad_y < original.cols; bad_y ++){
-
+		for (bad_y = 0; bad_y < original.cols; bad_y++){
 			// Se o pixel for ruim.
 			if (mask.at<uchar>(bad_x, bad_y) != 0){
 				// Inicializando a melhor distância como uma distância inválida.
 				best_dist = -1.0;
 
-				// Oara cada pixel bom (x, y).
+				// Para cada pixel bom (x, y).
 				for (x = 0; x < original.rows; x++){
 					for (y = 0; y < original.cols; y++){
 						// Se o pixel for bom.
 						if (mask.at<uchar>(x, y) == 0){
 							// Inicializando a distância da janela centrada em (x, y) para a janela centrada em (bad_x, bad_y) com 0.0.
-							dist = 0.0;
-							used = 0;
+							dist = distance(original, mask, bad_x, bad_y, x, y, k);
 
-							// Percorrendo as janelas (x + i, y + j) e (bad_x + i, bad_y + j).
-							for (i = -a; i <= a; i++){
-								for (j = -a; j <= a; j++){
-									// Flag que dirá se eu vou usar esse pixel para o cálculo da distância ou não.
-									use = true;
-
-									// Se o pixel (bad_x + i, bad_y + j) estiver dentro da imagem.
-									if (inside(bad_x + i, bad_y + j, original.rows, original.cols)){
-										// Se o pixel (bad_x + i, bad_y + j) for ruim, não usaremos ele.
-										if (mask.at<uchar>(bad_x + i, bad_y + j) != 0){
-											use = false;
-										}
-										else{
-											bad_p = original.at<Vec3b>(bad_x + i, bad_y + j);
-										}
-									}
-									else{
-										// Se o pixel (bad_x + i, bad_y + j) estiver fora da imagem, consideramos que é um pixel preto.
-										bad_p[0] = bad_p[1] = bad_p[2] = 0;
-									}
-
-									// Se o pixel (x + i, y + j) estiver dentro da imagem.
-									if (inside(x + i, y + j, original.rows, original.cols)){
-										// Se o pixel (x + i, y + j) for ruim, não usaremos ele.
-										if (mask.at<uchar>(x + i, y + j) != 0){
-											use = false;
-										}
-										else{
-											p = original.at<Vec3b>(x + i, y + j);
-										}
-									}
-									else{
-										// Se o pixel (x + i, y + j) estiver fora da imagem, consideramos que é um pixel preto.
-										p[0] = p[1] = p[2] = 0;
-									}
-
-									// Se o pudermos calcular a distância entre (bad_x + i, bad_y + j) e (x + i, y + j).
-									if (use){
-										// Soma a distância entre dois pixels e incrementa o número de pixels usados.
-										dist += pixel_distance(p, bad_p);
-										used++;
-									}
-								}
-							}
-
-							// Se o número de pixels usados para o cálculo da distância for 0, ignore-o.
-							if (used){
-								// Normalizando a distância. (Talvez haja uma normalização melhor para usar, pegando apenas janelas que usem pelo menos 50% dos pixels)
-								dist /= (double)used;
-
-								// Se o pixel atual tiver uma distância menor do que a menor distância obtida até agora, atualize o melhor pixel.
-								if (best_dist == -1.0 or dist < best_dist){
-									best_dist = dist;
-									best_p = original.at<Vec3b>(x, y);
-								}
+							// Se o pixel atual tiver uma distância menor do que a menor distância obtida até agora, atualize o melhor pixel.
+							if (best_dist == -1.0 or dist < best_dist){
+								// Preenchendo o pixel (bad_x, bad_y) com o pixel (x, y) cuja distância de sua janela K x K é mínima.
+								ans.at<Vec3b>(bad_x, bad_y) = original.at<Vec3b>(x, y);
+								best_dist = dist;
 							}
 						}
 					}
 				}
+			}
+			else{
+				// Se o pixel (bad_x, bad_y) for bom, basta copiar da imagem original para a imagem final.
+				ans.at<Vec3b>(bad_x, bad_y) = original.at<Vec3b>(bad_x, bad_y);
+			}
+		}
+	}
 
-				// Preenchendo o pixel (bad_x, bad_y) com o pixel (x, y) cuja distância de sua janela K x K é mínima.
-				ans.at<Vec3b>(bad_x, bad_y) = best_p;
+	// Retornando a imagem final.
+	return ans;
+}
+
+/* Função que faz um Brute Force Local para fazer Inpainting em cada pixel. */
+Mat local_brute_force(Mat &original, Mat &mask, int radius){
+	int threshold, x, y, bad_x, bad_y, k;
+	double dist, best_dist;
+	Mat ans;
+
+	// Inicializando a imagem final.
+	ans = Mat(original.rows, original.cols, CV_8UC3);
+
+	// Obtendo as dimensões da janela ideal para o Brute Force.
+	k = extract_window_size(mask);
+
+	printf("k = %d\n", k);
+
+	// Para cada pixel ruim (bad_x, bad_y).
+	for (bad_x = 0; bad_x < original.rows; bad_x++){
+		printf("Inpainting line %d\n", bad_x);
+		
+		for (bad_y = 0; bad_y < original.cols; bad_y++){
+			// Se o pixel for ruim.
+			if (mask.at<uchar>(bad_x, bad_y) != 0){
+				// Inicializando a melhor distância como uma distância inválida.
+				best_dist = -1.0;
+
+				// Para cada pixel (x, y) em uma área quadrada definida pelo raio "radius".
+				for (x = max(0, bad_x - radius); x < min(original.rows, bad_x + radius + 1); x++){
+					for (y = max(0, bad_y - radius); y < min(original.cols, bad_y + radius + 1); y++){
+						// Se o pixel for bom.
+						if (mask.at<uchar>(x, y) == 0){
+							// Inicializando a distância da janela centrada em (x, y) para a janela centrada em (bad_x, bad_y) com 0.0.
+							dist = distance(original, mask, bad_x, bad_y, x, y, k);
+
+							// Se o pixel atual tiver uma distância menor do que a menor distância obtida até agora, atualize o melhor pixel.
+							if (best_dist == -1.0 or dist < best_dist){
+								// Preenchendo o pixel (bad_x, bad_y) com o pixel (x, y) cuja distância de sua janela K x K é mínima.
+								ans.at<Vec3b>(bad_x, bad_y) = original.at<Vec3b>(x, y);
+								best_dist = dist;
+							}
+						}
+					}
+				}
 			}
 			else{
 				// Se o pixel (bad_x, bad_y) for bom, basta copiar da imagem original para a imagem final.
@@ -440,8 +517,6 @@ int main(int argc, char *argv[]){
 	// Lendo a imagem.
 	original = imread(DETERIORATED_PATH + std::string(argv[1]), 1);
 
-	std::cout << DETERIORATED_PATH + std::string(argv[1]) << std::endl;
-
 	// Imagem sem conteúdo.
 	if (!original.data){
 		printf("No image data.\n");
@@ -459,8 +534,9 @@ int main(int argc, char *argv[]){
 	printf("Inpainting image...\n");
 
 	// Roda o algoritmo de brute force.
-	ans = brute_force(original, mask);
-	// ans = gerchberg_papoulis(original, mask, 20);
+	// ans = brute_force(original, mask);
+	ans = local_brute_force(original, mask, 50);
+	// ans = gerchberg_papoulis(original, mask, 10);
 
 	// Escrevendo a imagem em um arquivo.
 	imwrite(INPAINTED_PATH + std::string(argv[2]), ans);
