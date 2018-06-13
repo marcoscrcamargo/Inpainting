@@ -8,8 +8,12 @@ using namespace cv;
 
 /* Porcentagem de pixels mínima de uma certa cor para considerar como rabisco. */
 #define RATIO 0.01
-#define MINIMIUM_FREQUENCY 0
-#define MOST_FREQUENT 1
+#define MOST_FREQUENT 0
+#define MINIMIUM_FREQUENCY 1
+#define ORIGINAL_PATH "../images/original/"
+#define DETERIORATED_PATH "../images/deteriorated/"
+#define INPAINTED_PATH "../images/inpainted/"
+#define MASKS_PATH "../images/masks/"
 
 /* Função que retorna a distância entre dois pixels. */
 double pixel_distance(Vec3b p1, Vec3b p2){
@@ -174,7 +178,7 @@ int extract_window_size(Mat &mask){
 	}
 
 	// Retornando o "diâmetro" + 1.
-	return 2 * ans + 1;
+	return 2 * ans + 3;
 }
 
 /* Função que faz um Brute Force para fazer Inpainting em cada pixel. */
@@ -347,11 +351,9 @@ Mat gerchberg_papoulis(Mat &original, Mat &mask, int T){
 	std::vector<Mat> g[3], G[3];
 	int k, x, y, c, i;
 
-	// Alocando arrays para as imagens e transformadas de cada iteração.
-	for (c = 0; c < 3; c++){
-		g[c].resize(T + 1); // Domínio espacial.
-		G[c].resize(T + 1); // Domínio da frequência.
-	}
+	// Obtendo a máscara no domínio das frequências.
+	mask.convertTo(M, CV_32FC1);
+	dft(M, M);
 
 	// Obtendo o filtro da média.
 	mean = Mat::zeros(original.rows, original.cols, CV_32FC1);
@@ -368,11 +370,7 @@ Mat gerchberg_papoulis(Mat &original, Mat &mask, int T){
 
 	// Obtendo o filtro no domínio das frequências.
 	dft(mean, mean);
-
-	// Obtendo a máscara no domínio das frequências.
-	mask.convertTo(M, CV_32FC1);
-	dft(M, M);
-
+	
 	// Alocando termos auxiliares.
 	mask_term_1 = Mat(mask.rows, mask.cols, CV_32FC1);
 	mask_term_2 = Mat(mask.rows, mask.cols, CV_32FC1);
@@ -387,6 +385,11 @@ Mat gerchberg_papoulis(Mat &original, Mat &mask, int T){
 
 	// Para cada canal:
 	for (c = 0; c < 3; c++){
+		// Alocando arrays para as imagens e transformadas de cada iteração.
+		g[c].resize(T + 1); // Domínio espacial.
+		G[c].resize(T + 1); // Domínio da frequência.
+
+		// Extraindo o canal c.
 		g[c][0] = extract_channel(original, c);
 
 		// Para cada iteração.
@@ -409,20 +412,13 @@ Mat gerchberg_papoulis(Mat &original, Mat &mask, int T){
 			}
 
 			// Realizando a convolução com o filtro de média 7x7 e obtendo a parte real da inversa.
-			dft(G[c][i].mul(mean), g[c][i], DFT_REAL_OUTPUT);
+			// dft(G[c][i].mul(mean), g[c][i], DFT_REAL_OUTPUT);
 			// dft(G[c][i].mul(mean), g[c][i], DFT_INVERSE);
-			// idft(G[c][i].mul(mean), g[c][i]);
+			idft(G[c][i].mul(mean), g[c][i]);
 
 			// Renormalizando a imagem entre 0 e 255.
 			normalize(g[c][i], 0, 255);
 
-			// Inserindo pixels conhecidos, um por um.
-			/*for (x = 0; x < original.rows; x++){
-				for (y = 0; y < original.cols; y++){
-
-				}
-			}*/
-			
 			// Inserindo pixels conhecidos.
 			g[c][i] = mask_term_1.mul(g[c][0]) + mask_term_2.mul(g[c][i]);
 		}
@@ -442,7 +438,9 @@ int main(int argc, char *argv[]){
 	printf("Reading image...\n");
 
 	// Lendo a imagem.
-	original = imread(argv[1], 1);
+	original = imread(DETERIORATED_PATH + std::string(argv[1]), 1);
+
+	std::cout << DETERIORATED_PATH + std::string(argv[1]) << std::endl;
 
 	// Imagem sem conteúdo.
 	if (!original.data){
@@ -456,16 +454,16 @@ int main(int argc, char *argv[]){
 	printf("Writing mask...\n");
 
 	// Escrevendo a máscara.
-	imwrite("mask.bmp", mask);
+	imwrite(MASKS_PATH + std::string(argv[2]), mask);
 
 	printf("Inpainting image...\n");
 
 	// Roda o algoritmo de brute force.
-	// ans = brute_force(original, mask);
-	ans = gerchberg_papoulis(original, mask, 20);
+	ans = brute_force(original, mask);
+	// ans = gerchberg_papoulis(original, mask, 20);
 
 	// Escrevendo a imagem em um arquivo.
-	imwrite(argv[2], ans);
+	imwrite(INPAINTED_PATH + std::string(argv[2]), ans);
 
 	// Mostra a imagem resultante em uma janela.
 	// namedWindow("Display Image", WINDOW_AUTOSIZE);
