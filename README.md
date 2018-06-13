@@ -7,11 +7,20 @@ Neste trabalho são estudadas duas técnicas de *inpaiting* para a remoção de 
 
 # Imagens utilizadas
 
+![dereiored_dogo_1_in.bmp](./project/images/deteriorated/dogo_1_in.bmp)
+![dereiored_dogo_2_in.bmp](./project/images/deteriorated/dogo_2_in.bmp)
+
 # Extração da máscara
 
-# Inpaiting das imagens
+![mask_dogo1.bmp](./project/images/masks/dogo1.bmp)
+![mask_dogo1.bmp](./project/images/masks/dogo2.bmp)
 
-# Compação com a imagem original
+# Inpainting das imagens
+
+![inpainted_dogo_1_in.bmp](./project/images/inpainted/dogo1.bmp)
+![inpainted_dogo_2_in.bmp](./project/images/inpainted/dogo2.bmp)
+
+# Comparação com a imagem original
 
 
 
@@ -19,7 +28,7 @@ Neste trabalho são estudadas duas técnicas de *inpaiting* para a remoção de 
 <!-- |   Autores |
 | --- | -->
 
-| [![victorxjoey](https://avatars1.githubusercontent.com/u/13484548?s=400&v=4)](https://github.com/VictorXjoeY/) |               [![marcoscrcamargo](https://avatars0.githubusercontent.com/u/13886241?s=460&v=4)](https://github.com/marcoscrcamargo/) |
+| [![victorxjoey](https://avatars1.githubusercontent.com/u/13484548?s=200&v=4)](https://github.com/VictorXjoeY/) |               [![marcoscrcamargo](https://avatars0.githubusercontent.com/u/13886241?s=200&v=4)](https://github.com/marcoscrcamargo/) |
 |:-----------------------------------------------------------------------------------------------------------------:|:-------------------------------------------------------------------------------------------------------:|
 |[Marcos Cesar Ribeiro de Camargo](https://github.com/marcoscrcamargo/)|[Victor Luiz Roquete Forbes](https://github.com/VictorXjoeY/)|
 | 9278045 | 9293394|
