@@ -13,6 +13,10 @@ DETERIORATED_PATH = "./images/deteriorated/"
 INPAINTED_PATH = "./images/inpainted/Gerchberg Papoulis/"
 MASKS_PATH = "./images/masks/"
 
+# Função que retorna se o pixel é branco.
+def white(p):
+	return p[0] >= 250 and p[1] >= 250 and p[2] >= 250
+
 # Retorna a frequência das cores de uma imagem.
 def rgb_frequency(f):
 	freq = {}
@@ -34,7 +38,7 @@ def most_frequent(freq):
 	ans = None
 
 	for rgb in freq:
-		if ans is None or freq[rgb] > freq[ans]:
+		if not white(rgb) and (ans is None or freq[rgb] > freq[ans]):
 			ans = rgb
 
 	return ans
@@ -73,7 +77,7 @@ def extract_mask(f, mode):
 				rgb = (f[x][y][0], f[x][y][1], f[x][y][2])
 
 				# Pinta se a frequência da cor desse pixel for muito alta.
-				if freq[rgb] > threshold:
+				if not white(rgb) and freq[rgb] > threshold:
 					mask[x][y] = 255
 
 	return mask

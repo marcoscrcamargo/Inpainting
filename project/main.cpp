@@ -48,6 +48,11 @@ std::vector<unsigned char> from_vec3b(Vec3b &v){
 	return p;
 }
 
+/* Função que retorna se um pixel é branco. */
+bool white(std::vector<unsigned char> p){
+	return p[0] >= 250 and p[1] >= 250 and p[2] >= 250;
+}
+
 /* Função que retorna um map com as frequências de cada pixel RGB. */
 std::map<std::vector<unsigned char>, int> rgb_frequency(Mat &img){
 	std::map<std::vector<unsigned char>, int> freq;
@@ -65,7 +70,7 @@ std::map<std::vector<unsigned char>, int> rgb_frequency(Mat &img){
 	return freq;
 }
 
-/* Função que retorna o pixel em RGB mais frequente. */
+/* Função que retorna o pixel em RGB mais frequente (que não seja branco). */
 std::vector<unsigned char> most_frequent(std::map<std::vector<unsigned char>, int> freq){
 	std::map<std::vector<unsigned char>, int>::iterator it;
 	std::vector<unsigned char> ans;
@@ -76,7 +81,7 @@ std::vector<unsigned char> most_frequent(std::map<std::vector<unsigned char>, in
 	// Para cada elemento do map.
 	for (it = freq.begin(); it != freq.end(); it++){
 		// Se a frequência desse elemento for maior que a do mais frequente, atualize-o.
-		if (it->second > freq[ans]){
+		if (!white(it->first) and it->second > freq[ans]){
 			ans = it->first;
 		}
 	}
@@ -122,7 +127,7 @@ Mat extract_mask(Mat &original, int mode){
 		for (x = 0; x < original.rows; x++){
 			for (y = 0; y < original.cols; y++){
 				// Se a frequência dessa cor RGB for menor ou igual ao threshold, marque com branco. Caso contrário, marque com preto.
-				if (freq[from_vec3b(original.at<Vec3b>(x, y))] > threshold){
+				if (!white(from_vec3b(original.at<Vec3b>(x, y))) and freq[from_vec3b(original.at<Vec3b>(x, y))] > threshold){
 					mask.at<uchar>(x, y) = 255;
 				}
 			}
@@ -196,7 +201,7 @@ int extract_window_size(Mat &mask){
 	return 2 * ans + 3;
 }
 
-double distance(Mat &original, Mat &mask, int xi, int yi, int xf, int yf, int k){
+double window_distance(Mat &original, Mat &mask, int xi, int yi, int xf, int yf, int k){
 	int used, a, i, j;
 	Vec3b pi, pf;
 	double dist;
@@ -291,7 +296,7 @@ Mat brute_force(Mat &original, Mat &mask){
 						// Se o pixel for bom.
 						if (mask.at<uchar>(x, y) == 0){
 							// Inicializando a distância da janela centrada em (x, y) para a janela centrada em (bad_x, bad_y) com 0.0.
-							dist = distance(original, mask, bad_x, bad_y, x, y, k);
+							dist = window_distance(original, mask, bad_x, bad_y, x, y, k);
 
 							// Se o pixel atual tiver uma distância menor do que a menor distância obtida até agora, atualize o melhor pixel.
 							if (best_dist == -1.0 or dist < best_dist){
@@ -344,7 +349,7 @@ Mat local_brute_force(Mat &original, Mat &mask, int radius){
 						// Se o pixel for bom.
 						if (mask.at<uchar>(x, y) == 0){
 							// Inicializando a distância da janela centrada em (x, y) para a janela centrada em (bad_x, bad_y) com 0.0.
-							dist = distance(original, mask, bad_x, bad_y, x, y, k);
+							dist = window_distance(original, mask, bad_x, bad_y, x, y, k);
 
 							// Se o pixel atual tiver uma distância menor do que a menor distância obtida até agora, atualize o melhor pixel.
 							if (best_dist == -1.0 or dist < best_dist){
