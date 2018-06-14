@@ -8,10 +8,6 @@
 |[Victor Luiz Roquete Forbes](https://github.com/VictorXjoeY/)|[Marcos Cesar Ribeiro de Camargo](https://github.com/marcoscrcamargo/)|
 | 9293394 | 9278045|
 
-
-
-# Sumário
-
 # Introdução
 *Inpainting* é o processo de reconstrução digital de partes perdidas ou deterioradas de imagens e vídeos, também conhecida como interpolação de imagens e vídeos. Refere-se à aplicação de algoritmos sofisticados para substituir partes perdidas ou corrompidas da imagem (principalmente pequenas regiões ou para remover pequenos defeitos).
 
@@ -73,6 +69,10 @@ Considerando uma Máscara **M** que possui valor 0 nos locais em que a imagem é
 		+  *g_k* = (1 - M/255) * *g_0* + (M/255) * *g_k*
 
 Ao final do processo é obtida a imagem *G_k* restaurada.
+
+|<img src="./Project/images/inpainted/Gerchberg Papoulis/dogo2.bmp"   width="200px" alt="dogo2"/>|<img src="./Project/images/Gerchberg Papoulis/horse_car.bmp"   height="200px" alt="horse_car"/>|<img src="./Project/images/Gerchberg Papoulis/forbes.bmp"   width="200px" alt="forbes"/>|<img src="./Project/images/Gerchberg Papoulis/momo_fino.bmp"   width="200px" alt="momo_fino"/>|
+|------------|------------|------------|------------|
+| Cachorro (retirada da internet) | Texto em foto (retirada de um artigo) | Forbes | Professor Moacir |
 
 ## *Inpainting* por exemplos
 Os algoritmos de *Inpainting* por exemplos utilizados consistem em substituir cada *pixel* deteriorado *Pd* por um *pixel* não deteriorado *P* cuja janela *K*x*K* centrada em *P* maximiza uma certa medida de similaridade em relação a janela *K*x*K* centrada em *Pd*.
