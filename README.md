@@ -75,18 +75,17 @@ Considerando uma Máscara **M** que possui valor 0 nos locais em que a imagem é
 Ao final do processo é obtida a imagem *G_k* restaurada.
 
 ### *Inpainting* por exemplos
-Os algoritmos de *Inpainting* por exemplos utilizados consistem em substituir cada *pixel* deteriorado $$P_d$$ por um *pixel* não deteriorado $$P$$ cuja janela $$K \times K$$ centrada em $$P$$ maximiza uma certa medida de similaridade em relação a janela $$K \times K$$ centrada em $$P_d$$.
+Os algoritmos de *Inpainting* por exemplos utilizados consistem em substituir cada *pixel* deteriorado *P_d* por um *pixel* não deteriorado *P* cuja janela *K*x*K* centrada em *P* maximiza uma certa medida de similaridade em relação a janela *K*x*K* centrada em *P_d*.
 
-O $$K$$ é definido automaticamente levando em consideração a "grossura" do rabisco. $$K$$ é da ordem da máxima distância de Manhattan mínima entre cada *pixel* deteriorado $$P_d$$ e qualquer *pixel* não-deteriorado.
+O *K* é definido automaticamente levando em consideração a "grossura" do rabisco. *K* é da ordem da máxima distância de Manhattan mínima entre cada *pixel* deteriorado *P_d* e qualquer *pixel* não-deteriorado.
 
 Para todo o projeto assumimos que os *pixels* fora da imagem são pretos.
 
 ## *Brute Force*
-Nesse algoritmo a busca pelo *pixel* $$P$$ é feita em toda a imagem. Esse algoritmo obtém os melhores resultados em geral, mas seu tempo de execução é altíssimo e, portanto, apenas conseguimos rodar para a imagem dogo1.bmp (100x100) e dogo2.bmp (400x400).
+Nesse algoritmo a busca pelo *pixel* *P* é feita em toda a imagem. Esse algoritmo obtém os melhores resultados em geral, mas seu tempo de execução é altíssimo e, portanto, apenas conseguimos rodar para a imagem dogo1.bmp (100x100) e dogo2.bmp (400x400).
 
 ## *Local Brute Force*
-Nesse algoritmo fazemos a suposição de que as janelas mais similares não estão muito longe da região deteriorada, portanto a busca pelo *pixel* $$P$$ é feita apenas em uma região $$101 \times 101$$ centrada em $$P_d$$. Isso permite que façamos *inpainting* em imagens maiores em tempo hábil.
-
+Nesse algoritmo fazemos a suposição de que as janelas mais similares não estão muito longe da região deteriorada, portanto a busca pelo *pixel* *P* é feita apenas em uma região *101*x*101* centrada em *P_d*. Isso permite que façamos *inpainting* em imagens maiores em tempo hábil.
 
 # Inpainting das imagens
 
