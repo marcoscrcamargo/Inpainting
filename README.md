@@ -95,7 +95,7 @@ Nesse algoritmo fazemos a suposição de que as janelas mais similares não est�
 
 
 
-<-- # Analise dos resultados -->
+<!-- # Analise dos resultados -->
 
 # Instruções para execução do código
 A imagem de entrada deve estar na pasta project/images/deteriorated/, a máscara será salva em project/images/masks/ e a imagem de saída na pasta project/images/deteriorated/<inpaiting_algorithm>/.
