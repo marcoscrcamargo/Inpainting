@@ -14,14 +14,14 @@ Parte do conjunto de imagens utilizado é apresentado abaixo.
 ## Imagens Originais
 As imagens abaixo estão em sua forma original.
 
-|<img src="./project/images/original/dogo2.bmp"   width="200px" alt="dogo2"/>|<img src="./project/images/original/horse_car.bmp"   height="200px" alt="horse_car"/>|<img src="./project/images/original/forbes.bmp"   width="200px" alt="forbes"/>|<img src="./project/images/original/momo_fino.bmp"   width="200px" alt="momo_fino"/>|
+|<img src="./Project/images/original/dogo2.bmp"   width="200px" alt="dogo2"/>|<img src="./Project/images/original/horse_car.bmp"   height="200px" alt="horse_car"/>|<img src="./Project/images/original/forbes.bmp"   width="200px" alt="forbes"/>|<img src="./Project/images/original/momo_fino.bmp"   width="200px" alt="momo_fino"/>|
 |------------|------------|------------|------------|
 | Imagem retirada da internet | Imagem retirada de um artigo | Foto do Forbes | Foto do Professor Moacir |
 
 ## Imagens Deterioradas
 As imagens abaixo foram rabiscadas artificialmente. A única imagem que não inserimos rabiscos foi a segunda imagem, que foi retirada de um artigo.
 
-|<img src="./project/images/deteriorated/dogo2.bmp"   width="200px" alt="dogo2"/>|<img src="./project/images/deteriorated/horse_car.bmp"   height="200px" alt="horse_car"/>|<img src="./project/images/deteriorated/forbes.bmp"   width="200px" alt="forbes"/>|<img src="./project/images/deteriorated/momo_fino.bmp"   width="200px" alt="momo_fino"/>|
+|<img src="./Project/images/deteriorated/dogo2.bmp"   width="200px" alt="dogo2"/>|<img src="./Project/images/deteriorated/horse_car.bmp"   height="200px" alt="horse_car"/>|<img src="./Project/images/deteriorated/forbes.bmp"   width="200px" alt="forbes"/>|<img src="./Project/images/deteriorated/momo_fino.bmp"   width="200px" alt="momo_fino"/>|
 |------------|------------|------------|------------|
 | Imagem retirada da internet | Imagem retirada de um artigo | Foto do Forbes | Foto do Professor Moacir |
 
@@ -40,7 +40,7 @@ Nesse método assumimos que apenas uma cor deve ser removida: a mais frequente. 
 
 Nesse método definimos um *threshold* e assumimos que todas as cores que ocorrem mais vezes do que esse *threshold* fazem parte da região de *inpainting*. Para essa etapa definimos o *threshold* como sendo 1% dos *pixels* da imagem, ou seja, se alguma cor ocorrer em mais do que 1% da imagem, ela é considerada "rabisco". Esse método não funciona tão bem quando existe rabiscos de apenas uma cor, mas é um método necessário para remover rabiscos de diferentes cores.
 
-|<img src="./project/images/deteriorated/momo.bmp"   width="200px" alt="momo"/>|<img src="./project/images/masks/momo.bmp"   width="200px" alt="momo"/>|
+|<img src="./Project/images/deteriorated/momo.bmp"   width="200px" alt="momo"/>|<img src="./Project/images/masks/momo.bmp"   width="200px" alt="momo"/>|
 |:-----------------------------------:|:-----------------------------------:|
 | Foto deteriorada | Máscara extraída|
 
@@ -53,7 +53,7 @@ Nesse método definimos um *threshold* e assumimos que todas as cores que ocorre
 
 # Inpainting das imagens
 
-|<img src="./project/images/deteriorated/forbes.bmp" width="200px" alt="forbes"/>|<img src="./project/images/inpainted/Gerchberg Papoulis/forbes.bmp" width="200px" alt="forbes_gerchberg"/>|<img src="./project/images/inpainted/Local Brute Force/forbes.bmp" width="200px" alt="forbes_examplebf"/>|
+|<img src="./Project/images/deteriorated/forbes.bmp" width="200px" alt="forbes"/>|<img src="./Project/images/inpainted/Gerchberg Papoulis/forbes.bmp" width="200px" alt="forbes_gerchberg"/>|<img src="./Project/images/inpainted/Local Brute Force/forbes.bmp" width="200px" alt="forbes_examplebf"/>|
 |------------|------------|------------|
 | Foto deteriorada | Gerchberg Papoulis | Inpainting por exemplos|
 
