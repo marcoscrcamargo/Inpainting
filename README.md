@@ -26,15 +26,13 @@ Foi implementada a extração automática das máscaras para *inpaiting* das ima
 
 |<img src="./project/images/deteriorated/momo.bmp"   width="200px" alt="momo"/>|<img src="./project/images/masks/momo.bmp"   width="200px" alt="momo"/>|
 |:-----------------------------------:|:-----------------------------------:|
-|Exemplo de extração de máscara|
+| Foto deteriorada | Máscara extraída|
 
 # Inpainting das imagens
 
-<img src="./project/images/deteriorated/forbes.bmp" width="200px" alt="forbes"/>
-
-<img src="./project/images/inpainted/Gerchberg Papoulis/forbes.bmp" width="200px" alt="forbes_gerchberg"/>
-
-<img src="./project/images/inpainted/Local Brute Force/forbes.bmp" width="200px" alt="forbes_examplebf"/>
+|<img src="./project/images/deteriorated/forbes.bmp" width="200px" alt="forbes"/> | <img src="./project/images/inpainted/Gerchberg Papoulis/forbes.bmp" width="200px" alt="forbes_gerchberg"/> | <img src="./project/images/inpainted/Local Brute Force/forbes.bmp" width="200px" alt="forbes_examplebf"/>|
+|:-----------------------------------:|:-----------------------------------:|:-----------------------------------:|:-----------------------------------:|
+| Foto deteriorada | Gerchberg Papoulis | Inpainting por exemplos|
 
 # Analise dos resultados
 
