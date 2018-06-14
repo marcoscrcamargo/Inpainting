@@ -1,27 +1,23 @@
 <h1 align="center">Inpainting</h1>
 
 # Introdução
-*Inpaiting* é o processo de reconstrução digital de partes perdidas ou deteriodadas de imagens ou vídeos.
-Neste trabalho são estudadas duas técnicas de *inpaiting* para a remoção de rabiscos inseridos artificialmente em fotos.
+*Inpaiting* é o processo de reconstrução digital de partes perdidas ou deterioradas de imagens ou vídeos.
+Neste trabalho são estudadas duas técnicas de *inpainting* para a remoção de rabiscos inseridos artificialmente em fotos.
 
 # Algoritmos
 
 # Imagens utilizadas
-Para testar os algoritmos implementados, foram utilizadas as imagens mostradas abaixo.
 
-<img src="./project/images/deteriorated/dogo1.bmp"  width="200px" alt="dogo1"/>
+Para testar os algoritmos implementados foram utilizadas imagens com rabiscos inseridos artificialmente. Segue abaixo alguns exemplos das imagens utilizadas no trabalho.
 
-<img src="./project/images/deteriorated/dogo2.bmp"   width="200px" alt="dogo2"/>
 
-<img src="./project/images/deteriorated/forbes.bmp"   height="200px" alt="forbes"/>
-
-<img src="./project/images/deteriorated/momo.bmp"   width="200px" alt="momo"/>
-
-<img src="./project/images/deteriorated/momo_fino.bmp"   width="200px" alt="momo_fino"/>
+|<img src="./project/images/deteriorated/dogo2.bmp"   width="200px" alt="dogo2"/>|<img src="./project/images/deteriorated/forbes.bmp"   height="200px" alt="forbes"/>|<img src="./project/images/deteriorated/momo_fino.bmp"   width="200px" alt="momo_fino"/>|
+|------------|------------|------------|
+| Imagem retirada da internet | Foto do Forbes | Foto do prof. Moacir |
 
 # Extração da máscara
 
-Foi implementada a extração automática das máscaras para *inpaiting* das imagens.
+Foi implementada a extração automática das máscaras para o *inpainting* das imagens.
 
 
 |<img src="./project/images/deteriorated/momo.bmp"   width="200px" alt="momo"/>|<img src="./project/images/masks/momo.bmp"   width="200px" alt="momo"/>|
@@ -38,7 +34,6 @@ Foi implementada a extração automática das máscaras para *inpaiting* das ima
 # Analise dos resultados
 
 # Próximos Passos
-
 
 
 ### Autores
