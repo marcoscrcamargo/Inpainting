@@ -75,9 +75,9 @@ Considerando uma Máscara **M** que possui valor 0 nos locais em que a imagem é
 Ao final do processo é obtida a imagem *G_k* restaurada.
 
 ## *Inpainting* por exemplos
-Os algoritmos de *Inpainting* por exemplos utilizados consistem em substituir cada *pixel* deteriorado *P_d* por um *pixel* não deteriorado *P* cuja janela *K*x*K* centrada em *P* maximiza uma certa medida de similaridade em relação a janela *K*x*K* centrada em *P_d*.
+Os algoritmos de *Inpainting* por exemplos utilizados consistem em substituir cada *pixel* deteriorado *Pd* por um *pixel* não deteriorado *P* cuja janela *K*x*K* centrada em *P* maximiza uma certa medida de similaridade em relação a janela *K*x*K* centrada em *Pd*.
 
-O *K* é definido automaticamente levando em consideração a "grossura" do rabisco. *K* é da ordem da máxima distância de Manhattan mínima entre cada *pixel* deteriorado *P_d* e qualquer *pixel* não-deteriorado.
+O *K* é definido automaticamente levando em consideração a "grossura" do rabisco da seguinte forma: Para cada *pixel* deteriorado *Pd* calcula-se sua distância de Manhattan para o pixel não-deteriorado mais próximo. Ao recuperar o máximo de todos esses valores, multiplica-lo por 2 e somar 3, obtemos um valor para *K* grande o suficiente para a região deteriorada nunca conter completamente uma janela *K*x*K*.
 
 Para todo o projeto assumimos que os *pixels* fora da imagem são pretos.
 
@@ -85,7 +85,7 @@ Para todo o projeto assumimos que os *pixels* fora da imagem são pretos.
 Nesse algoritmo a busca pelo *pixel* *P* é feita em toda a imagem. Esse algoritmo obtém os melhores resultados em geral, mas seu tempo de execução é altíssimo e, portanto, apenas conseguimos rodar para a imagem dogo1.bmp (100x100) e dogo2.bmp (400x400).
 
 ### *Local Brute Force*
-Nesse algoritmo fazemos a suposição de que as janelas mais similares não estão muito longe da região deteriorada, portanto a busca pelo *pixel* *P* é feita apenas em uma região 101x101 centrada em *P_d*. Isso permite que façamos *inpainting* em imagens maiores em tempo hábil.
+Nesse algoritmo fazemos a suposição de que as janelas mais similares não estão muito longe da região deteriorada, portanto a busca pelo *pixel* *P* é feita apenas em uma região 101x101 centrada em *Pd*. Isso permite que façamos *inpainting* em imagens maiores em tempo hábil.
 
 # Inpainting das imagens
 
@@ -118,23 +118,20 @@ A execução do código em **Python** é feita pelo comando:
 
 	python3 main.py <image_in.bmp> <image_out.bmp> <mask_extraction_algorithm>
 
-O código em python só contém a implementação do algoritmo *Gerchberg Papoulis*, por isso não é necessário escolher o algoritmo de *inpainting*.
+O código em **Python** só contém a implementação do algoritmo *Gerchberg Papoulis*, por isso não é necessário escolher o algoritmo de *inpainting*.
 
 Os argumentos dos programas são:
-
- * <image_in.bmp> - imagem de entrada.
- * <image_out.bmp> - imagem de saída.
- * <mask_extraction_algorithm> - algoritmo de extração da máscara (*most_frequent* ou *minimum_frequency*).
- * <inpainting_algorithm> - algoritmo de *inpainting* (*brute*, *local*, *smart* ou *papoulis*).
-
-
-
+ * <image_in.bmp> - Imagem de entrada.
+ * <image_out.bmp> - Imagem de saída.
+ * <mask_extraction_algorithm> - Algoritmo de extração da máscara (*most_frequent* ou *minimum_frequency*).
+ * <inpainting_algorithm> - Algoritmo de *inpainting* (*brute* ou *local*).
 
 # Próximos Passos
 
 Os próximos passos para o projeto incluem:
 
- * Implementação otimizada do algoritmo de *Inpainting* por exemplos.
  * Melhorar detecção das máscaras.
- * Visualização da diferença e calculo do RMSE da imagem original e imagem restaurada.
+ * Implementação de uma versão mais otimizada do algoritmo de *Inpainting* por exemplos (*Smart Brute Force*).
+ * Experimentos com as diferentes possíveis medidas de distância entre janelas *K*x*K*.
+ * Visualização da diferença e cálculo do RMSE da imagem original e imagem restaurada.
 
