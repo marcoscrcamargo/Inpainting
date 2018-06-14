@@ -10,7 +10,7 @@ using namespace cv;
 #define RATIO 0.01
 #define MOST_FREQUENT 0
 #define MINIMIUM_FREQUENCY 1
-#define ORIGINAL_PATH "../images/deteriorated/"
+#define ORIGINAL_PATH "../images/original/"
 #define DETERIORATED_PATH "../images/deteriorated/"
 #define BRUTE_INPAINTED_PATH "../images/inpainted/Brute Force/"
 #define LOCAL_INPAINTED_PATH "../images/inpainted/Local Brute Force/"
@@ -510,12 +510,85 @@ Mat gerchberg_papoulis(Mat &deteriorated, Mat &mask, int T){
 	return merge_channels(g[0][T], g[1][T], g[2][T]);
 }
 
+/* Função que uma imagem grayscale que representa a diferença entre duas imagens. */
+Mat extract_difference(Mat &original, Mat &inpainted){
+	int x, y, c, cur;
+	Mat ans;
+
+	// Alocando uma imagem grayscale.
+	ans = Mat(original.rows, original.cols, CV_8UC1);
+
+	// Para cada pixel (x, y).
+	for (x = 0; x < original.rows; x++){
+		for (y = 0; y < original.cols; y++){
+			cur = 0;
+
+			// Somando as diferenças absolutas de cada canal de cor.
+			for (c = 0; c < 3; c++){
+				cur += abs(((int)original.at<Vec3b>(x, y)[c]) - ((int)inpainted.at<Vec3b>(x, y)[c]));
+			}
+
+			// Tirando a média e arredondando.
+			ans.at<uchar>(x, y) = round((double)cur / 3.0);
+		}
+	}
+
+	// Retornando a diferença.
+	return ans;
+}
+
+/* Função que retorna o RMSE de duas imagens na região da máscara. */
+double rmse(Mat &original, Mat &inpainted, Mat &mask){
+	int x, y, c, n;
+	double ans;
+
+	ans = 0.0;
+	n = 0;
+
+	// Para cada pixel (x, y).
+	for (x = 0; x < original.rows; x++){
+		for (y = 0; y < original.cols; y++){
+			// Se estiver deteriorado.
+			if (mask.at<uchar>(x, y) != 0){
+				for (c = 0; c < 3; c++){
+					ans += (double)(original.at<Vec3b>(x, y)[c] - inpainted.at<Vec3b>(x, y)[c]) * (original.at<Vec3b>(x, y)[c] - inpainted.at<Vec3b>(x, y)[c]);
+					n++;
+				}
+			}
+		}
+	}
+
+	// Retornando o RMSE.
+	return sqrt(ans / (double)n);
+}
+
 int main(int argc, char *argv[]){
-	Mat deteriorated, inpainted, mask;
+	Mat original, deteriorated, inpainted, difference, mask;
+
+	// Apenas compare duas imagens.
+	if (argc == 5 and !strcmp(argv[1], "compare")){
+		// Lendo as imagens a serem comparadas.
+		original = imread(argv[2], 1);
+		inpainted = imread(argv[3], 1);
+		mask = imread(argv[4], 0);
+
+		// Imprimindo o RMSE apenas na região da máscara.
+		printf("RMSE = %.3lf\n", rmse(original, inpainted, mask));
+
+		// Extraindo a diferença entre a imagem original e a reconstruída.
+		difference = extract_difference(original, inpainted);
+
+		printf("Writing difference...\n");
+
+		// Escrevendo a diferença em um arquivo.
+		imwrite("../images/diff.bmp", difference);
+
+		return 0;
+	}
 
 	// Uso incorreto.
-	if (argc != 5){
-		printf("Usage: ./main <image_in.bmp> <image_out.bmp> <mask_extraction_algorithm> <inpainting_algorithm>\n");
+	if (argc != 5 and argc != 6){
+		printf("Usage: ./main <image_in.bmp> <image_out.bmp> <mask_extraction_algorithm> <inpainting_algorithm> (compare)?\n");
 		printf("<mask_extraction_algorithm> - {most_frequent, minimum_frequency}\n");
 		printf("<inpainting_algorithm> - {brute, local}\n");
 		return -1;
@@ -523,7 +596,8 @@ int main(int argc, char *argv[]){
 
 	printf("Reading image...\n");
 
-	// Lendo a imagem.
+	// Lendo a imagem original e a imagem deteriorada.
+	original = imread(ORIGINAL_PATH + std::string(argv[1]), 1);
 	deteriorated = imread(DETERIORATED_PATH + std::string(argv[1]), 1);
 
 	// Imagem sem conteúdo.
@@ -541,7 +615,7 @@ int main(int argc, char *argv[]){
 	}
 	else{
 		printf("There's no %s mask extraction algorithm\n", argv[3]);
-		assert(false);
+		return -1;
 	}
 
 	printf("Writing mask...\n");
@@ -556,24 +630,52 @@ int main(int argc, char *argv[]){
 		// Roda o Brute Force e salva na pasta correspondente.
 		inpainted = brute_force(deteriorated, mask);
 		imwrite(BRUTE_INPAINTED_PATH + std::string(argv[2]), inpainted);
+
+		// Faz uma comparação da imagem original com a reconstruída.
+		if (argc == 6 and !strcmp(argv[5], "compare")){
+			// Imprimindo o RMSE apenas na região da máscara.
+			printf("RMSE = %.3lf\n", rmse(original, inpainted, mask));
+
+			// Extraindo a diferença entre a imagem original e a reconstruída.
+			difference = extract_difference(original, inpainted);
+
+			printf("Writing difference...\n");
+
+			// Escrevendo a diferença em um arquivo.
+			imwrite(BRUTE_INPAINTED_PATH + std::string("diff_") + std::string(argv[2]), difference);
+		}
 	}
 	else if (!strcmp(argv[4], "local")){
 		// Roda o Local Brute Force e salva na pasta correspondente.
 		inpainted = local_brute_force(deteriorated, mask, 50);
 		imwrite(LOCAL_INPAINTED_PATH + std::string(argv[2]), inpainted);
+
+		// Faz uma comparação da imagem original com a reconstruída.
+		if (argc == 6 and !strcmp(argv[5], "compare")){
+			// Imprimindo o RMSE apenas na região da máscara.
+			printf("RMSE = %.3lf\n", rmse(original, inpainted, mask));
+
+			// Extraindo a diferença entre a imagem original e a reconstruída.
+			difference = extract_difference(original, inpainted);
+
+			printf("Writing difference...\n");
+
+			// Escrevendo a diferença em um arquivo.
+			imwrite(LOCAL_INPAINTED_PATH + std::string("diff_") + std::string(argv[2]), difference);
+		}
 	}
 	else if (!strcmp(argv[4], "smart")){
 		printf("Not implemented yet\n");
-		assert(false);
+		return -1;
 	}
 	else if (!strcmp(argv[4], "papoulis")){
 		printf("Not fixed yet\n");
 		// inpainted = gerchberg_papoulis(deteriorated, mask, 10);
-		assert(false);
+		return -1;
 	}
 	else{
 		printf("There's no %s inpainting algorithm\n", argv[4]);
-		assert(false);
+		return -1;
 	}
 
 	// Mostra a imagem resultante em uma janela.
