@@ -3,7 +3,7 @@
 
 ## Autores
 
-| [![victorxjoey](https://avatars1.githubusercontent.com/u/13484548?s=200&v=4)](https://github.com/VictorXjoeY/) |               [![marcoscrcamargo](https://avatars0.githubusercontent.com/u/13886241?s=200&v=4)](https://github.com/marcoscrcamargo/) |
+| [![victorxjoey](https://avatars1.githubusercontent.com/u/13484548?s=230&v=4)](https://github.com/VictorXjoeY/) |               [![marcoscrcamargo](https://avatars0.githubusercontent.com/u/13886241?s=230&v=4)](https://github.com/marcoscrcamargo/) |
 |:-----------------------------------------------------------------------------------------------------------------:|:-------------------------------------------------------------------------------------------------------:|
 |[Victor Luiz Roquete Forbes](https://github.com/VictorXjoeY/)|[Marcos Cesar Ribeiro de Camargo](https://github.com/marcoscrcamargo/)|
 | 9293394 | 9278045|
@@ -12,29 +12,29 @@
 
 # Sumário
 
-## Introdução
+# Introdução
 *Inpainting* é o processo de reconstrução digital de partes perdidas ou deterioradas de imagens e vídeos, também conhecida como interpolação de imagens e vídeos. Refere-se à aplicação de algoritmos sofisticados para substituir partes perdidas ou corrompidas da imagem (principalmente pequenas regiões ou para remover pequenos defeitos).
 
 Nessa etapa do trabalho estudamos e implementamos duas técnicas de *inpainting* para a remoção automática de rabiscos inseridos artificialmente em imagens. Para realizarmos a detecção automática da região que devemos fazer *inpainting* usamos do fato de que os rabiscos são feitos com cores contrastantes que ocorrem com alta frequência nas imagens.
 
-## Conjunto de imagens
+# Conjunto de imagens
 Parte do conjunto de imagens utilizado é apresentado abaixo.
 
-### Imagens Originais
+## Imagens Originais
 As imagens abaixo estão em sua forma original.
 
 |<img src="./Project/images/original/dogo2.bmp"   width="200px" alt="dogo2"/>|<img src="./Project/images/original/horse_car.bmp"   height="200px" alt="horse_car"/>|<img src="./Project/images/original/forbes.bmp"   width="200px" alt="forbes"/>|<img src="./Project/images/original/momo_fino.bmp"   width="200px" alt="momo_fino"/>|
 |------------|------------|------------|------------|
 | Cachorro (retirada da internet) | Texto em foto (retirada de um artigo) | Forbes | Professor Moacir |
 
-### Imagens Deterioradas
+## Imagens Deterioradas
 As imagens abaixo foram rabiscadas artificialmente. A única imagem que não inserimos rabiscos foi a segunda imagem, que foi retirada de um artigo.
 
 |<img src="./Project/images/deteriorated/dogo2.bmp"   width="200px" alt="dogo2"/>|<img src="./Project/images/deteriorated/horse_car.bmp"   height="200px" alt="horse_car"/>|<img src="./Project/images/deteriorated/forbes.bmp"   width="200px" alt="forbes"/>|<img src="./Project/images/deteriorated/momo_fino.bmp"   width="200px" alt="momo_fino"/>|
 |------------|------------|------------|------------|
 | Cachorro (retirada da internet) | Texto em foto (retirada de um artigo) | Forbes | Professor Moacir |
 
-## Obtenção da máscara
+# Obtenção da máscara
 
 O primeiro passo para realizar *inpainting* é definir a região deteriorada. Para isso implementamos dois métodos simples para extrair a máscara automaticamente. Para essa etapa do trabalho queremos realizar *inpainting* em cores específicas, ou seja, assumimos como sendo parte da região deteriorada todos os *pixels* que possuem certas cortes determinadas pelos métodos descritos a seguir.
 
@@ -46,14 +46,14 @@ Vale notar que ambos os métodos podem ser melhorados para que a máscara obtida
 |:-----------------------------------:|:-----------------------------------:|
 | Foto deteriorada | Máscara extraída |
 
-### *Most Frequent*
+## *Most Frequent*
 Nesse método assumimos que apenas uma cor deve ser removida: a mais frequente. Esse método funciona muito bem quando existe rabiscos de apenas uma cor.
 
-### *Minimum Frequency*
+## *Minimum Frequency*
 
 Nesse método definimos um *threshold* e assumimos que todas as cores que ocorrem mais vezes do que esse *threshold* fazem parte da região de *inpainting*. Para essa etapa definimos o *threshold* como sendo 1% dos *pixels* da imagem, ou seja, se alguma cor ocorrer em mais do que 1% da imagem, ela é considerada "rabisco". Esse método não funciona tão bem quando existe rabiscos de apenas uma cor, mas é um método necessário para remover rabiscos de diferentes cores.
 
-## Algoritmos de *Inpainting*
+# Algoritmos de *Inpainting*
 ## Gerchberg Papoulis
 O algoritmo Gerchberg-Papoulis é um algoritmo de *inpaiting* por difusão que funciona por meio de cortes nas frequencias obtidas pela Transformada Discreta de Fourier (DFT), zerando parte das frequências das imagens.
 
@@ -74,17 +74,17 @@ Considerando uma Máscara **M** que possui valor 0 nos locais em que a imagem é
 
 Ao final do processo é obtida a imagem *G_k* restaurada.
 
-### *Inpainting* por exemplos
+## *Inpainting* por exemplos
 Os algoritmos de *Inpainting* por exemplos utilizados consistem em substituir cada *pixel* deteriorado *P_d* por um *pixel* não deteriorado *P* cuja janela *K*x*K* centrada em *P* maximiza uma certa medida de similaridade em relação a janela *K*x*K* centrada em *P_d*.
 
 O *K* é definido automaticamente levando em consideração a "grossura" do rabisco. *K* é da ordem da máxima distância de Manhattan mínima entre cada *pixel* deteriorado *P_d* e qualquer *pixel* não-deteriorado.
 
 Para todo o projeto assumimos que os *pixels* fora da imagem são pretos.
 
-## *Brute Force*
+### *Brute Force*
 Nesse algoritmo a busca pelo *pixel* *P* é feita em toda a imagem. Esse algoritmo obtém os melhores resultados em geral, mas seu tempo de execução é altíssimo e, portanto, apenas conseguimos rodar para a imagem dogo1.bmp (100x100) e dogo2.bmp (400x400).
 
-## *Local Brute Force*
+### *Local Brute Force*
 Nesse algoritmo fazemos a suposição de que as janelas mais similares não estão muito longe da região deteriorada, portanto a busca pelo *pixel* *P* é feita apenas em uma região 101x101 centrada em *P_d*. Isso permite que façamos *inpainting* em imagens maiores em tempo hábil.
 
 # Inpainting das imagens
