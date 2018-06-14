@@ -1,6 +1,15 @@
 <h1 align="center">Inpainting</h1>
 
 
+## Autores
+
+| [![victorxjoey](https://avatars1.githubusercontent.com/u/13484548?s=200&v=4)](https://github.com/VictorXjoeY/) |               [![marcoscrcamargo](https://avatars0.githubusercontent.com/u/13886241?s=200&v=4)](https://github.com/marcoscrcamargo/) |
+|:-----------------------------------------------------------------------------------------------------------------:|:-------------------------------------------------------------------------------------------------------:|
+|[Victor Luiz Roquete Forbes](https://github.com/VictorXjoeY/)|[Marcos Cesar Ribeiro de Camargo](https://github.com/marcoscrcamargo/)|
+| 9293394 | 9278045|
+
+
+
 # Sumário
 
 # Introdução
@@ -57,9 +66,9 @@ Nesse método definimos um *threshold* e assumimos que todas as cores que ocorre
 |------------|------------|------------|
 | Foto deteriorada | Gerchberg Papoulis | Inpainting por exemplos|
 
-# Analise dos resultados
 
-# Próximos Passos
+
+<-- # Analise dos resultados -->
 
 # Instruções para execução do código
 A imagem de entrada deve estar na pasta project/images/deteriorated/, a máscara será salva em project/images/masks/ e a imagem de saída na pasta project/images/deteriorated/<inpaiting_algorithm>/.
@@ -94,12 +103,11 @@ Os argumentos dos programas são:
 
 
 
+# Próximos Passos
 
-### Autores
+Os próximos passos para o projeto incluem:
 
-| [![victorxjoey](https://avatars1.githubusercontent.com/u/13484548?s=200&v=4)](https://github.com/VictorXjoeY/) |               [![marcoscrcamargo](https://avatars0.githubusercontent.com/u/13886241?s=200&v=4)](https://github.com/marcoscrcamargo/) |
-|:-----------------------------------------------------------------------------------------------------------------:|:-------------------------------------------------------------------------------------------------------:|
-|[Victor Luiz Roquete Forbes](https://github.com/VictorXjoeY/)|[Marcos Cesar Ribeiro de Camargo](https://github.com/marcoscrcamargo/)|
-| 9293394 | 9278045|
-
+ * Implementação otimizada do algoritmo de *Inpainting* por exemplos.
+ * Melhorar detecção das máscaras.
+ * Visualização da diferença e calculo do RMSE da imagem original e imagem restaurada.
 
