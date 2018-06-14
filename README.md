@@ -59,18 +59,18 @@ O algoritmo Gerchberg-Papoulis é um algoritmo de *inpaiting* por difusão que f
 
 Considerando uma Máscara **M** que possui valor 0 nos locais em que a imagem é conhecida e 255 nas regiões deterioradas, o algoritmo com **T** iterações é aplicado da seguinte maneira:
 
-1. $$ g_0 $$ = Imagem inicial
+1. *g_0* = Imagem inicial
 2. Obtenção da DFT de M.
 3. Para cada iteração k = 1, ..., T
- +  $$G_k$$ = DFT de $$g_{k-1}$$
- +  Filtra $$G_k$$ zerando coeficientes das frequências relativos a:
-	 +  $$G_k >= 0.9 * max(M)$$ 
-	 +  $$G_k <= 0.01 * max(G_k) $$ 
- +  Convolução de $$G_k$$ com um filtro de média $$k x k$$.
- +  $$g_k$$ = IDFT de $$G_k$$
- +  Normalização de $$G_k$$ entre 0 e 255.
- +  Inserção dos pixels de gk somente na região referente a máscara.
-	 +  $$g_k = (1 - M/255)* g_0 + (M/255)*g_k$$
+	+  *G_k* = DFT de *g_{k-1}*
+	+  Filtra *G_k* zerando coeficientes das frequências relativos a:
+		+  *G_k* >= 0.9 * max(*M*) 
+		+  *G_k* <= 0.01 * max(*G_k*) 
+	+  Convolução de *G_k* com um filtro de média *k x k*.
+	+  *g_k* = IDFT de *G_k*
+	+  Normalização de *G_k* entre 0 e 255.
+	+  Inserção dos pixels de *gk* somente na região referente a máscara.
+		+  *g_k* = (1 - M/255) * *g_0* + (M/255) * *g_k*
 
 Ao final do processo é obtida a imagem $$G_k$$ restaurada.
 
