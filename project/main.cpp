@@ -51,7 +51,7 @@ std::vector<unsigned char> from_vec3b(Vec3b &v){
 /* Função que retorna um map com as frequências de cada pixel RGB. */
 std::map<std::vector<unsigned char>, int> rgb_frequency(Mat &img){
 	std::map<std::vector<unsigned char>, int> freq;
-	int x, y, i;
+	int x, y;
 
 	// Para cada pixel.
 	for (x = 0; x < img.rows; x++){
@@ -263,7 +263,7 @@ double distance(Mat &original, Mat &mask, int xi, int yi, int xf, int yf, int k)
 
 /* Função que faz um Brute Force para fazer Inpainting em cada pixel. */
 Mat brute_force(Mat &original, Mat &mask){
-	int threshold, x, y, bad_x, bad_y, k;
+	int x, y, bad_x, bad_y, k;
 	double dist, best_dist;
 	Mat ans;
 
@@ -316,7 +316,7 @@ Mat brute_force(Mat &original, Mat &mask){
 
 /* Função que faz um Brute Force Local para fazer Inpainting em cada pixel. */
 Mat local_brute_force(Mat &original, Mat &mask, int radius){
-	int threshold, x, y, bad_x, bad_y, k;
+	int x, y, bad_x, bad_y, k;
 	double dist, best_dist;
 	Mat ans;
 
