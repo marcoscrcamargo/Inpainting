@@ -126,7 +126,7 @@ Os argumentos dos programas são:
  * <mask_extraction_algorithm> - Algoritmo de extração da máscara (*most_frequent* ou *minimum_frequency*).
  * <inpainting_algorithm> - Algoritmo de *inpainting* (*brute* ou *local*).
 
-# Próximos Passos
+# Próximos passos
 
 Os próximos passos para o projeto incluem:
 
