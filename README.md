@@ -70,7 +70,7 @@ Considerando uma Máscara **M** que possui valor 0 nos locais em que a imagem é
 
 Ao final do processo é obtida a imagem *G_k* restaurada.
 
-|<img src="./Project/images/inpainted/Gerchberg Papoulis/dogo2.bmp"   width="200px" alt="dogo2"/>|<img src="./Project/images/Gerchberg Papoulis/horse_car.bmp"   height="200px" alt="horse_car"/>|<img src="./Project/images/Gerchberg Papoulis/forbes.bmp"   width="200px" alt="forbes"/>|<img src="./Project/images/Gerchberg Papoulis/momo_fino.bmp"   width="200px" alt="momo_fino"/>|
+|<img src="./Project/images/inpainted/Gerchberg Papoulis/dogo2.bmp"   width="200px" alt="dogo2"/>|<img src="./Project/images/inpainted/Gerchberg Papoulis/horse_car.bmp"   height="200px" alt="horse_car"/>|<img src="./Project/images/inpainted/Gerchberg Papoulis/forbes.bmp"   width="200px" alt="forbes"/>|<img src="./Project/images/inpainted/Gerchberg Papoulis/momo_fino.bmp"   width="200px" alt="momo_fino"/>|
 |------------|------------|------------|------------|
 | Cachorro (retirada da internet) | Texto em foto (retirada de um artigo) | Forbes | Professor Moacir |
 
@@ -79,21 +79,21 @@ Os algoritmos de *Inpainting* por exemplos utilizados consistem em substituir ca
 
 O *K* é definido automaticamente levando em consideração a "grossura" do rabisco da seguinte forma: Para cada *pixel* deteriorado *Pd* calcula-se sua distância de Manhattan para o pixel não-deteriorado mais próximo. Ao recuperar o máximo de todos esses valores, multiplica-lo por 2 e somar 3, obtemos um valor para *K* grande o suficiente para a região deteriorada nunca conter completamente uma janela *K*x*K*.
 
-Para todo o projeto assumimos que os *pixels* fora da imagem são pretos.
+A medida de distância utilizada foi similar ao RMSE, mas calculado apenas entre *pixels* não-deteriorados. Vale dizer que para todo o projeto assumimos que os *pixels* fora da imagem são pretos (0, 0, 0).
 
 ### *Brute Force*
 Nesse algoritmo a busca pelo *pixel* *P* é feita em toda a imagem. Esse algoritmo obtém os melhores resultados em geral, mas seu tempo de execução é altíssimo e, portanto, apenas conseguimos rodar para a imagem dogo1.bmp (100x100) e dogo2.bmp (400x400).
 
+|<img src="./Project/images/deteriorated/dogo1.bmp"   width="200px" alt="dogo2"/>|<img src="./Project/images/inpainted/Brute Force/dogo1.bmp"   height="200px" alt="horse_car"/>|<img src="./Project/images/deteriorated/dogo2.bmp"   width="200px" alt="forbes"/>|<img src="./Project/images/inpainted/Brute Force/dogo2.bmp"   width="200px" alt="momo_fino"/>|
+|------------|------------|------------|------------|
+| Cachorro 100x100 deteriorado | Cachorro 100x100 reconstruído | Cachorro 400x400 deteriorado | Cachorro 100x100 reconstruído |
+
 ### *Local Brute Force*
 Nesse algoritmo fazemos a suposição de que as janelas mais similares não estão muito longe da região deteriorada, portanto a busca pelo *pixel* *P* é feita apenas em uma região 101x101 centrada em *Pd*. Isso permite que façamos *inpainting* em imagens maiores em tempo hábil.
 
-# Inpainting das imagens
-
-|<img src="./Project/images/deteriorated/forbes.bmp" width="200px" alt="forbes"/>|<img src="./Project/images/inpainted/Gerchberg Papoulis/forbes.bmp" width="200px" alt="forbes_gerchberg"/>|<img src="./Project/images/inpainted/Local Brute Force/forbes.bmp" width="200px" alt="forbes_examplebf"/>|
-|------------|------------|------------|
-| Foto deteriorada | Gerchberg Papoulis | Inpainting por exemplos|
-
-
+|<img src="./Project/images/inpainted/Local Brute Force/dogo2.bmp"   width="200px" alt="dogo2"/>|<img src="./Project/images/inpainted/Local Brute Force/horse_car.bmp"   height="200px" alt="horse_car"/>|<img src="./Project/images/inpainted/Local Brute Force/forbes.bmp"   width="200px" alt="forbes"/>|<img src="./Project/images/inpainted/Local Brute Force/momo_fino.bmp"   width="200px" alt="momo_fino"/>|
+|------------|------------|------------|------------|
+| Cachorro 100x100 deteriorado | Cachorro 100x100 reconstruído | Cachorro 400x400 deteriorado | Cachorro 100x100 reconstruído |
 
 <!-- # Analise dos resultados -->
 
@@ -130,8 +130,9 @@ Os argumentos dos programas são:
 
 Os próximos passos para o projeto incluem:
 
- * Melhorar detecção das máscaras.
+ * Melhorar a extração automática das máscaras.
  * Implementação de uma versão mais otimizada do algoritmo de *Inpainting* por exemplos (*Smart Brute Force*).
  * Experimentos com as diferentes possíveis medidas de distância entre janelas *K*x*K*.
- * Visualização da diferença e cálculo do RMSE da imagem original e imagem restaurada.
+ * Visualização da diferença entre as imagem originais e as imagens reconstruídas.
+ * Análise do RMSE entre as imagens originais e as imagem reconstruídas.
 
