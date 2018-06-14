@@ -72,7 +72,7 @@ Considerando uma Máscara **M** que possui valor 0 nos locais em que a imagem é
 	+  Inserção dos pixels de *gk* somente na região referente a máscara.
 		+  *g_k* = (1 - M/255) * *g_0* + (M/255) * *g_k*
 
-Ao final do processo é obtida a imagem $$G_k$$ restaurada.
+Ao final do processo é obtida a imagem *G_k* restaurada.
 
 ### *Inpainting* por exemplos
 Os algoritmos de *Inpainting* por exemplos utilizados consistem em substituir cada *pixel* deteriorado $$P_d$$ por um *pixel* não deteriorado $$P$$ cuja janela $$K \times K$$ centrada em $$P$$ maximiza uma certa medida de similaridade em relação a janela $$K \times K$$ centrada em $$P_d$$.
