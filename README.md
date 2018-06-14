@@ -81,7 +81,6 @@ O *K* é definido automaticamente levando em consideração a "grossura" do rabi
 
 Para todo o projeto assumimos que os *pixels* fora da imagem são pretos.
 
-<<<<<<< HEAD
 ### *Brute Force*
 Nesse algoritmo a busca pelo *pixel* *P* é feita em toda a imagem. Esse algoritmo obtém os melhores resultados em geral, mas seu tempo de execução é altíssimo e, portanto, apenas conseguimos rodar para a imagem dogo1.bmp (100x100) e dogo2.bmp (400x400).
 
