@@ -176,6 +176,11 @@ def gerchberg_papoulis(img, mask, T):
 	return np.round(ans).astype(np.uint8)
 
 def main():
+	# Wrong usage.
+	if len(sys.argv) != 4:
+		print("Usage: python3 main.py <image_in.bmp> <image_out.bmp> <mask_extraction_algorithm>")
+		print("<mask_extraction_algorithm> - {most_frequent, minimum_frequency}");
+
 	# Obtendo os nomes dos arquivos de entrada e saída.
 	filename_in, filename_out = (sys.argv[1], sys.argv[2])
 
@@ -188,7 +193,12 @@ def main():
 	sys.setrecursionlimit(f.shape[0] * f.shape[1] + 10)
 
 	# Extraindo a máscara.
-	mask = extract_mask(f, MOST_FREQUENT)
+	if sys.argv[3] == "most_frequent":
+		mask = extract_mask(f, MOST_FREQUENT)
+	elif sys.argv[3] == "minimum_frequency":
+		mask = extract_mask(f, MINIMUM_FREQUENCY)
+	else:
+		assert(False)
 
 	print("Writing mask...")
 
