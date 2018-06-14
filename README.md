@@ -42,6 +42,37 @@ Foi implementada a extração automática das máscaras para o *inpainting* das 
 # Próximos Passos
 
 # Instruções para execução do código
+A imagem de entrada deve estar na pasta project/images/deteriorated/, a máscara será salva em project/images/masks/ e a imagem de saída na pasta project/images/deteriorated/<inpaiting_algorithm>/.
+
+A compilação do código em C++ foi feita utilizando o cmake com o arquivo CMakeLists.txt dentro da pasta Project, então para gerar o Makefile e compilar o executável é preciso executar os comandos: 
+
+	cd project/
+	mkdir build/
+	cd build/
+	cmake ../
+	make
+
+
+A execução do código em **C++** é feita pelo comando:
+
+	./main <image_in.bmp> <image_out.bmp> <mask_extraction_algorithm> <inpainting_algorithm>
+
+
+A execução do código em **Python** é feita pelo comando:
+
+	python3 main.py <image_in.bmp> <image_out.bmp> <mask_extraction_algorithm>
+
+O código em python só contém a implementação do algoritmo *Gerchberg Papoulis*, por isso não é necessário escolher o algoritmo de *inpainting*.
+
+Os argumentos dos programas são:
+
+ * <image_in.bmp> - imagem de entrada.
+ * <image_out.bmp> - imagem de saída.
+ * <mask_extraction_algorithm> - algoritmo de extração da máscara (*most_frequent* ou *minimum_frequency*).
+ * <inpainting_algorithm> - algoritmo de *inpainting* (*brute*, *local*, *smart* ou *papoulis*).
+
+
+
 
 
 ### Autores
