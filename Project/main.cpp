@@ -8,6 +8,7 @@ using namespace cv;
 
 /* Porcentagem de pixels mínima de uma certa cor para considerar como rabisco. */
 #define RATIO 0.01
+#define MAX_HSV_DISTANCE 500
 #define MOST_FREQUENT 0
 #define MINIMIUM_FREQUENCY 1
 #define ORIGINAL_PATH "../images/original/"
@@ -91,6 +92,91 @@ std::vector<unsigned char> most_frequent(std::map<std::vector<unsigned char>, in
 	return ans;
 }
 
+int hsv_distance(Vec3b p1, Vec3b p2){
+	int d0, d1;
+
+	if (p1[0] < p2[0]){
+		d0 = min((int)p2[0] - (int)p1[0], (int)p1[0] + 255 - (int)p2[0]);
+	}
+	else{
+		d0 = min((int)p1[0] - (int)p2[0], (int)p2[0] + 255 - (int)p1[0]);
+	}
+
+	if (p1[1] < p2[1]){
+		d1 = min((int)p2[1] - (int)p1[1], (int)p1[1] + 255 - (int)p2[1]);
+	}
+	else{
+		d1 = min((int)p1[1] - (int)p2[1], (int)p2[1] + 255 - (int)p1[1]);
+	}
+
+	return d0 * d0 + d1 * d1;
+}
+
+/* Função que preenche a "penumbra" ao redor do risco "duro" com uma Multi-Source BFS. */
+void fill_blur(Mat &deteriorated, Mat &mask){
+	std::vector<std::vector<bool> > seen;
+	std::queue<std::pair<int, int> > q;
+	Mat deteriorated_hsv;
+	int x, y;
+
+	// Transformando para HSV.
+	cvtColor(deteriorated, deteriorated_hsv, COLOR_BGR2HSV);
+
+	// Alocando matriz de visitados.
+	seen.resize(deteriorated_hsv.rows);
+
+	// Para cada pixel (x, y).
+	for (x = 0; x < deteriorated_hsv.rows; x++){
+		seen[x].assign(deteriorated_hsv.cols, false);
+
+		for (y = 0; y < deteriorated_hsv.cols; y++){
+			if (mask.at<uchar>(x, y) != 0){
+				q.push(std::make_pair(x, y));
+				seen[x][y] = true;
+			}
+		}
+	}
+
+	// Multi-Source Breadth-First Search a partir dos pixels deteriorados.
+	while (!q.empty()){
+		x = q.front().first;
+		y = q.front().second;
+		q.pop();
+
+		// Up.
+		if (inside(x - 1, y, mask.rows, mask.cols) and !seen[x - 1][y] and hsv_distance(deteriorated_hsv.at<Vec3b>(x - 1, y), deteriorated_hsv.at<Vec3b>(x, y)) <= MAX_HSV_DISTANCE){ // Up.
+			printf("Filling (%d, %d)\n", x - 1, y);
+			seen[x - 1][y] = true;
+			mask.at<uchar>(x - 1, y) = 255;
+			q.push(std::make_pair(x - 1, y));
+		}
+
+		// Down.
+		if (inside(x + 1, y, mask.rows, mask.cols) and !seen[x + 1][y] and hsv_distance(deteriorated_hsv.at<Vec3b>(x + 1, y), deteriorated_hsv.at<Vec3b>(x, y)) <= MAX_HSV_DISTANCE){ // Down.
+			printf("Filling (%d, %d)\n", x + 1, y);
+			seen[x + 1][y] = true;
+			mask.at<uchar>(x + 1, y) = 255;
+			q.push(std::make_pair(x + 1, y));
+		}
+
+		// Left.
+		if (inside(x, y - 1, mask.rows, mask.cols) and !seen[x][y - 1] and hsv_distance(deteriorated_hsv.at<Vec3b>(x, y - 1), deteriorated_hsv.at<Vec3b>(x, y)) <= MAX_HSV_DISTANCE){ // Left.
+			printf("Filling (%d, %d)\n", x, y - 1);
+			seen[x][y - 1] = true;
+			mask.at<uchar>(x, y - 1) = 255;
+			q.push(std::make_pair(x, y - 1));
+		}
+
+		// Right.
+		if (inside(x, y + 1, mask.rows, mask.cols) and !seen[x][y + 1] and hsv_distance(deteriorated_hsv.at<Vec3b>(x, y + 1), deteriorated_hsv.at<Vec3b>(x, y)) <= MAX_HSV_DISTANCE){ // Right.
+			printf("Filling (%d, %d)\n", x, y + 1);
+			seen[x][y + 1] = true;
+			mask.at<uchar>(x, y + 1) = 255;
+			q.push(std::make_pair(x, y + 1));
+		}
+	}
+}
+
 /* Função que retorna a máscara contendo apenas o ruído (rabisco). */
 Mat extract_mask(Mat &deteriorated, int mode){
 	std::map<std::vector<unsigned char>, int> freq;
@@ -135,58 +221,60 @@ Mat extract_mask(Mat &deteriorated, int mode){
 		}
 	}
 
+	// Preenchendo a "penumbra" dos rabiscos.
+	fill_blur(deteriorated, mask);
+
 	return mask;
 }
 
-/* Função que extrai o tamanho ideal da janela para o Brute Force. */
+/* Função que extrai o tamanho ideal da janela para o Brute Force com uma Multi-Source BFS. */
 int extract_window_size(Mat &mask){
 	std::vector<std::vector<int> > dist;
-	int changes, ans, x, y;
+	std::queue<std::pair<int, int> > q;
+	int ans, x, y;
 
 	// Alocando matriz de distâncias.
 	dist.resize(mask.rows);
 
 	// Inicializando.
 	for (x = 0; x < mask.rows; x++){
-		dist[x].assign(mask.cols, mask.rows * mask.cols);
+		dist[x].assign(mask.cols, -1);
 
 		for (y = 0; y < mask.cols; y++){
 			// Se o pixel (x, y) é bom.
 			if (mask.at<uchar>(x, y) == 0){
 				dist[x][y] = 0;
+				q.push(std::make_pair(x, y));
 			}
 		}
 	}
 
-	// (Bellman-Ford) Enquanto não convergir.
-	do{
-		changes = 0;
+	// Breadth-First Search.
+	while (!q.empty()){
+		x = q.front().first;
+		y = q.front().second;
+		q.pop();
 
-		// Relaxando as arestas.
-		for (x = 0; x < mask.rows; x++){
-			for (y = 0; y < mask.cols; y++){
-				if (inside(x - 1, y, mask.rows, mask.cols) and dist[x - 1][y] + 1 < dist[x][y]){ // Up.
-					dist[x][y] = dist[x - 1][y] + 1;
-					changes++;
-				}
-
-				if (inside(x + 1, y, mask.rows, mask.cols) and dist[x + 1][y] + 1 < dist[x][y]){ // Down.
-					dist[x][y] = dist[x + 1][y] + 1;
-					changes++;
-				}
-
-				if (inside(x, y - 1, mask.rows, mask.cols) and dist[x][y - 1] + 1 < dist[x][y]){ // Left.
-					dist[x][y] = dist[x][y - 1] + 1;
-					changes++;
-				}
-
-				if (inside(x, y + 1, mask.rows, mask.cols) and dist[x][y + 1] + 1 < dist[x][y]){ // Right.
-					dist[x][y] = dist[x][y + 1] + 1;
-					changes++;
-				}
-			}
+		if (inside(x - 1, y, mask.rows, mask.cols) and dist[x - 1][y] == -1){ // Up.
+			dist[x - 1][y] = dist[x][y] + 1;
+			q.push(std::make_pair(x - 1, y));
 		}
-	}while (changes > 0);
+
+		if (inside(x + 1, y, mask.rows, mask.cols) and dist[x + 1][y] == -1){ // Down.
+			dist[x + 1][y] = dist[x][y] + 1;
+			q.push(std::make_pair(x + 1, y));
+		}
+
+		if (inside(x, y - 1, mask.rows, mask.cols) and dist[x][y - 1] == -1){ // Left.
+			dist[x][y - 1] = dist[x][y] + 1;
+			q.push(std::make_pair(x, y - 1));
+		}
+
+		if (inside(x, y + 1, mask.rows, mask.cols) and dist[x][y + 1] == -1){ // Right.
+			dist[x][y + 1] = dist[x][y] + 1;
+			q.push(std::make_pair(x, y + 1));
+		}
+	}
 
 	// Inicializando o "raio".
 	ans = 0;
@@ -202,6 +290,7 @@ int extract_window_size(Mat &mask){
 	return 2 * ans + 3;
 }
 
+/* Retorna a distância (medida de similaridade) entre duas janelas KxK centradas em (xi, yi) e em (xf, yf). */
 double window_distance(Mat &deteriorated, Mat &mask, int xi, int yi, int xf, int yf, int k){
 	int used, a, i, j;
 	Vec3b pi, pf;
