@@ -1,0 +1,41 @@
+Brute Force:
+	dogo1.bmp (100x100):
+		RMSE: 8.340
+		Time: 00m07s
+	dogo2.bmp (400x400):
+		RMSE: 13.222
+		Time: 32m19s
+	momo.bmp (280x280):
+		RMSE: 23.721
+		Time: 30m24s
+	momo_fino.bmp (280x280):
+		RMSE: 13.735
+		Time: 06m50s
+
+Local Brute Force:
+	dogo1.bmp (100x100):
+		RMSE: 8.340
+		Time: 00m05s
+	dogo2.bmp (400x400):
+		RMSE: 12.456
+		Time: 01m50s
+	momo.bmp (280x280):
+		RMSE: 23.456
+		Time: 03m23s
+	momo_fino.bmp (280x280):
+		RMSE: 14.350
+		Time: 00m47s
+	
+Gerchberg Papoulis:
+	dogo1.bmp (100x100):
+		RMSE: 9.909
+		Time: 00m01s
+	dogo2.bmp (400x400):
+		RMSE: 6.528
+		Time: 00m09s
+	momo.bmp (280x280):
+		RMSE: 9.043
+		Time: 00m05s
+	momo_fino.bmp (280x280):
+		RMSE: 8.568
+		Time: 00m05s

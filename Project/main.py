@@ -11,6 +11,7 @@ MINIMUM_FREQUENCY = 1
 ORIGINAL_PATH = "./images/original/"
 DETERIORATED_PATH = "./images/deteriorated/"
 INPAINTED_PATH = "./images/inpainted/Gerchberg Papoulis/"
+DIFFERENCE_PATH = "./images/difference/Gerchberg Papoulis/"
 MASKS_PATH = "./images/masks/"
 
 # Função que retorna se o pixel é branco.
@@ -175,43 +176,78 @@ def gerchberg_papoulis(img, mask, T):
 	# Retornando o resultado da última iteração.
 	return np.round(ans).astype(np.uint8)
 
+# Calcula o RMSE entre duas imagens na região deteriorada.
+def rmse(original, inpainted, mask):
+	ans = 0.0
+	n = 0
+
+	# Para cada pixel (x, y).
+	for x in range(original.shape[0]):
+		for y in range(original.shape[1]):
+			# Se o pixel (x, y) estiver deteriorado.
+			if mask[x][y] != 0:
+				ans += ((original[x, y, :] - inpainted[x, y, :])**2).sum()
+				n += original.shape[2]
+
+	return np.sqrt(ans / n)
+
+# Retorna uma imagem grayscale representando a diferença entre duas imagens.
+def extract_difference(original, inpainted):
+	diff = np.empty((original.shape[0], original.shape[1]), np.uint8)
+
+	for x in range(original.shape[0]):
+		for y in range(original.shape[1]):
+			diff[x][y] = np.round(np.mean(np.absolute(original[x, y, :] - inpainted[x, y, :])))
+
+	return diff
+
 def main():
 	# Wrong usage.
-	if len(sys.argv) != 4:
-		print("Usage: python3 main.py <image_in.bmp> <image_out.bmp> <mask_extraction_algorithm>")
+	if len(sys.argv) != 4 and len(sys.argv) != 5:
+		print("Usage: python3 main.py <image_in.bmp> <image_out.bmp> <mask_extraction_algorithm> compare?")
 		print("<mask_extraction_algorithm> - {most_frequent, minimum_frequency}");
 
 	# Obtendo os nomes dos arquivos de entrada e saída.
 	filename_in, filename_out = (sys.argv[1], sys.argv[2])
 
-	print("Reading image...")
-
 	# Lendo a imagem.
-	f = imageio.imread(DETERIORATED_PATH + filename_in)
+	print("Reading original image from: " + ORIGINAL_PATH + filename_in)
+	original = imageio.imread(ORIGINAL_PATH + filename_in)
+	print("Reading deteriorated image from: " + DETERIORATED_PATH + filename_in)
+	deteriorated = imageio.imread(DETERIORATED_PATH + filename_in)
 
 	# Setando o limite da recursão.
-	sys.setrecursionlimit(f.shape[0] * f.shape[1] + 10)
+	sys.setrecursionlimit(deteriorated.shape[0] * deteriorated.shape[1] + 10)
 
 	# Extraindo a máscara.
 	if sys.argv[3] == "most_frequent":
-		mask = extract_mask(f, MOST_FREQUENT)
+		mask = extract_mask(deteriorated, MOST_FREQUENT)
 	elif sys.argv[3] == "minimum_frequency":
-		mask = extract_mask(f, MINIMUM_FREQUENCY)
+		mask = extract_mask(deteriorated, MINIMUM_FREQUENCY)
 	else:
 		assert(False)
 
-	print("Writing mask...")
-
 	# Escrevendo a máscara em um arquivo.
+	print("Writing mask to: " + MASKS_PATH + filename_out)
 	imageio.imwrite(MASKS_PATH + filename_out, mask)
 
 	# Aplicando o algoritmo de Gerchberg-Papoulis
-	ans = gerchberg_papoulis(f, mask, 10)
-
-	print("Writing image...")
+	inpainted = gerchberg_papoulis(deteriorated, mask, 10)
 
 	# Escrevendo a imagem resultante em um arquivo.
-	imageio.imwrite(INPAINTED_PATH + filename_out, ans)
+	print("Writing image to: " + INPAINTED_PATH + filename_out)
+	imageio.imwrite(INPAINTED_PATH + filename_out, inpainted)
+
+	if len(sys.argv) == 5 and sys.argv[4] == "compare":
+		# Imprimindo o RMSE apenas na região da máscara.
+		print("RMSE = %.3f" % (rmse(original, inpainted, mask)))
+
+		# Extraindo uma imagem que representa a diferença entre a original e a restaurada.
+		diff = extract_difference(original, inpainted)
+
+		# Escrevendo a diferença em um arquivo.
+		print("Writing difference to: " + DIFFERENCE_PATH + filename_out)
+		imageio.imwrite(DIFFERENCE_PATH + filename_out, diff)
 
 if __name__ == "__main__":
 	main()

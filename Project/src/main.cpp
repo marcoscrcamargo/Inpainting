@@ -12,13 +12,21 @@ using namespace cv;
 #define MOST_FREQUENT 0
 #define MINIMIUM_FREQUENCY 1
 
+/* Parâmetros do Inpainting. */
+#define RADIUS 50 // Raio do Local Brute Force.
+#define MAX_WINDOW_DISTANCE 256.0 * sqrt(3.0) // Distância máxima entre duas janelas.
+#define WINDOW_DISTANCE_THRESHOLD 50.0 // Distância máxima entre duas janelas para recalcular tudo no Smart Brute Force.
+
 /* Caminhos das pastas com as imagens. */
 #define ORIGINAL_PATH "./images/original/"
 #define DETERIORATED_PATH "./images/deteriorated/"
 #define BRUTE_INPAINTED_PATH "./images/inpainted/Brute Force/"
+#define BRUTE_DIFFERENCE_PATH "./images/difference/Brute Force/"
 #define LOCAL_INPAINTED_PATH "./images/inpainted/Local Brute Force/"
+#define LOCAL_DIFFERENCE_PATH "./images/difference/Local Brute Force/"
+#define SMART_INPAINTED_PATH "./images/inpainted/Smart Brute Force/"
+#define SMART_DIFFERENCE_PATH "./images/difference/Smart Brute Force/"
 #define MASKS_PATH "./images/masks/"
-#define DIFFERENCE_PATH "./images/difference/"
 
 /* Função que retorna true se o pixel (x, y) está dentro da imagem. */
 bool inside(int, int, int, int);
@@ -57,7 +65,10 @@ double window_distance(Mat &, Mat &, int, int, int, int, int);
 Mat brute_force(Mat &, Mat &);
 
 /* Função que faz um Brute Force Local para fazer Inpainting em cada pixel. */
-Mat local_brute_force(Mat &, Mat &, int);
+Mat local_brute_force(Mat &, Mat &);
+
+/* Função que faz um Brute Force mantendo uma lista das janelas mais similares e passando adiante para os pixels vizinhos. */
+Mat smart_brute_force(Mat &, Mat &);
 
 /* Extracts a single channel from an image. */
 Mat extract_channel(Mat &, int);
@@ -458,7 +469,59 @@ Mat brute_force(Mat &deteriorated, Mat &mask){
 	return inpainted;
 }
 
-Mat local_brute_force(Mat &deteriorated, Mat &mask, int radius){
+Mat local_brute_force(Mat &deteriorated, Mat &mask){
+	int x, y, bad_x, bad_y, k;
+	double dist, best_dist;
+	Mat inpainted;
+
+	// Inicializando a imagem final.
+	inpainted = Mat(deteriorated.rows, deteriorated.cols, CV_8UC3);
+
+	// Obtendo as dimensões da janela ideal para o Brute Force.
+	k = extract_window_size(mask);
+
+	printf("k = %d\n", k);
+
+	// Para cada pixel ruim (bad_x, bad_y).
+	for (bad_x = 0; bad_x < deteriorated.rows; bad_x++){
+		printf("Inpainting line %d\n", bad_x);
+		
+		for (bad_y = 0; bad_y < deteriorated.cols; bad_y++){
+			// Se o pixel for ruim.
+			if (mask.at<uchar>(bad_x, bad_y) != 0){
+				// Inicializando a melhor distância como uma distância inválida.
+				best_dist = -1.0;
+
+				// Para cada pixel (x, y) em uma área quadrada definida pelo raio "RADIUS".
+				for (x = max(0, bad_x - RADIUS); x < min(deteriorated.rows, bad_x + RADIUS + 1); x++){
+					for (y = max(0, bad_y - RADIUS); y < min(deteriorated.cols, bad_y + RADIUS + 1); y++){
+						// Se o pixel for bom.
+						if (mask.at<uchar>(x, y) == 0){
+							// Inicializando a distância da janela centrada em (x, y) para a janela centrada em (bad_x, bad_y) com 0.0.
+							dist = window_distance(deteriorated, mask, bad_x, bad_y, x, y, k);
+
+							// Se o pixel atual tiver uma distância menor do que a menor distância obtida até agora, atualize o melhor pixel.
+							if (best_dist == -1.0 or dist < best_dist){
+								// Preenchendo o pixel (bad_x, bad_y) com o pixel (x, y) cuja distância de sua janela K x K é mínima.
+								inpainted.at<Vec3b>(bad_x, bad_y) = deteriorated.at<Vec3b>(x, y);
+								best_dist = dist;
+							}
+						}
+					}
+				}
+			}
+			else{
+				// Se o pixel (bad_x, bad_y) for bom, basta copiar da imagem deteriorated para a imagem final.
+				inpainted.at<Vec3b>(bad_x, bad_y) = deteriorated.at<Vec3b>(bad_x, bad_y);
+			}
+		}
+	}
+
+	// Retornando a imagem final.
+	return inpainted;
+}
+
+Mat smart_brute_force(Mat &deteriorated, Mat &mask){
 	int x, y, bad_x, bad_y, k;
 	double dist, best_dist;
 	Mat inpainted;
@@ -482,8 +545,8 @@ Mat local_brute_force(Mat &deteriorated, Mat &mask, int radius){
 				best_dist = -1.0;
 
 				// Para cada pixel (x, y) em uma área quadrada definida pelo raio "radius".
-				for (x = max(0, bad_x - radius); x < min(deteriorated.rows, bad_x + radius + 1); x++){
-					for (y = max(0, bad_y - radius); y < min(deteriorated.cols, bad_y + radius + 1); y++){
+				for (x = max(0, bad_x - RADIUS); x < min(deteriorated.rows, bad_x + RADIUS + 1); x++){
+					for (y = max(0, bad_y - RADIUS); y < min(deteriorated.cols, bad_y + RADIUS + 1); y++){
 						// Se o pixel for bom.
 						if (mask.at<uchar>(x, y) == 0){
 							// Inicializando a distância da janela centrada em (x, y) para a janela centrada em (bad_x, bad_y) com 0.0.
@@ -708,11 +771,11 @@ int main(int argc, char *argv[]){
 	// ./main compare <path/original.bmp> <path/inpainted.bmp> <path/mask.bmp> <path/diff.bmp>
 	if (argc == 6 and !strcmp(argv[1], "compare")){ // Apenas compara duas imagens.
 		// Lendo as imagens a serem comparadas.
-		printf("Reading original image at: %s\n", argv[2]);
+		printf("Reading original image from: %s\n", argv[2]);
 		original = imread(argv[2], 1);
-		printf("Reading inpainted image at: %s\n", argv[3]);
+		printf("Reading inpainted image from: %s\n", argv[3]);
 		inpainted = imread(argv[3], 1);
-		printf("Reading mask at: %s\n", argv[4]);
+		printf("Reading mask from: %s\n", argv[4]);
 		mask = imread(argv[4], 0);
 
 		// Sem imagem.
@@ -735,9 +798,9 @@ int main(int argc, char *argv[]){
 	}
 
 	// Lendo a imagem original e a imagem deteriorada.
-	printf("Reading original image at: %s\n", (ORIGINAL_PATH + std::string(argv[1])).c_str());
+	printf("Reading original image from: %s\n", (ORIGINAL_PATH + std::string(argv[1])).c_str());
 	original = imread(ORIGINAL_PATH + std::string(argv[1]), 1);
-	printf("Reading deteriorated image at: %s\n", (DETERIORATED_PATH + std::string(argv[1])).c_str());
+	printf("Reading deteriorated image from: %s\n", (DETERIORATED_PATH + std::string(argv[1])).c_str());
 	deteriorated = imread(DETERIORATED_PATH + std::string(argv[1]), 1);
 
 	// Sem imagem.
@@ -772,7 +835,7 @@ int main(int argc, char *argv[]){
 		imwrite(BRUTE_INPAINTED_PATH + std::string(argv[2]), inpainted);
 
 		// Faz uma comparação da imagem original com a reconstruída.
-		if (argc == 6 and !strcmp(argv[5], "compare")){
+		if (argc == 6 and !strcmp(argv[5], "compare") and original.data){
 			// Imprimindo o RMSE apenas na região da máscara.
 			printf("RMSE = %.3lf\n", rmse(original, inpainted, mask));
 
@@ -780,15 +843,34 @@ int main(int argc, char *argv[]){
 			difference = extract_difference(original, inpainted);
 
 			// Escrevendo a diferença em um arquivo.
-			printf("Writing difference to: %s\n", (DIFFERENCE_PATH + std::string("Brute Force/") + std::string(argv[2])).c_str());
-			imwrite(DIFFERENCE_PATH + std::string("Brute Force/") + std::string(argv[2]), difference);
+			printf("Writing difference to: %s\n", (BRUTE_DIFFERENCE_PATH + std::string(argv[2])).c_str());
+			imwrite(BRUTE_DIFFERENCE_PATH + std::string(argv[2]), difference);
 		}
 	}
 	else if (!strcmp(argv[4], "local")){
 		// Roda o Local Brute Force e salva na pasta correspondente.
-		inpainted = local_brute_force(deteriorated, mask, 50);
+		inpainted = local_brute_force(deteriorated, mask);
 		printf("Writing inpainted image by Local Brute Force to: %s\n", (LOCAL_INPAINTED_PATH + std::string(argv[2])).c_str());
 		imwrite(LOCAL_INPAINTED_PATH + std::string(argv[2]), inpainted);
+
+		// Faz uma comparação da imagem original com a reconstruída.
+		if (argc == 6 and !strcmp(argv[5], "compare") and original.data){
+			// Imprimindo o RMSE apenas na região da máscara.
+			printf("RMSE = %.3lf\n", rmse(original, inpainted, mask));
+
+			// Extraindo a diferença entre a imagem original e a reconstruída.
+			difference = extract_difference(original, inpainted);
+
+			// Escrevendo a diferença em um arquivo.
+			printf("Writing difference to: %s\n", (LOCAL_DIFFERENCE_PATH + std::string(argv[2])).c_str());
+			imwrite(LOCAL_DIFFERENCE_PATH + std::string(argv[2]), difference);
+		}
+	}
+	else if (!strcmp(argv[4], "smart") and original.data){
+		// Roda o Local Brute Force e salva na pasta correspondente.
+		inpainted = smart_brute_force(deteriorated, mask);
+		printf("Writing inpainted image by Smart Brute Force to: %s\n", (SMART_INPAINTED_PATH + std::string(argv[2])).c_str());
+		imwrite(SMART_INPAINTED_PATH + std::string(argv[2]), inpainted);
 
 		// Faz uma comparação da imagem original com a reconstruída.
 		if (argc == 6 and !strcmp(argv[5], "compare")){
@@ -799,13 +881,9 @@ int main(int argc, char *argv[]){
 			difference = extract_difference(original, inpainted);
 
 			// Escrevendo a diferença em um arquivo.
-			printf("Writing difference to: %s\n", (DIFFERENCE_PATH + std::string("Local Brute Force/") + std::string(argv[2])).c_str());
-			imwrite(DIFFERENCE_PATH + std::string("Local Brute Force/") + std::string(argv[2]), difference);
+			printf("Writing difference to: %s\n", (SMART_DIFFERENCE_PATH + std::string(argv[2])).c_str());
+			imwrite(SMART_DIFFERENCE_PATH + std::string(argv[2]), difference);
 		}
-	}
-	else if (!strcmp(argv[4], "smart")){
-		printf("Not implemented yet\n");
-		return -1;
 	}
 	else if (!strcmp(argv[4], "papoulis")){
 		printf("Not fixed yet\n");
@@ -816,11 +894,6 @@ int main(int argc, char *argv[]){
 		printf("There's no %s inpainting algorithm\n", argv[4]);
 		return -1;
 	}
-
-	// Mostra a imagem resultante em uma janela.
-	// namedWindow("Display Image", WINDOW_AUTOSIZE);
-	// imshow("Display Image", inpainted);
-	// waitKey(0);
 
 	return 0;
 }
