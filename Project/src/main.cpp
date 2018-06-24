@@ -6,18 +6,81 @@
 
 using namespace cv;
 
-/* Porcentagem de pixels mínima de uma certa cor para considerar como rabisco. */
-#define RATIO 0.01
-#define MAX_HSV_DISTANCE 500
+/* Parâmetros para a extração de máscaras. */
+#define RATIO 0.01 // Porcentagem de pixels mínima de uma certa cor para considerar como rabisco.
+#define MAX_HSV_DISTANCE 500 // Distância máxima para considerar um pixel como "penumbra" do outro.
 #define MOST_FREQUENT 0
 #define MINIMIUM_FREQUENCY 1
+
+/* Caminhos das pastas com as imagens. */
 #define ORIGINAL_PATH "../images/original/"
 #define DETERIORATED_PATH "../images/deteriorated/"
 #define BRUTE_INPAINTED_PATH "../images/inpainted/Brute Force/"
 #define LOCAL_INPAINTED_PATH "../images/inpainted/Local Brute Force/"
 #define MASKS_PATH "../images/masks/"
+#define DIFFERENCE_PATH "../images/"
+
+/* Função que retorna true se o pixel (x, y) está dentro da imagem. */
+bool inside(int, int, int, int);
 
 /* Função que retorna a distância entre dois pixels. */
+double pixel_distance(Vec3b, Vec3b);
+
+/* Função que retorna true se um pixel é branco e false caso contrário. */
+bool white(std::vector<unsigned char>);
+
+/* Função que converte um Vec3b para um vector<unsigned char>. */
+std::vector<unsigned char> from_vec3b(Vec3b &);
+
+/* Função que retorna um map com as frequências de cada pixel RGB. */
+std::map<std::vector<unsigned char>, int> rgb_frequency(Mat &);
+
+/* Função que retorna o pixel em RGB mais frequente (que não seja branco). */
+std::vector<unsigned char> most_frequent(std::map<std::vector<unsigned char>, int>);
+
+/* Função que retorna uma métrica para avaliar se um pixel é a "penumbra" do outro. */
+int hsv_distance(Vec3b, Vec3b);
+
+/* Função que preenche a "penumbra" ao redor do risco "duro" com uma Multi-Source BFS. */
+void fill_blur(Mat &, Mat &);
+
+/* Função que retorna a máscara contendo apenas o ruído (rabisco). */
+Mat extract_mask(Mat &, int);
+
+/* Função que extrai o tamanho ideal da janela para o Brute Force com uma Multi-Source BFS. */
+int extract_window_size(Mat &);
+
+/* Retorna a distância (medida de similaridade) entre duas janelas KxK centradas em (xi, yi) e em (xf, yf). */
+double window_distance(Mat &, Mat &, int, int, int, int, int);
+
+/* Função que faz um Brute Force para fazer Inpainting em cada pixel. */
+Mat brute_force(Mat &, Mat &);
+
+/* Função que faz um Brute Force Local para fazer Inpainting em cada pixel. */
+Mat local_brute_force(Mat &, Mat &, int);
+
+/* Extracts a single channel from an image. */
+Mat extract_channel(Mat &, int);
+
+/* Função que dá um merge dos canais RGB. */
+Mat merge_channels(Mat &, Mat &, Mat &);
+
+/* Função que normaliza uma imagem entre [l, r]. */
+void normalize(Mat &, double, double);
+
+/* Algoritmo Gerchberg-Papoulis com filtragem espacial. */
+Mat gerchberg_papoulis(Mat &, Mat &, int);
+
+/* Função que uma imagem grayscale que representa a diferença entre duas imagens. */
+Mat extract_difference(Mat &, Mat &);
+
+/* Função que retorna o RMSE de duas imagens na região da máscara. */
+double rmse(Mat &, Mat &, Mat &);
+
+bool inside(int x, int y, int n, int m){
+	return 0 <= x and x < n and 0 <= y and y < m;
+}
+
 double pixel_distance(Vec3b p1, Vec3b p2){
 	double dist;
 	int i;
@@ -29,12 +92,6 @@ double pixel_distance(Vec3b p1, Vec3b p2){
 	return sqrt(dist);
 }
 
-/* Função que retorna true se o pixel (x, y) está dentro da imagem. */
-bool inside(int x, int y, int n, int m){
-	return 0 <= x and x < n and 0 <= y and y < m;
-}
-
-/* Função que converte um Vec3b para um vector<unsigned char>. */
 std::vector<unsigned char> from_vec3b(Vec3b &v){
 	std::vector<unsigned char> p;
 	int i;
@@ -50,12 +107,10 @@ std::vector<unsigned char> from_vec3b(Vec3b &v){
 	return p;
 }
 
-/* Função que retorna se um pixel é branco. */
 bool white(std::vector<unsigned char> p){
 	return p[0] >= 250 and p[1] >= 250 and p[2] >= 250;
 }
 
-/* Função que retorna um map com as frequências de cada pixel RGB. */
 std::map<std::vector<unsigned char>, int> rgb_frequency(Mat &img){
 	std::map<std::vector<unsigned char>, int> freq;
 	int x, y;
@@ -72,7 +127,6 @@ std::map<std::vector<unsigned char>, int> rgb_frequency(Mat &img){
 	return freq;
 }
 
-/* Função que retorna o pixel em RGB mais frequente (que não seja branco). */
 std::vector<unsigned char> most_frequent(std::map<std::vector<unsigned char>, int> freq){
 	std::map<std::vector<unsigned char>, int>::iterator it;
 	std::vector<unsigned char> ans;
@@ -112,7 +166,6 @@ int hsv_distance(Vec3b p1, Vec3b p2){
 	return d0 * d0 + d1 * d1;
 }
 
-/* Função que preenche a "penumbra" ao redor do risco "duro" com uma Multi-Source BFS. */
 void fill_blur(Mat &deteriorated, Mat &mask){
 	std::vector<std::vector<bool> > seen;
 	std::queue<std::pair<int, int> > q;
@@ -177,7 +230,6 @@ void fill_blur(Mat &deteriorated, Mat &mask){
 	}
 }
 
-/* Função que retorna a máscara contendo apenas o ruído (rabisco). */
 Mat extract_mask(Mat &deteriorated, int mode){
 	std::map<std::vector<unsigned char>, int> freq;
 	std::vector<unsigned char> p;
@@ -221,13 +273,12 @@ Mat extract_mask(Mat &deteriorated, int mode){
 		}
 	}
 
-	// Preenchendo a "penumbra" dos rabiscos.
-	fill_blur(deteriorated, mask);
+	// (A medida de decisão para detectar a penumbra ainda está ruim) Preenchendo a "penumbra" dos rabiscos.
+	// fill_blur(deteriorated, mask);
 
 	return mask;
 }
 
-/* Função que extrai o tamanho ideal da janela para o Brute Force com uma Multi-Source BFS. */
 int extract_window_size(Mat &mask){
 	std::vector<std::vector<int> > dist;
 	std::queue<std::pair<int, int> > q;
@@ -290,7 +341,6 @@ int extract_window_size(Mat &mask){
 	return 2 * ans + 3;
 }
 
-/* Retorna a distância (medida de similaridade) entre duas janelas KxK centradas em (xi, yi) e em (xf, yf). */
 double window_distance(Mat &deteriorated, Mat &mask, int xi, int yi, int xf, int yf, int k){
 	int used, a, i, j;
 	Vec3b pi, pf;
@@ -356,7 +406,6 @@ double window_distance(Mat &deteriorated, Mat &mask, int xi, int yi, int xf, int
 	return 256.0 * sqrt(3.0);
 }
 
-/* Função que faz um Brute Force para fazer Inpainting em cada pixel. */
 Mat brute_force(Mat &deteriorated, Mat &mask){
 	int x, y, bad_x, bad_y, k;
 	double dist, best_dist;
@@ -409,7 +458,6 @@ Mat brute_force(Mat &deteriorated, Mat &mask){
 	return inpainted;
 }
 
-/* Função que faz um Brute Force Local para fazer Inpainting em cada pixel. */
 Mat local_brute_force(Mat &deteriorated, Mat &mask, int radius){
 	int x, y, bad_x, bad_y, k;
 	double dist, best_dist;
@@ -462,7 +510,6 @@ Mat local_brute_force(Mat &deteriorated, Mat &mask, int radius){
 	return inpainted;
 }
 
-/* Extracts a single channel from an image. */
 Mat extract_channel(Mat &img, int c){
 	Mat channel;
 	int x, y;
@@ -481,7 +528,6 @@ Mat extract_channel(Mat &img, int c){
 	return channel;
 }
 
-/* Função que dá um merge dos canais RGB. */
 Mat merge_channels(Mat &c0, Mat &c1, Mat &c2){
 	int x, y;
 	Mat img;
@@ -500,7 +546,6 @@ Mat merge_channels(Mat &c0, Mat &c1, Mat &c2){
 	return img;
 }
 
-/* Função que normaliza uma imagem entre [l, r]. */
 void normalize(Mat &img, double l, double r){
 	double img_min, img_max;
 	int x, y;
@@ -516,7 +561,6 @@ void normalize(Mat &img, double l, double r){
 	}
 }
 
-/* Algoritmo Gerchberg-Papoulis com filtragem espacial. */
 Mat gerchberg_papoulis(Mat &deteriorated, Mat &mask, int T){
 	Mat M, mean, mask_term_1, mask_term_2;
 	double M_max, M_min, G_max, G_min;
@@ -583,7 +627,7 @@ Mat gerchberg_papoulis(Mat &deteriorated, Mat &mask, int T){
 				}
 			}
 
-			// Realizando a convolução com o filtro de média 7x7 e obtendo a parte real da inversa.
+			// Realizando a convolução com o filtro de média KxK e obtendo a parte real da inversa.
 			// dft(G[c][i].mul(mean), g[c][i], DFT_REAL_OUTPUT);
 			// dft(G[c][i].mul(mean), g[c][i], DFT_INVERSE);
 			idft(G[c][i].mul(mean), g[c][i]);
@@ -599,7 +643,6 @@ Mat gerchberg_papoulis(Mat &deteriorated, Mat &mask, int T){
 	return merge_channels(g[0][T], g[1][T], g[2][T]);
 }
 
-/* Função que uma imagem grayscale que representa a diferença entre duas imagens. */
 Mat extract_difference(Mat &original, Mat &inpainted){
 	int x, y, c, cur;
 	Mat ans;
@@ -626,7 +669,6 @@ Mat extract_difference(Mat &original, Mat &inpainted){
 	return ans;
 }
 
-/* Função que retorna o RMSE de duas imagens na região da máscara. */
 double rmse(Mat &original, Mat &inpainted, Mat &mask){
 	int x, y, c, n;
 	double ans;
@@ -654,7 +696,16 @@ double rmse(Mat &original, Mat &inpainted, Mat &mask){
 int main(int argc, char *argv[]){
 	Mat original, deteriorated, inpainted, difference, mask;
 
-	// Apenas compare duas imagens.
+	// Uso incorreto.
+	if (argc != 5 and argc != 6){
+		printf("Compare usage: ./main compare <path/original.bmp> <path/inpainted.bmp> <path/mask.bmp>\n");
+		printf("Inpainting usage: ./main <image_in.bmp> <image_out.bmp> <mask_extraction_algorithm> <inpainting_algorithm> (compare)?\n");
+		printf("<mask_extraction_algorithm> - {most_frequent, minimum_frequency}\n");
+		printf("<inpainting_algorithm> - {brute, local}\n");
+		return -1;
+	}
+
+	// ./main compare <path/original.bmp> <path/inpainted.bmp> <path/mask.bmp>
 	if (argc == 5 and !strcmp(argv[1], "compare")){
 		// Lendo as imagens a serem comparadas.
 		original = imread(argv[2], 1);
@@ -670,17 +721,9 @@ int main(int argc, char *argv[]){
 		printf("Writing difference...\n");
 
 		// Escrevendo a diferença em um arquivo.
-		imwrite("../images/diff.bmp", difference);
+		imwrite(DIFFERENCE_PATH + std::string("diff.bmp"), difference);
 
 		return 0;
-	}
-
-	// Uso incorreto.
-	if (argc != 5 and argc != 6){
-		printf("Usage: ./main <image_in.bmp> <image_out.bmp> <mask_extraction_algorithm> <inpainting_algorithm> (compare)?\n");
-		printf("<mask_extraction_algorithm> - {most_frequent, minimum_frequency}\n");
-		printf("<inpainting_algorithm> - {brute, local}\n");
-		return -1;
 	}
 
 	printf("Reading image...\n");
