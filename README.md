@@ -97,54 +97,69 @@ Nesse algoritmo fazemos a suposição de que as janelas mais similares não est�
 
 # Resultados
 
-## Professor Moacir com bordas grossas
+Os resultados obtidos com o algoritmo de força bruta por exemplos são melhores comparados ao algoritmo de Gerchberg Papoulis, como é possível observar pela imagem da diferença entre as fotos originais e as resultantes dos algoritmos e pela raiz do erro quadratico médio (RMSE) apresentados abaixo.
+
+O algoritmo de Gerchberg Papoulis apresenta um *inpaiting* mais borrado que o de força bruta, porém sua execução é muito mais rápida. Para alguns casos a diferença visual é grande e bem perceptivel, como na imagem do Professor Moacir. No caso da imagem Forbes a diferença visual é mais sutil e quando vista de longe é difícil de perceber.
+
+
+## Comparação dos tempos de execução e RMSE
+
+A tabela abaixo mostra um comparativo entre os erros obtidos e tempo de execução para os algoritmos utilizados.
+
+| Imagem | Dimensões | Algoritmo | RMSE | Tempo de execução |
+|--------|-----------|-----------|------|-------------------|
+|momo.bmp|  280x280  |Gerchberg Papoulis| xx.xx |00m05s|
+|momo.bmp|  280x280  |Brute Force|23.721|30m24s|
+|momo.bmp|  280x280  |Local Brute Force|23.456|03m23s|
+
+### Professor Moacir com bordas grossas
 
 |<img src="./Project/images/inpainted/Local Brute Force/momo.bmp"   width="200px" alt="momo_inpainted_brute"/>|
 <img src="./Project/images/difference/Local Brute Force/momo.bmp"   width="200px" alt="momo_diff_brute"/>|
 <img src="./Project/images/inpainted/Gerchberg Papoulis/momo.bmp"   width="200px" alt="momo_inapinted_gerchberg"/>|
 <img src="./Project/images/difference/Gerchberg Papoulis/momo.bmp"   width="200px" alt="momo_diff_gerchberg"/>|
 |------------|------------|------------|------------|
-| Local Brute Force (RMSE:) | Imagem da diferença Local Brute Force | Gerchberg Papoulis (RMSE:) | Imagem da diferença Gerchberg Papoulis |
+| Local Brute Force | Imagem da diferença Local Brute Force | Gerchberg Papoulis | Imagem da diferença Gerchberg Papoulis |
 
-## Professor Moacir com bordas finas
+### Professor Moacir com bordas finas
 
 |<img src="./Project/images/inpainted/Local Brute Force/momo_fino.bmp"   width="200px" alt="momo_fino_inpainted_brute"/>|
 <img src="./Project/images/difference/Local Brute Force/momo_fino.bmp"   width="200px" alt="momo_fino_diff_brute"/>|
 <img src="./Project/images/inpainted/Gerchberg Papoulis/momo_fino.bmp"   width="200px" alt="momo_fino_inapinted_gerchberg"/>|
 <img src="./Project/images/difference/Gerchberg Papoulis/momo_fino.bmp"   width="200px" alt="momo_fino_diff_gerchberg"/>|
 |------------|------------|------------|------------|
-| Local Brute Force (RMSE:) | Imagem da diferença Local Brute Force | Gerchberg Papoulis (RMSE:) | Imagem da diferença Gerchberg Papoulis |
+| Local Brute Force | Imagem da diferença Local Brute Force | Gerchberg Papoulis | Imagem da diferença Gerchberg Papoulis |
 
 
-## Forbes
+### Forbes
 
 |<img src="./Project/images/inpainted/Local Brute Force/forbes.bmp"   width="200px" alt="forbes_inpainted_brute"/>|
 <img src="./Project/images/difference/Local Brute Force/forbes.bmp"   width="200px" alt="forbes_diff_brute"/>|
 <img src="./Project/images/inpainted/Gerchberg Papoulis/forbes.bmp"   width="200px" alt="forbes_inapinted_gerchberg"/>|
 <img src="./Project/images/difference/Gerchberg Papoulis/forbes.bmp"   width="200px" alt="forbes_diff_gerchberg"/>|
 |------------|------------|------------|------------|
-| Local Brute Force (RMSE:) | Imagem da diferença Local Brute Force | Gerchberg Papoulis (RMSE:) | Imagem da diferença Gerchberg Papoulis |
+| Local Brute Force | Imagem da diferença Local Brute Force | Gerchberg Papoulis | Imagem da diferença Gerchberg Papoulis |
 
-## Cachorro
+### Cachorro
 
 |<img src="./Project/images/inpainted/Local Brute Force/dogo2.bmp"   width="200px" alt="dogo2_inpainted_brute"/>|
 <img src="./Project/images/difference/Local Brute Force/dogo2.bmp"   width="200px" alt="dogo2_diff_brute"/>|
 <img src="./Project/images/inpainted/Gerchberg Papoulis/dogo2.bmp"   width="200px" alt="dogo2_inapinted_gerchberg"/>|
 <img src="./Project/images/difference/Gerchberg Papoulis/dogo2.bmp"   width="200px" alt="dogo2_diff_gerchberg"/>|
 |------------|------------|------------|------------|
-| Local Brute Force (RMSE:) | Imagem da diferença Local Brute Force | Gerchberg Papoulis (RMSE:) | Imagem da diferença Gerchberg Papoulis |
+| Local Brute Force | Imagem da diferença Local Brute Force | Gerchberg Papoulis | Imagem da diferença Gerchberg Papoulis |
 
 
-## Texto
+### Texto
 
 |<img src="./Project/images/inpainted/Local Brute Force/horse_car.bmp"   width="200px" alt="horse_car_inpainted_brute"/>|
 <img src="./Project/images/difference/Local Brute Force/horse_car.bmp"   width="200px" alt="horse_car_diff_brute"/>|
 <img src="./Project/images/inpainted/Gerchberg Papoulis/horse_car.bmp"   width="200px" alt="horse_car_inapinted_gerchberg"/>|
 <img src="./Project/images/difference/Gerchberg Papoulis/horse_car.bmp"   width="200px" alt="horse_car_diff_gerchberg"/>|
 |------------|------------|------------|------------|
-| Local Brute Force (RMSE:) | Imagem da diferença Local Brute Force | Gerchberg Papoulis (RMSE:) | Imagem da diferença Gerchberg Papoulis |
+| Local Brute Force | Imagem da diferença Local Brute Force | Gerchberg Papoulis | Imagem da diferença Gerchberg Papoulis |
 
-
+## Outros Resultados
 
 # Instruções para execução do código
 A imagem de entrada deve estar na pasta project/images/deteriorated/, a máscara será salva em project/images/masks/ e a imagem de saída na pasta project/images/deteriorated/<inpaiting_algorithm>/.
