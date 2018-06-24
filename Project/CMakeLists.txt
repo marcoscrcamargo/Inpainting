@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
-add_definitions( "-Wall" )
+add_compile_options(-Wall)
 project( main )
 include_directories(${MyProject_SOURCE_DIR}/include)
 find_package( OpenCV REQUIRED )
