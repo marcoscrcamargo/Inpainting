@@ -13,12 +13,12 @@ using namespace cv;
 #define MINIMIUM_FREQUENCY 1
 
 /* Caminhos das pastas com as imagens. */
-#define ORIGINAL_PATH "../images/original/"
-#define DETERIORATED_PATH "../images/deteriorated/"
-#define BRUTE_INPAINTED_PATH "../images/inpainted/Brute Force/"
-#define LOCAL_INPAINTED_PATH "../images/inpainted/Local Brute Force/"
-#define MASKS_PATH "../images/masks/"
-#define DIFFERENCE_PATH "../images/"
+#define ORIGINAL_PATH "./images/original/"
+#define DETERIORATED_PATH "./images/deteriorated/"
+#define BRUTE_INPAINTED_PATH "./images/inpainted/Brute Force/"
+#define LOCAL_INPAINTED_PATH "./images/inpainted/Local Brute Force/"
+#define MASKS_PATH "./images/masks/"
+#define DIFFERENCE_PATH "./images/difference/"
 
 /* Função que retorna true se o pixel (x, y) está dentro da imagem. */
 bool inside(int, int, int, int);
@@ -705,12 +705,21 @@ int main(int argc, char *argv[]){
 		return -1;
 	}
 
-	// ./main compare <path/original.bmp> <path/inpainted.bmp> <path/mask.bmp>
-	if (argc == 5 and !strcmp(argv[1], "compare")){
+	// ./main compare <path/original.bmp> <path/inpainted.bmp> <path/mask.bmp> <path/diff.bmp>
+	if (argc == 6 and !strcmp(argv[1], "compare")){ // Apenas compara duas imagens.
 		// Lendo as imagens a serem comparadas.
+		printf("Reading original image at: %s\n", argv[2]);
 		original = imread(argv[2], 1);
+		printf("Reading inpainted image at: %s\n", argv[3]);
 		inpainted = imread(argv[3], 1);
+		printf("Reading mask at: %s\n", argv[4]);
 		mask = imread(argv[4], 0);
+
+		// Sem imagem.
+		if (!original.data or !inpainted.data or !mask.data){
+			printf("No image data.");
+			return -1;
+		}
 
 		// Imprimindo o RMSE apenas na região da máscara.
 		printf("RMSE = %.3lf\n", rmse(original, inpainted, mask));
@@ -718,27 +727,26 @@ int main(int argc, char *argv[]){
 		// Extraindo a diferença entre a imagem original e a reconstruída.
 		difference = extract_difference(original, inpainted);
 
-		printf("Writing difference...\n");
-
 		// Escrevendo a diferença em um arquivo.
-		imwrite(DIFFERENCE_PATH + std::string("diff.bmp"), difference);
+		printf("Writing difference to: %s\n", argv[5]);
+		imwrite(argv[5], difference);
 
 		return 0;
 	}
 
-	printf("Reading image...\n");
-
 	// Lendo a imagem original e a imagem deteriorada.
+	printf("Reading original image at: %s\n", (ORIGINAL_PATH + std::string(argv[1])).c_str());
 	original = imread(ORIGINAL_PATH + std::string(argv[1]), 1);
+	printf("Reading deteriorated image at: %s\n", (DETERIORATED_PATH + std::string(argv[1])).c_str());
 	deteriorated = imread(DETERIORATED_PATH + std::string(argv[1]), 1);
 
-	// Imagem sem conteúdo.
+	// Sem imagem.
 	if (!deteriorated.data){
 		printf("No image data.\n");
 		return -1;
 	}
 
-	// Extraindo a imagem.
+	// Extraindo a máscara.
 	if (!strcmp(argv[3], "most_frequent")){
 		mask = extract_mask(deteriorated, MOST_FREQUENT);
 	}
@@ -750,9 +758,8 @@ int main(int argc, char *argv[]){
 		return -1;
 	}
 
-	printf("Writing mask...\n");
-
 	// Escrevendo a máscara.
+	printf("Writing mask to: %s\n", (MASKS_PATH + std::string(argv[2])).c_str());
 	imwrite(MASKS_PATH + std::string(argv[2]), mask);
 
 	printf("Inpainting image...\n");
@@ -761,6 +768,7 @@ int main(int argc, char *argv[]){
 	if (!strcmp(argv[4], "brute")){
 		// Roda o Brute Force e salva na pasta correspondente.
 		inpainted = brute_force(deteriorated, mask);
+		printf("Writing inpainted image by Brute Force to: %s\n", (BRUTE_INPAINTED_PATH + std::string(argv[2])).c_str());
 		imwrite(BRUTE_INPAINTED_PATH + std::string(argv[2]), inpainted);
 
 		// Faz uma comparação da imagem original com a reconstruída.
@@ -771,15 +779,15 @@ int main(int argc, char *argv[]){
 			// Extraindo a diferença entre a imagem original e a reconstruída.
 			difference = extract_difference(original, inpainted);
 
-			printf("Writing difference...\n");
-
 			// Escrevendo a diferença em um arquivo.
-			imwrite(BRUTE_INPAINTED_PATH + std::string("diff_") + std::string(argv[2]), difference);
+			printf("Writing difference to: %s\n", (DIFFERENCE_PATH + std::string("Brute Force/") + std::string(argv[2])).c_str());
+			imwrite(DIFFERENCE_PATH + std::string("Brute Force/") + std::string(argv[2]), difference);
 		}
 	}
 	else if (!strcmp(argv[4], "local")){
 		// Roda o Local Brute Force e salva na pasta correspondente.
 		inpainted = local_brute_force(deteriorated, mask, 50);
+		printf("Writing inpainted image by Local Brute Force to: %s\n", (LOCAL_INPAINTED_PATH + std::string(argv[2])).c_str());
 		imwrite(LOCAL_INPAINTED_PATH + std::string(argv[2]), inpainted);
 
 		// Faz uma comparação da imagem original com a reconstruída.
@@ -790,10 +798,9 @@ int main(int argc, char *argv[]){
 			// Extraindo a diferença entre a imagem original e a reconstruída.
 			difference = extract_difference(original, inpainted);
 
-			printf("Writing difference...\n");
-
 			// Escrevendo a diferença em um arquivo.
-			imwrite(LOCAL_INPAINTED_PATH + std::string("diff_") + std::string(argv[2]), difference);
+			printf("Writing difference to: %s\n", (DIFFERENCE_PATH + std::string("Local Brute Force/") + std::string(argv[2])).c_str());
+			imwrite(DIFFERENCE_PATH + std::string("Local Brute Force/") + std::string(argv[2]), difference);
 		}
 	}
 	else if (!strcmp(argv[4], "smart")){
