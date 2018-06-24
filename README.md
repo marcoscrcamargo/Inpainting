@@ -95,7 +95,54 @@ Nesse algoritmo fazemos a suposição de que as janelas mais similares não est�
 |------------|------------|------------|------------|
 | Cachorro (retirada da internet) | Texto em foto (retirada de um artigo) | Forbes | Professor Moacir |
 
-# Analise dos resultados
+# Resultados
+
+## Professor Moacir com bordas grossas
+
+|<img src="./Project/images/inpainted/Local Brute Force/momo.bmp"   width="200px" alt="momo_inpainted_brute"/>|
+<img src="./Project/images/difference/Local Brute Force/momo.bmp"   width="200px" alt="momo_diff_brute"/>|
+<img src="./Project/images/inpainted/Gerchberg Papoulis/momo.bmp"   width="200px" alt="momo_inapinted_gerchberg"/>|
+<img src="./Project/images/difference/Gerchberg Papoulis/momo.bmp"   width="200px" alt="momo_diff_gerchberg"/>|
+|------------|------------|------------|------------|
+| Local Brute Force (RMSE:) | Imagem da diferença Local Brute Force | Gerchberg Papoulis (RMSE:) | Imagem da diferença Gerchberg Papoulis |
+
+## Professor Moacir com bordas finas
+
+|<img src="./Project/images/inpainted/Local Brute Force/momo_fino.bmp"   width="200px" alt="momo_fino_inpainted_brute"/>|
+<img src="./Project/images/difference/Local Brute Force/momo_fino.bmp"   width="200px" alt="momo_fino_diff_brute"/>|
+<img src="./Project/images/inpainted/Gerchberg Papoulis/momo_fino.bmp"   width="200px" alt="momo_fino_inapinted_gerchberg"/>|
+<img src="./Project/images/difference/Gerchberg Papoulis/momo_fino.bmp"   width="200px" alt="momo_fino_diff_gerchberg"/>|
+|------------|------------|------------|------------|
+| Local Brute Force (RMSE:) | Imagem da diferença Local Brute Force | Gerchberg Papoulis (RMSE:) | Imagem da diferença Gerchberg Papoulis |
+
+
+## Forbes
+
+|<img src="./Project/images/inpainted/Local Brute Force/forbes.bmp"   width="200px" alt="forbes_inpainted_brute"/>|
+<img src="./Project/images/difference/Local Brute Force/forbes.bmp"   width="200px" alt="forbes_diff_brute"/>|
+<img src="./Project/images/inpainted/Gerchberg Papoulis/forbes.bmp"   width="200px" alt="forbes_inapinted_gerchberg"/>|
+<img src="./Project/images/difference/Gerchberg Papoulis/forbes.bmp"   width="200px" alt="forbes_diff_gerchberg"/>|
+|------------|------------|------------|------------|
+| Local Brute Force (RMSE:) | Imagem da diferença Local Brute Force | Gerchberg Papoulis (RMSE:) | Imagem da diferença Gerchberg Papoulis |
+
+## Cachorro
+
+|<img src="./Project/images/inpainted/Local Brute Force/dogo2.bmp"   width="200px" alt="dogo2_inpainted_brute"/>|
+<img src="./Project/images/difference/Local Brute Force/dogo2.bmp"   width="200px" alt="dogo2_diff_brute"/>|
+<img src="./Project/images/inpainted/Gerchberg Papoulis/dogo2.bmp"   width="200px" alt="dogo2_inapinted_gerchberg"/>|
+<img src="./Project/images/difference/Gerchberg Papoulis/dogo2.bmp"   width="200px" alt="dogo2_diff_gerchberg"/>|
+|------------|------------|------------|------------|
+| Local Brute Force (RMSE:) | Imagem da diferença Local Brute Force | Gerchberg Papoulis (RMSE:) | Imagem da diferença Gerchberg Papoulis |
+
+
+## Texto
+
+|<img src="./Project/images/inpainted/Local Brute Force/horse_car.bmp"   width="200px" alt="horse_car_inpainted_brute"/>|
+<img src="./Project/images/difference/Local Brute Force/horse_car.bmp"   width="200px" alt="horse_car_diff_brute"/>|
+<img src="./Project/images/inpainted/Gerchberg Papoulis/horse_car.bmp"   width="200px" alt="horse_car_inapinted_gerchberg"/>|
+<img src="./Project/images/difference/Gerchberg Papoulis/horse_car.bmp"   width="200px" alt="horse_car_diff_gerchberg"/>|
+|------------|------------|------------|------------|
+| Local Brute Force (RMSE:) | Imagem da diferença Local Brute Force | Gerchberg Papoulis (RMSE:) | Imagem da diferença Gerchberg Papoulis |
 
 
 
