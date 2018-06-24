@@ -95,6 +95,10 @@ Nesse algoritmo fazemos a suposição de que as janelas mais similares não est�
 |------------|------------|------------|------------|
 | Cachorro (retirada da internet) | Texto em foto (retirada de um artigo) | Forbes | Professor Moacir |
 
+### *Smart Brute Force*
+
+
+
 # Resultados
 
 Os resultados obtidos com o algoritmo de força bruta por exemplos são melhores comparados ao algoritmo de Gerchberg Papoulis, como é possível observar pela imagem da diferença entre as fotos originais e as resultantes dos algoritmos e pela raiz do erro quadratico médio (RMSE) apresentados abaixo. O RMSE foi calculado utilizando somente os pixels da região deteriorada (pixels da máscara).
@@ -211,16 +215,22 @@ Comparação do RMSE e tempo de execução para cada algoritmo:
 
 ## Outros exemplos
 
+Para verificar a funcionalidade dos algoritmos de *inpainting* implementados em objetos mais largos e em contextos diferentes, testamos a remoção de uma pessoa em frente a faixada de um zoológico. A partir da imagem original foi criada a imagem deteriorada, adicionando a cor vermelha em cima da pessoa a ser removida. Os resultados podem ser observados abaixo:
 
-Zoológico:
-
-|<img src="./Project/images/original/zoo.bmp"   width="200px" alt="momo_fino_diff_brute"/>|
-<img src="./Project/images/deteriorated/zoo.bmp"   width="200px" alt="momo_fino_diff_brute"/>|
-<img src="./Project/images/inpainted/Local Brute Force/zoo.bmp"   width="200px" alt="momo_fino_inpainted_brute"/>|
+|<img src="./Project/images/original/zoo.bmp"   width="300px" alt="zoo_original"/>|
+<img src="./Project/images/deteriorated/zoo.bmp"   width="300px" alt="zoo_deteroprated"/>|
+<img src="./Project/images/inpainted/Local Brute Force/zoo.bmp"   width="300px" alt="zoo_inpainted_brute"/>|
 |------------|------------|------------|
 | Imagem Original | Imagem deteriorada | Local Brute Force |
 
 
+Também foi testado a remoção de irregularidades na pele de uma pessoa e a criação da imagem deteriorada para o *inpainting* foi feita criando circulos em volta das irregularidades a serem removidas. Os resultados podem ser observados abaixo:
+
+|<img src="./Project/images/original/forbes_profile.bmp"   width="300px" alt="forbes_profile_original"/>|
+<img src="./Project/images/deteriorated/forbes_profile.bmp"   width="300px" alt="forbes_profile_deteroprated"/>|
+<img src="./Project/images/inpainted/Local Brute Force/forbes_profile.bmp"   width="300px" alt="forbes_profile_inpainted_brute"/>|
+|------------|------------|------------|
+| Imagem Original | Imagem deteriorada | Local Brute Force |
 
 
 # Instruções para execução do código
