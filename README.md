@@ -97,7 +97,7 @@ Nesse algoritmo fazemos a suposição de que as janelas mais similares não est�
 
 # Resultados
 
-Os resultados obtidos com o algoritmo de força bruta por exemplos são melhores comparados ao algoritmo de Gerchberg Papoulis, como é possível observar pela imagem da diferença entre as fotos originais e as resultantes dos algoritmos e pela raiz do erro quadratico médio (RMSE) apresentados abaixo.
+Os resultados obtidos com o algoritmo de força bruta por exemplos são melhores comparados ao algoritmo de Gerchberg Papoulis, como é possível observar pela imagem da diferença entre as fotos originais e as resultantes dos algoritmos e pela raiz do erro quadratico médio (RMSE) apresentados abaixo. O RMSE foi calculado utilizando somente os pixels da região deteriorada (pixels da máscara).
 
 O algoritmo de Gerchberg Papoulis apresenta um *inpaiting* mais borrado que o de força bruta, porém sua execução é muito mais rápida. Para alguns casos a diferença visual é grande e bem perceptivel, como na imagem do Professor Moacir. No caso da imagem Forbes a diferença visual é mais sutil e quando vista de longe é difícil de perceber.
 
@@ -106,7 +106,7 @@ O algoritmo de Gerchberg Papoulis apresenta um *inpaiting* mais borrado que o de
 
 Para avaliar os resultados obtidos comparamos, nas imagens apresentadas abaixo, o resultado do algoritmo de força bruta e do Gerchberg Papoulis com a imagem da diferença ao lado de cada resultado. Em seguida avaliamos o tempo de execução de cada algoritmo e seu RMSE.
 
-### Professor Moacir com bordas grossas
+### Professor Moacir (desenho com bordas grossas)
 A foto do professor Moacir com o desenho de bordas grossas (momo.bmp) tem dimensão 280x280.
 
 Comparação das imagens:
@@ -125,8 +125,11 @@ Comparação do RMSE e tempo de execução para cada algoritmo:
 |Gerchberg Papoulis| xx.xx |00m05s|
 |Brute Force|23.721|30m24s|
 |Local Brute Force|23.456|03m23s|
+|Smart Brute Force|??|??m??s|
 
-### Professor Moacir com bordas finas
+### Professor Moacir (desenho com bordas finas)
+
+Comparação das imagens:
 
 |<img src="./Project/images/inpainted/Local Brute Force/momo_fino.bmp"   width="200px" alt="momo_fino_inpainted_brute"/>|
 <img src="./Project/images/difference/Local Brute Force/momo_fino.bmp"   width="200px" alt="momo_fino_diff_brute"/>|
@@ -135,8 +138,19 @@ Comparação do RMSE e tempo de execução para cada algoritmo:
 |------------|------------|------------|------------|
 | Local Brute Force | Imagem da diferença Local Brute Force | Gerchberg Papoulis | Imagem da diferença Gerchberg Papoulis |
 
+Comparação do RMSE e tempo de execução para cada algoritmo:
+
+| Algoritmo | RMSE | Tempo de execução |
+|-----------|------|-------------------|
+|Gerchberg Papoulis| ?? |??|
+|Brute Force|??|??|
+|Local Brute Force|??|??|
+|Smart Brute Force|??|??|
+
 
 ### Forbes
+
+Comparação das imagens:
 
 |<img src="./Project/images/inpainted/Local Brute Force/forbes.bmp"   width="200px" alt="forbes_inpainted_brute"/>|
 <img src="./Project/images/difference/Local Brute Force/forbes.bmp"   width="200px" alt="forbes_diff_brute"/>|
@@ -145,7 +159,18 @@ Comparação do RMSE e tempo de execução para cada algoritmo:
 |------------|------------|------------|------------|
 | Local Brute Force | Imagem da diferença Local Brute Force | Gerchberg Papoulis | Imagem da diferença Gerchberg Papoulis |
 
+Comparação do RMSE e tempo de execução para cada algoritmo:
+
+| Algoritmo | RMSE | Tempo de execução |
+|-----------|------|-------------------|
+|Gerchberg Papoulis| ?? |??|
+|Brute Force|??|??|
+|Local Brute Force|??|??|
+|Smart Brute Force|??|??|
+
 ### Cachorro
+
+Comparação das imagens:
 
 |<img src="./Project/images/inpainted/Local Brute Force/dogo2.bmp"   width="200px" alt="dogo2_inpainted_brute"/>|
 <img src="./Project/images/difference/Local Brute Force/dogo2.bmp"   width="200px" alt="dogo2_diff_brute"/>|
@@ -154,8 +179,19 @@ Comparação do RMSE e tempo de execução para cada algoritmo:
 |------------|------------|------------|------------|
 | Local Brute Force | Imagem da diferença Local Brute Force | Gerchberg Papoulis | Imagem da diferença Gerchberg Papoulis |
 
+Comparação do RMSE e tempo de execução para cada algoritmo:
+
+| Algoritmo | RMSE | Tempo de execução |
+|-----------|------|-------------------|
+|Gerchberg Papoulis| ?? |??|
+|Brute Force|??|??|
+|Local Brute Force|??|??|
+|Smart Brute Force|??|??|
+
 
 ### Texto
+
+Comparação das imagens:
 
 |<img src="./Project/images/inpainted/Local Brute Force/horse_car.bmp"   width="200px" alt="horse_car_inpainted_brute"/>|
 <img src="./Project/images/difference/Local Brute Force/horse_car.bmp"   width="200px" alt="horse_car_diff_brute"/>|
@@ -164,7 +200,28 @@ Comparação do RMSE e tempo de execução para cada algoritmo:
 |------------|------------|------------|------------|
 | Local Brute Force | Imagem da diferença Local Brute Force | Gerchberg Papoulis | Imagem da diferença Gerchberg Papoulis |
 
-## Outros Resultados
+Comparação do RMSE e tempo de execução para cada algoritmo:
+
+| Algoritmo | RMSE | Tempo de execução |
+|-----------|------|-------------------|
+|Gerchberg Papoulis| ?? |??|
+|Brute Force|??|??|
+|Local Brute Force|??|??|
+|Smart Brute Force|??|??|
+
+## Outros exemplos
+
+
+Zoológico:
+
+|<img src="./Project/images/original/zoo.bmp"   width="200px" alt="momo_fino_diff_brute"/>|
+<img src="./Project/images/deteriorated/zoo.bmp"   width="200px" alt="momo_fino_diff_brute"/>|
+<img src="./Project/images/inpainted/Local Brute Force/zoo.bmp"   width="200px" alt="momo_fino_inpainted_brute"/>|
+|------------|------------|------------|
+| Imagem Original | Imagem deteriorada | Local Brute Force |
+
+
+
 
 # Instruções para execução do código
 A imagem de entrada deve estar na pasta project/images/deteriorated/, a máscara será salva em project/images/masks/ e a imagem de saída na pasta project/images/deteriorated/<inpaiting_algorithm>/.
