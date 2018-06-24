@@ -102,17 +102,14 @@ Os resultados obtidos com o algoritmo de força bruta por exemplos são melhores
 O algoritmo de Gerchberg Papoulis apresenta um *inpaiting* mais borrado que o de força bruta, porém sua execução é muito mais rápida. Para alguns casos a diferença visual é grande e bem perceptivel, como na imagem do Professor Moacir. No caso da imagem Forbes a diferença visual é mais sutil e quando vista de longe é difícil de perceber.
 
 
-## Comparação dos tempos de execução e RMSE
+## Comparação das imagens
 
-A tabela abaixo mostra um comparativo entre os erros obtidos e tempo de execução para os algoritmos utilizados.
-
-| Imagem | Dimensões | Algoritmo | RMSE | Tempo de execução |
-|--------|-----------|-----------|------|-------------------|
-|momo.bmp|  280x280  |Gerchberg Papoulis| xx.xx |00m05s|
-|momo.bmp|  280x280  |Brute Force|23.721|30m24s|
-|momo.bmp|  280x280  |Local Brute Force|23.456|03m23s|
+Para avaliar os resultados obtidos comparamos, nas imagens apresentadas abaixo, o resultado do algoritmo de força bruta e do Gerchberg Papoulis com a imagem da diferença ao lado de cada resultado. Em seguida avaliamos o tempo de execução de cada algoritmo e seu RMSE.
 
 ### Professor Moacir com bordas grossas
+A foto do professor Moacir com o desenho de bordas grossas (momo.bmp) tem dimensão 280x280.
+
+Comparação das imagens:
 
 |<img src="./Project/images/inpainted/Local Brute Force/momo.bmp"   width="200px" alt="momo_inpainted_brute"/>|
 <img src="./Project/images/difference/Local Brute Force/momo.bmp"   width="200px" alt="momo_diff_brute"/>|
@@ -120,6 +117,14 @@ A tabela abaixo mostra um comparativo entre os erros obtidos e tempo de execuç�
 <img src="./Project/images/difference/Gerchberg Papoulis/momo.bmp"   width="200px" alt="momo_diff_gerchberg"/>|
 |------------|------------|------------|------------|
 | Local Brute Force | Imagem da diferença Local Brute Force | Gerchberg Papoulis | Imagem da diferença Gerchberg Papoulis |
+
+Comparação do RMSE e tempo de execução para cada algoritmo:
+
+| Algoritmo | RMSE | Tempo de execução |
+|-----------|------|-------------------|
+|Gerchberg Papoulis| xx.xx |00m05s|
+|Brute Force|23.721|30m24s|
+|Local Brute Force|23.456|03m23s|
 
 ### Professor Moacir com bordas finas
 
