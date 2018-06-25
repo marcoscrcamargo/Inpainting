@@ -46,8 +46,8 @@ Smart Brute Force:
 		RMSE: 12.567
 		Time: 00m24s
 	forbes.bmp (961x1280):
-		RMSE: 09.083
-		Time: 02m42s
+		RMSE: 08.533
+		Time: 06m10s
 	horse_car.bmp (438x297):
 		RMSE: 20.614
 		Time: 07m48s
@@ -78,4 +78,6 @@ Smart Brute Force for assisted removal:
 	zoo.bmp:
 		Time: 
 	team.bmp:
-		Time: 
+		Time: 91m12s
+	gabi_star:
+		Time: 02m11s

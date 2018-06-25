@@ -16,7 +16,7 @@ using namespace cv;
 /* Parâmetros do Inpainting. */
 #define RADIUS 50 // Raio do Local Brute Force.
 #define MAX_WINDOW_DISTANCE 256.0 * sqrt(3.0) // Distância máxima entre duas janelas.
-#define WINDOW_DISTANCE_THRESHOLD 10.0 // Distância máxima entre duas janelas para recalcular tudo no Smart Brute Force.
+#define WINDOW_DISTANCE_THRESHOLD 5.0 // Distância máxima entre duas janelas para recalcular tudo no Smart Brute Force.
 #define WINDOW_LIST_SIZE 50 // Tamanho da lista de janelas.
 #define ELITE_SIZE 5 // Quantidade de pixels similares para fazer a média.
 
@@ -669,6 +669,8 @@ Vec3b update_candidates(Mat &deteriorated, Mat &mask, int bad_x, int bad_y, int 
 void dfs(Mat &deteriorated, Mat &inpainted, Mat &mask, std::vector<std::vector<bool> > &seen, int x, int y, int k, std::vector<std::pair<int, int> > candidates){
 	inpainted.at<Vec3b>(x, y) = update_candidates(deteriorated, mask, x, y, k, candidates);
 	seen[x][y] = true;
+
+	printf("Filled (%d, %d)\n", x, y);
 
 	if (inside(x - 1, y, mask.rows, mask.cols) and !seen[x - 1][y] and mask.at<uchar>(x - 1, y) != 0){ // Up.
 		dfs(deteriorated, inpainted, mask, seen, x - 1, y, k, candidates);
