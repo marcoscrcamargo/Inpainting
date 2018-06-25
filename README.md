@@ -49,6 +49,11 @@ Nesse método assumimos que apenas uma cor deve ser removida: a mais frequente. 
 
 Nesse método definimos um *threshold* e assumimos que todas as cores que ocorrem mais vezes do que esse *threshold* fazem parte da região de *inpainting*. Para essa etapa definimos o *threshold* como sendo 1% dos *pixels* da imagem, ou seja, se alguma cor ocorrer em mais do que 1% da imagem, ela é considerada "rabisco". Esse método não funciona tão bem quando existe rabiscos de apenas uma cor, mas é um método necessário para remover rabiscos de diferentes cores.
 
+## *Red*
+
+Extração especifica para remoção de objetos desenhando em vermelho
+
+
 # Algoritmos de *Inpainting*
 ## Gerchberg Papoulis
 O algoritmo Gerchberg-Papoulis é um algoritmo de *inpaiting* por difusão que funciona por meio de cortes nas frequencias obtidas pela Transformada Discreta de Fourier (DFT), zerando parte das frequências das imagens.
@@ -217,7 +222,7 @@ Comparação do RMSE e tempo de execução para cada algoritmo:
 
 Para verificar a funcionalidade dos algoritmos de *inpainting* implementados em objetos mais largos e em contextos diferentes, testamos a remoção de uma pessoa em frente a faixada de um zoológico. A partir da imagem original foi criada a imagem deteriorada, adicionando a cor vermelha em cima da pessoa a ser removida. Os resultados podem ser observados abaixo:
 
-|<img src="./Project/images/original/zoo.bmp"   width="300px" alt="zoo_original"/>|
+|<img src="./Project/images/other/zoo.bmp"   width="300px" alt="zoo_original"/>|
 <img src="./Project/images/deteriorated/zoo.bmp"   width="300px" alt="zoo_deteroprated"/>|
 <img src="./Project/images/inpainted/Local Brute Force/zoo.bmp"   width="300px" alt="zoo_inpainted_brute"/>|
 |------------|------------|------------|
@@ -226,7 +231,7 @@ Para verificar a funcionalidade dos algoritmos de *inpainting* implementados em 
 
 Também foi testado a remoção de irregularidades na pele de uma pessoa e a criação da imagem deteriorada para o *inpainting* foi feita criando circulos em volta das irregularidades a serem removidas. Os resultados podem ser observados abaixo:
 
-|<img src="./Project/images/original/forbes_profile.bmp"   width="300px" alt="forbes_profile_original"/>|
+|<img src="./Project/images/other/forbes_profile.bmp"   width="300px" alt="forbes_profile_original"/>|
 <img src="./Project/images/deteriorated/forbes_profile.bmp"   width="300px" alt="forbes_profile_deteroprated"/>|
 <img src="./Project/images/inpainted/Local Brute Force/forbes_profile.bmp"   width="300px" alt="forbes_profile_inpainted_brute"/>|
 |------------|------------|------------|
@@ -244,8 +249,7 @@ A compilação do código em C++ foi feita utilizando o cmake com o arquivo CMak
 
 A execução do código em **C++** é feita pelo comando:
 
-	./main <image_in.bmp> <image_out.bmp> <mask_extraction_algorithm> <inpainting_algorithm>
-
+	./main <image_in.bmp> <image_out.bmp> <mask_extraction_algorithm> <inpainting_algorithm> (compare)?
 
 A execução do código em **Python** é feita pelo comando:
 
@@ -256,7 +260,7 @@ O código em **Python** só contém a implementação do algoritmo *Gerchberg Pa
 Os argumentos dos programas são:
  * <image_in.bmp> - Imagem de entrada.
  * <image_out.bmp> - Imagem de saída.
- * <mask_extraction_algorithm> - Algoritmo de extração da máscara (*most_frequent* ou *minimum_frequency*).
+ * <mask_extraction_algorithm> - Algoritmo de extração da máscara (*most_frequent*, *minimum_frequency* ou *red*).
  * <inpainting_algorithm> - Algoritmo de *inpainting* (*brute* ou *local*).
 
 # Próximos passos
