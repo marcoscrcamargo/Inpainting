@@ -11,11 +11,14 @@ using namespace cv;
 #define MAX_HSV_DISTANCE 500 // Distância máxima para considerar um pixel como "penumbra" do outro.
 #define MOST_FREQUENT 0
 #define MINIMIUM_FREQUENCY 1
+#define RED 2
 
 /* Parâmetros do Inpainting. */
 #define RADIUS 50 // Raio do Local Brute Force.
 #define MAX_WINDOW_DISTANCE 256.0 * sqrt(3.0) // Distância máxima entre duas janelas.
-#define WINDOW_DISTANCE_THRESHOLD 50.0 // Distância máxima entre duas janelas para recalcular tudo no Smart Brute Force.
+#define WINDOW_DISTANCE_THRESHOLD 10.0 // Distância máxima entre duas janelas para recalcular tudo no Smart Brute Force.
+#define WINDOW_LIST_SIZE 50 // Tamanho da lista de janelas.
+#define ELITE_SIZE 5 // Quantidade de pixels similares para fazer a média.
 
 /* Caminhos das pastas com as imagens. */
 #define ORIGINAL_PATH "./images/original/"
@@ -28,6 +31,23 @@ using namespace cv;
 #define SMART_DIFFERENCE_PATH "./images/difference/Smart Brute Force/"
 #define MASKS_PATH "./images/masks/"
 
+struct KWindow{
+	double dist;
+	int x, y;
+
+	KWindow(){}
+
+	KWindow(int x, int y, double dist){
+		this->x = x;
+		this->y = y;
+		this->dist = dist;
+	}
+
+	bool operator < (const KWindow &b) const{
+		return this->dist < b.dist;
+	}
+};
+
 /* Função que retorna true se o pixel (x, y) está dentro da imagem. */
 bool inside(int, int, int, int);
 
@@ -36,6 +56,9 @@ double pixel_distance(Vec3b, Vec3b);
 
 /* Função que retorna true se um pixel é branco e false caso contrário. */
 bool white(std::vector<unsigned char>);
+
+/* Função que retorna true se um pixel é totalmente vermelho (255, 0, 0). */
+bool red(std::vector<unsigned char>);
 
 /* Função que converte um Vec3b para um vector<unsigned char>. */
 std::vector<unsigned char> from_vec3b(Vec3b &);
@@ -120,6 +143,10 @@ std::vector<unsigned char> from_vec3b(Vec3b &v){
 
 bool white(std::vector<unsigned char> p){
 	return p[0] >= 250 and p[1] >= 250 and p[2] >= 250;
+}
+
+bool red(std::vector<unsigned char> p){
+	return p[0] == 0 and p[1] == 0 and p[2] == 255;
 }
 
 std::map<std::vector<unsigned char>, int> rgb_frequency(Mat &img){
@@ -249,43 +276,56 @@ Mat extract_mask(Mat &deteriorated, int mode){
 
 	// Alocando a máscara com zeros.
 	mask = Mat::zeros(deteriorated.rows, deteriorated.cols, CV_8UC1);
+
+	if (mode == RED){
+		// Para cada pixel (x, y).
+		for (x = 0; x < deteriorated.rows; x++){
+			for (y = 0; y < deteriorated.cols; y++){
+				// Se o pixel for vermelho.
+				if (red(from_vec3b(deteriorated.at<Vec3b>(x, y)))){
+					mask.at<uchar>(x, y) = 255;
+				}
+			}
+		}
+	}
+	else{
+		printf("Counting frequency...\n");
 		
-	printf("Counting frequency...\n");
-	
-	// Contando a frequência das cores.
-	freq = rgb_frequency(deteriorated);
+		// Contando a frequência das cores.
+		freq = rgb_frequency(deteriorated);
 
-	printf("Extracting mask...\n");
+		printf("Extracting mask...\n");
 
-	if (mode == MOST_FREQUENT){
-		p = most_frequent(freq);
+		if (mode == MOST_FREQUENT){
+			p = most_frequent(freq);
 
-		// Para cada pixel (x, y).
-		for (x = 0; x < deteriorated.rows; x++){
-			for (y = 0; y < deteriorated.cols; y++){
-				// Se a frequência dessa cor RGB for menor ou igual ao threshold, marque com branco. Caso contrário, marque com preto.
-				if (from_vec3b(deteriorated.at<Vec3b>(x, y)) == p){
-					mask.at<uchar>(x, y) = 255;
+			// Para cada pixel (x, y).
+			for (x = 0; x < deteriorated.rows; x++){
+				for (y = 0; y < deteriorated.cols; y++){
+					// Se a frequência dessa cor RGB for menor ou igual ao threshold, marque com branco. Caso contrário, marque com preto.
+					if (from_vec3b(deteriorated.at<Vec3b>(x, y)) == p){
+						mask.at<uchar>(x, y) = 255;
+					}
 				}
 			}
 		}
-	}
-	else if (mode == MINIMIUM_FREQUENCY){
-		threshold = RATIO * (deteriorated.rows * deteriorated.cols);
+		else if (mode == MINIMIUM_FREQUENCY){
+			threshold = RATIO * (deteriorated.rows * deteriorated.cols);
 
-		// Para cada pixel (x, y).
-		for (x = 0; x < deteriorated.rows; x++){
-			for (y = 0; y < deteriorated.cols; y++){
-				// Se a frequência dessa cor RGB for menor ou igual ao threshold, marque com branco. Caso contrário, marque com preto.
-				if (!white(from_vec3b(deteriorated.at<Vec3b>(x, y))) and freq[from_vec3b(deteriorated.at<Vec3b>(x, y))] > threshold){
-					mask.at<uchar>(x, y) = 255;
+			// Para cada pixel (x, y).
+			for (x = 0; x < deteriorated.rows; x++){
+				for (y = 0; y < deteriorated.cols; y++){
+					// Se a frequência dessa cor RGB for menor ou igual ao threshold, marque com branco. Caso contrário, marque com preto.
+					if (!white(from_vec3b(deteriorated.at<Vec3b>(x, y))) and freq[from_vec3b(deteriorated.at<Vec3b>(x, y))] > threshold){
+						mask.at<uchar>(x, y) = 255;
+					}
 				}
 			}
 		}
-	}
 
-	// (A medida de decisão para detectar a penumbra ainda está ruim) Preenchendo a "penumbra" dos rabiscos.
-	// fill_blur(deteriorated, mask);
+		// (A medida de decisão para detectar a penumbra ainda está ruim) Preenchendo a "penumbra" dos rabiscos.
+		// fill_blur(deteriorated, mask);
+	}	
 
 	return mask;
 }
@@ -414,7 +454,7 @@ double window_distance(Mat &deteriorated, Mat &mask, int xi, int yi, int xf, int
 	}
 
 	// Se não, retorne a máxima distância sqrt(3 * 256^2)
-	return 256.0 * sqrt(3.0);
+	return MAX_WINDOW_DISTANCE;
 }
 
 Mat brute_force(Mat &deteriorated, Mat &mask){
@@ -437,8 +477,8 @@ Mat brute_force(Mat &deteriorated, Mat &mask){
 		for (bad_y = 0; bad_y < deteriorated.cols; bad_y++){
 			// Se o pixel for ruim.
 			if (mask.at<uchar>(bad_x, bad_y) != 0){
-				// Inicializando a melhor distância como uma distância inválida.
-				best_dist = -1.0;
+				// Inicializando a melhor distância como a distância máxima.
+				best_dist = MAX_WINDOW_DISTANCE;
 
 				// Para cada pixel bom (x, y).
 				for (x = 0; x < deteriorated.rows; x++){
@@ -449,7 +489,7 @@ Mat brute_force(Mat &deteriorated, Mat &mask){
 							dist = window_distance(deteriorated, mask, bad_x, bad_y, x, y, k);
 
 							// Se o pixel atual tiver uma distância menor do que a menor distância obtida até agora, atualize o melhor pixel.
-							if (best_dist == -1.0 or dist < best_dist){
+							if (dist < best_dist){
 								// Preenchendo o pixel (bad_x, bad_y) com o pixel (x, y) cuja distância de sua janela K x K é mínima.
 								inpainted.at<Vec3b>(bad_x, bad_y) = deteriorated.at<Vec3b>(x, y);
 								best_dist = dist;
@@ -489,19 +529,19 @@ Mat local_brute_force(Mat &deteriorated, Mat &mask){
 		for (bad_y = 0; bad_y < deteriorated.cols; bad_y++){
 			// Se o pixel for ruim.
 			if (mask.at<uchar>(bad_x, bad_y) != 0){
-				// Inicializando a melhor distância como uma distância inválida.
-				best_dist = -1.0;
+				// Inicializando a melhor distância como a distância máxima.
+				best_dist = MAX_WINDOW_DISTANCE;
 
 				// Para cada pixel (x, y) em uma área quadrada definida pelo raio "RADIUS".
 				for (x = max(0, bad_x - RADIUS); x < min(deteriorated.rows, bad_x + RADIUS + 1); x++){
 					for (y = max(0, bad_y - RADIUS); y < min(deteriorated.cols, bad_y + RADIUS + 1); y++){
 						// Se o pixel for bom.
 						if (mask.at<uchar>(x, y) == 0){
-							// Inicializando a distância da janela centrada em (x, y) para a janela centrada em (bad_x, bad_y) com 0.0.
+							// Recuperando a distância entre a janela centrada em (bad_x, bad_y) e a janela centrada em (x, y).
 							dist = window_distance(deteriorated, mask, bad_x, bad_y, x, y, k);
 
 							// Se o pixel atual tiver uma distância menor do que a menor distância obtida até agora, atualize o melhor pixel.
-							if (best_dist == -1.0 or dist < best_dist){
+							if (dist < best_dist){
 								// Preenchendo o pixel (bad_x, bad_y) com o pixel (x, y) cuja distância de sua janela K x K é mínima.
 								inpainted.at<Vec3b>(bad_x, bad_y) = deteriorated.at<Vec3b>(x, y);
 								best_dist = dist;
@@ -521,10 +561,134 @@ Mat local_brute_force(Mat &deteriorated, Mat &mask){
 	return inpainted;
 }
 
+void get_local_candidates(Mat &, Mat &, int, int, int, std::vector<std::pair<int, int> > &);
+
+void get_local_candidates(Mat &deteriorated, Mat &mask, int bad_x, int bad_y, int k, std::vector<std::pair<int, int> > &candidates){
+	std::priority_queue<KWindow> pq;
+	int x, y, i;
+	double dist;
+
+	// Para cada pixel (x, y) em uma área quadrada definida pelo raio "RADIUS".
+	for (x = max(0, bad_x - RADIUS); x < min(deteriorated.rows, bad_x + RADIUS + 1); x++){
+		for (y = max(0, bad_y - RADIUS); y < min(deteriorated.cols, bad_y + RADIUS + 1); y++){
+			// Se o pixel for bom.
+			if (mask.at<uchar>(x, y) == 0){
+				// Recuperando a distância entre a janela centrada em (bad_x, bad_y) e a janela centrada em (x, y).
+				dist = window_distance(deteriorated, mask, bad_x, bad_y, x, y, k);
+
+				pq.push(KWindow(x, y, dist));
+
+				// Mantendo apenas as 100 melhores janelas.
+				if ((int)pq.size() > WINDOW_LIST_SIZE){
+					pq.pop();
+				}
+			}
+		}
+	}
+
+	// Colocando os 100 melhores em um vector em ordem crescente de distância.
+	for (i = (int)pq.size() - 1; i >= 0; i--){
+		candidates[i] = std::make_pair(pq.top().x, pq.top().y);
+		pq.pop();
+	}
+}
+
+Vec3b update_candidates(Mat &deteriorated, Mat &mask, int bad_x, int bad_y, int k, std::vector<std::pair<int, int> > &candidates){
+	std::priority_queue<KWindow> pq;
+	double dist, b, g, r;
+	std::vector<KWindow> elite;
+	Vec3b p, ans;
+	int i;
+
+	// Buscando o candidato com mínima distância.
+	for (i = 0; i < (int)candidates.size(); i++){
+		dist = window_distance(deteriorated, mask, bad_x, bad_y, candidates[i].first, candidates[i].second, k);
+
+		pq.push(KWindow(candidates[i].first, candidates[i].second, dist));
+
+		if ((int)pq.size() > ELITE_SIZE){
+			pq.pop();
+		}
+	}
+
+	// Colocando os 5 melhores em "elite".
+	elite.resize(ELITE_SIZE);
+
+	for (i = ELITE_SIZE - 1; i >= 0; i--){
+		elite[i] = pq.top();
+		pq.pop();
+	}
+
+	b = g = r = 0.0;
+
+	if (elite[0].dist > WINDOW_DISTANCE_THRESHOLD){
+		// A melhor janela não é boa o suficiente, buscando uma melhor.
+		get_local_candidates(deteriorated, mask, bad_x, bad_y, k, candidates);
+		
+		// Média dos 5 melhores candidatos.
+		for (i = 0; i < ELITE_SIZE; i++){
+			p = deteriorated.at<Vec3b>(candidates[i].first, candidates[i].second);
+
+			b += p[0];
+			g += p[1];
+			r += p[2];
+		}
+	}
+	else{
+		// Média dos 5 melhores candidatos.
+		for (i = 0; i < ELITE_SIZE; i++){
+			p = deteriorated.at<Vec3b>(elite[i].x, elite[i].y);
+
+			b += p[0];
+			g += p[1];
+			r += p[2];
+		}
+	}
+
+	ans[0] = round(b / (double)ELITE_SIZE);
+	ans[1] = round(g / (double)ELITE_SIZE);
+	ans[2] = round(r / (double)ELITE_SIZE);
+
+	return ans;
+}
+
+void dfs(Mat &deteriorated, Mat &inpainted, Mat &mask, std::vector<std::vector<bool> > &seen, int x, int y, int k, std::vector<std::pair<int, int> > candidates){
+	inpainted.at<Vec3b>(x, y) = update_candidates(deteriorated, mask, x, y, k, candidates);
+	seen[x][y] = true;
+
+	if (inside(x - 1, y, mask.rows, mask.cols) and !seen[x - 1][y] and mask.at<uchar>(x - 1, y) != 0){ // Up.
+		dfs(deteriorated, inpainted, mask, seen, x - 1, y, k, candidates);
+	}
+
+	if (inside(x + 1, y, mask.rows, mask.cols) and !seen[x + 1][y] and mask.at<uchar>(x + 1, y) != 0){ // Down.
+		dfs(deteriorated, inpainted, mask, seen, x + 1, y, k, candidates);
+	}
+
+	if (inside(x, y - 1, mask.rows, mask.cols) and !seen[x][y - 1] and mask.at<uchar>(x, y - 1) != 0){ // Left.
+		dfs(deteriorated, inpainted, mask, seen, x, y - 1, k, candidates);
+	}
+
+	if (inside(x, y + 1, mask.rows, mask.cols) and !seen[x][y + 1] and mask.at<uchar>(x, y + 1) != 0){ // Right.
+		dfs(deteriorated, inpainted, mask, seen, x, y + 1, k, candidates);
+	}
+}
+
 Mat smart_brute_force(Mat &deteriorated, Mat &mask){
-	int x, y, bad_x, bad_y, k;
-	double dist, best_dist;
+	std::vector<std::pair<int, int> > candidates;
+	std::vector<std::vector<bool> > seen;
+	int x, y, k, i;
 	Mat inpainted;
+
+	// Alocando matriz de posições visitadas.
+	seen.resize(deteriorated.rows);
+
+	// Inicializando as posições como não visitadas.
+	for (i = 0; i < deteriorated.rows; i++){
+		seen[i].assign(deteriorated.cols, false);
+	}
+
+	// Inicializando a lista de janelas.
+	candidates.assign(WINDOW_LIST_SIZE, std::make_pair(0, 0));
 
 	// Inicializando a imagem final.
 	inpainted = Mat(deteriorated.rows, deteriorated.cols, CV_8UC3);
@@ -534,37 +698,19 @@ Mat smart_brute_force(Mat &deteriorated, Mat &mask){
 
 	printf("k = %d\n", k);
 
-	// Para cada pixel ruim (bad_x, bad_y).
-	for (bad_x = 0; bad_x < deteriorated.rows; bad_x++){
-		printf("Inpainting line %d\n", bad_x);
-		
-		for (bad_y = 0; bad_y < deteriorated.cols; bad_y++){
-			// Se o pixel for ruim.
-			if (mask.at<uchar>(bad_x, bad_y) != 0){
-				// Inicializando a melhor distância como uma distância inválida.
-				best_dist = -1.0;
-
-				// Para cada pixel (x, y) em uma área quadrada definida pelo raio "radius".
-				for (x = max(0, bad_x - RADIUS); x < min(deteriorated.rows, bad_x + RADIUS + 1); x++){
-					for (y = max(0, bad_y - RADIUS); y < min(deteriorated.cols, bad_y + RADIUS + 1); y++){
-						// Se o pixel for bom.
-						if (mask.at<uchar>(x, y) == 0){
-							// Inicializando a distância da janela centrada em (x, y) para a janela centrada em (bad_x, bad_y) com 0.0.
-							dist = window_distance(deteriorated, mask, bad_x, bad_y, x, y, k);
-
-							// Se o pixel atual tiver uma distância menor do que a menor distância obtida até agora, atualize o melhor pixel.
-							if (best_dist == -1.0 or dist < best_dist){
-								// Preenchendo o pixel (bad_x, bad_y) com o pixel (x, y) cuja distância de sua janela K x K é mínima.
-								inpainted.at<Vec3b>(bad_x, bad_y) = deteriorated.at<Vec3b>(x, y);
-								best_dist = dist;
-							}
-						}
-					}
+	// Para cada pixel ruim (x, y).
+	for (x = 0; x < deteriorated.rows; x++){		
+		for (y = 0; y < deteriorated.cols; y++){
+			// Se o pixel for ruim e ainda não tiver sido visitado.
+			if (mask.at<uchar>(x, y) != 0){
+				if (!seen[x][y]){
+					// Rodando uma DFS a partir de (x, y).
+					dfs(deteriorated, inpainted, mask, seen, x, y, k, candidates);
 				}
 			}
 			else{
-				// Se o pixel (bad_x, bad_y) for bom, basta copiar da imagem deteriorated para a imagem final.
-				inpainted.at<Vec3b>(bad_x, bad_y) = deteriorated.at<Vec3b>(bad_x, bad_y);
+				// Se o pixel (x, y) for bom, basta copiar da imagem deteriorated para a imagem final.
+				inpainted.at<Vec3b>(x, y) = deteriorated.at<Vec3b>(x, y);
 			}
 		}
 	}
@@ -763,7 +909,7 @@ int main(int argc, char *argv[]){
 	if (argc != 5 and argc != 6){
 		printf("Compare usage: ./main compare <path/original.bmp> <path/inpainted.bmp> <path/mask.bmp>\n");
 		printf("Inpainting usage: ./main <image_in.bmp> <image_out.bmp> <mask_extraction_algorithm> <inpainting_algorithm> (compare)?\n");
-		printf("<mask_extraction_algorithm> - {most_frequent, minimum_frequency}\n");
+		printf("<mask_extraction_algorithm> - {most_frequent, minimum_frequency, red}\n");
 		printf("<inpainting_algorithm> - {brute, local}\n");
 		return -1;
 	}
@@ -815,6 +961,9 @@ int main(int argc, char *argv[]){
 	}
 	else if (!strcmp(argv[3], "minimum_frequency")){
 		mask = extract_mask(deteriorated, MINIMIUM_FREQUENCY);
+	}
+	else if (!strcmp(argv[3], "red")){
+		mask = extract_mask(deteriorated, RED);
 	}
 	else{
 		printf("There's no %s mask extraction algorithm\n", argv[3]);
