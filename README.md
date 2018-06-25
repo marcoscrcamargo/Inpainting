@@ -251,6 +251,10 @@ A execução do código em **C++** é feita pelo comando:
 
 	./main <image_in.bmp> <image_out.bmp> <mask_extraction_algorithm> <inpainting_algorithm> (compare)?
 
+É possivel também executar somente a compração, utilizando o comando:
+
+	./main compare <path/original.bmp> <path/inpainted.bmp> <path/mask.bmp>
+
 A execução do código em **Python** é feita pelo comando:
 
 	python3 main.py <image_in.bmp> <image_out.bmp> <mask_extraction_algorithm>
@@ -262,6 +266,7 @@ Os argumentos dos programas são:
  * <image_out.bmp> - Imagem de saída.
  * <mask_extraction_algorithm> - Algoritmo de extração da máscara (*most_frequent*, *minimum_frequency* ou *red*).
  * <inpainting_algorithm> - Algoritmo de *inpainting* (*brute* ou *local*).
+ * (compare) - Realiza a compação entre a imagem original e o resultado (RMSE e imagem da diferença).
 
 # Próximos passos
 
