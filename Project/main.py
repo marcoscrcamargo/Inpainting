@@ -186,7 +186,7 @@ def rmse(original, inpainted, mask):
 		for y in range(original.shape[1]):
 			# Se o pixel (x, y) estiver deteriorado.
 			if mask[x][y] != 0:
-				ans += ((original[x, y, :] - inpainted[x, y, :])**2).sum()
+				ans += ((original[x, y, :].astype(int) - inpainted[x, y, :].astype(int))**2).sum()
 				n += original.shape[2]
 
 	return np.sqrt(ans / n)
@@ -197,14 +197,14 @@ def extract_difference(original, inpainted):
 
 	for x in range(original.shape[0]):
 		for y in range(original.shape[1]):
-			diff[x][y] = np.round(np.mean(np.absolute(original[x, y, :] - inpainted[x, y, :])))
+			diff[x][y] = np.round(np.mean(np.absolute(original[x, y, :].astype(int) - inpainted[x, y, :].astype(int))))
 
 	return diff
 
 def main():
 	# Wrong usage.
 	if len(sys.argv) != 4 and len(sys.argv) != 5:
-		print("Usage: python3 main.py <image_in.bmp> <image_out.bmp> <mask_extraction_algorithm> compare?")
+		print("Usage: python3 main.py <image_in.bmp> <image_out.bmp> <mask_extraction_algorithm> (compare)?")
 		print("<mask_extraction_algorithm> - {most_frequent, minimum_frequency}");
 
 	# Obtendo os nomes dos arquivos de entrada e saída.
@@ -212,9 +212,9 @@ def main():
 
 	# Lendo a imagem.
 	print("Reading original image from: " + ORIGINAL_PATH + filename_in)
-	original = imageio.imread(ORIGINAL_PATH + filename_in)
+	original = imageio.imread(ORIGINAL_PATH + filename_in)[:, :, :3]
 	print("Reading deteriorated image from: " + DETERIORATED_PATH + filename_in)
-	deteriorated = imageio.imread(DETERIORATED_PATH + filename_in)
+	deteriorated = imageio.imread(DETERIORATED_PATH + filename_in)[:, :, :3]
 
 	# Setando o limite da recursão.
 	sys.setrecursionlimit(deteriorated.shape[0] * deteriorated.shape[1] + 10)
