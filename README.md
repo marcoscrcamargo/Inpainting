@@ -108,18 +108,18 @@ A suposição feita para o desenvolvimento desse algoritmo se deve ao fato de qu
 
 Podemos ver pela imagem horse_car.bmp que usar o *pixel* cuja janela *K*x*K* possui distância mínima não é sempre a melhor escolha. A média entre os 5 melhores candidatos resulta em um *inpainting* mais suave, removendo parte do ruído produzido pelos outros métodos de força bruta descritos.
 
+|<img src="./Project/images/deteriorated/horse_car.bmp"   width="200px" alt="horse_car_deteriorated"/>|
+<img src="./Project/images/masks/horse_car.bmp"   width="200px" alt="horse_car_mask"/>|
+<img src="./Project/images/inpainted/Local Brute Force/horse_car.bmp"   width="200px" alt="horse_car_local"/>|
+<img src="./Project/images/inpainted/Smart Brute Force/horse_car.bmp"   width="200px" alt="horse_car_smart"/>|
+|------------|------------|------------|------------|
+| Imagem deteriorada | Máscara | Local Brute Force | Smart Brute Force |
+
 # Resultados
 
 Os resultados obtidos com o algoritmo de força bruta por exemplos são melhores comparados ao algoritmo de Gerchberg Papoulis, como é possível observar pela imagem da diferença entre as fotos originais e as resultantes dos algoritmos e pela raiz do erro quadratico médio (RMSE) apresentados abaixo. O RMSE foi calculado utilizando somente os pixels da região deteriorada (pixels da máscara).
 
 O algoritmo de Gerchberg Papoulis apresenta um *inpaiting* mais borrado que o de força bruta, porém sua execução é muito mais rápida. Para alguns casos a diferença visual é grande e bem perceptivel, como na imagem do Professor Moacir. No caso da imagem Forbes a diferença visual é mais sutil e quando vista de longe é difícil de perceber.
-
-|<img src="./Project/images/deteriorated/horse_car.bmp"   width="200px" alt="horse_car_deteriorated"/>|
-<img src="./Project/images/mask/horse_car.bmp"   width="200px" alt="horse_car_mask"/>|
-<img src="./Project/images/inpainted/Local Brute Force/horse_car.bmp"   width="200px" alt="horse_car_local"/>|
-<img src="./Project/images/inpainted/Smart Brute Force/horse_car.bmp"   width="200px" alt="horse_car_smart"/>|
-|------------|------------|------------|------------|
-| Imagem deteriorada | Máscara | Local Brute Force | Smart Brute Force |
 
 ## Comparação das imagens
 
