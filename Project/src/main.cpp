@@ -111,6 +111,15 @@ Mat extract_difference(Mat &, Mat &);
 /* Função que retorna o RMSE de duas imagens na região da máscara. */
 double rmse(Mat &, Mat &, Mat &);
 
+/* Função que retorna por referência os melhores candidatos em um raio definido por RADIUS. */
+void get_local_candidates(Mat &, Mat &, int, int, int, std::vector<std::pair<int, int> > &);
+
+/* Depth-First Search para preencher os pixels deteriorados passando adiante uma lista de candidatos. */
+void dfs(Mat &deteriorated, Mat &, Mat &, std::vector<std::vector<bool> > &, int, int, int, std::vector<std::pair<int, int> >);
+
+/* Função que atualiza os melhores candidatos por referência em relação a uma certa janela e retorna o melhor pixel para ocupar essa posição. */
+Vec3b update_candidates(Mat &, Mat &, int, int, int, std::vector<std::pair<int, int> > &);
+
 bool inside(int x, int y, int n, int m){
 	return 0 <= x and x < n and 0 <= y and y < m;
 }
@@ -271,11 +280,12 @@ void fill_blur(Mat &deteriorated, Mat &mask){
 Mat extract_mask(Mat &deteriorated, int mode){
 	std::map<std::vector<unsigned char>, int> freq;
 	std::vector<unsigned char> p;
-	int threshold, x, y;
+	int threshold, det, x, y;
 	Mat mask;
 
 	// Alocando a máscara com zeros.
 	mask = Mat::zeros(deteriorated.rows, deteriorated.cols, CV_8UC1);
+	det = 0;
 
 	if (mode == RED){
 		// Para cada pixel (x, y).
@@ -284,6 +294,7 @@ Mat extract_mask(Mat &deteriorated, int mode){
 				// Se o pixel for vermelho.
 				if (red(from_vec3b(deteriorated.at<Vec3b>(x, y)))){
 					mask.at<uchar>(x, y) = 255;
+					det++;
 				}
 			}
 		}
@@ -305,6 +316,7 @@ Mat extract_mask(Mat &deteriorated, int mode){
 					// Se a frequência dessa cor RGB for menor ou igual ao threshold, marque com branco. Caso contrário, marque com preto.
 					if (from_vec3b(deteriorated.at<Vec3b>(x, y)) == p){
 						mask.at<uchar>(x, y) = 255;
+						det++;
 					}
 				}
 			}
@@ -318,6 +330,7 @@ Mat extract_mask(Mat &deteriorated, int mode){
 					// Se a frequência dessa cor RGB for menor ou igual ao threshold, marque com branco. Caso contrário, marque com preto.
 					if (!white(from_vec3b(deteriorated.at<Vec3b>(x, y))) and freq[from_vec3b(deteriorated.at<Vec3b>(x, y))] > threshold){
 						mask.at<uchar>(x, y) = 255;
+						det++;
 					}
 				}
 			}
@@ -325,7 +338,9 @@ Mat extract_mask(Mat &deteriorated, int mode){
 
 		// (A medida de decisão para detectar a penumbra ainda está ruim) Preenchendo a "penumbra" dos rabiscos.
 		// fill_blur(deteriorated, mask);
-	}	
+	}
+
+	printf("%d pixels to inpaint!\n", det);
 
 	return mask;
 }
@@ -561,8 +576,6 @@ Mat local_brute_force(Mat &deteriorated, Mat &mask){
 	return inpainted;
 }
 
-void get_local_candidates(Mat &, Mat &, int, int, int, std::vector<std::pair<int, int> > &);
-
 void get_local_candidates(Mat &deteriorated, Mat &mask, int bad_x, int bad_y, int k, std::vector<std::pair<int, int> > &candidates){
 	std::priority_queue<KWindow> pq;
 	int x, y, i;
@@ -592,6 +605,7 @@ void get_local_candidates(Mat &deteriorated, Mat &mask, int bad_x, int bad_y, in
 		pq.pop();
 	}
 }
+
 
 Vec3b update_candidates(Mat &deteriorated, Mat &mask, int bad_x, int bad_y, int k, std::vector<std::pair<int, int> > &candidates){
 	std::priority_queue<KWindow> pq;
@@ -1015,14 +1029,14 @@ int main(int argc, char *argv[]){
 			imwrite(LOCAL_DIFFERENCE_PATH + std::string(argv[2]), difference);
 		}
 	}
-	else if (!strcmp(argv[4], "smart") and original.data){
+	else if (!strcmp(argv[4], "smart")){
 		// Roda o Local Brute Force e salva na pasta correspondente.
 		inpainted = smart_brute_force(deteriorated, mask);
 		printf("Writing inpainted image by Smart Brute Force to: %s\n", (SMART_INPAINTED_PATH + std::string(argv[2])).c_str());
 		imwrite(SMART_INPAINTED_PATH + std::string(argv[2]), inpainted);
 
 		// Faz uma comparação da imagem original com a reconstruída.
-		if (argc == 6 and !strcmp(argv[5], "compare")){
+		if (argc == 6 and !strcmp(argv[5], "compare")  and original.data){
 			// Imprimindo o RMSE apenas na região da máscara.
 			printf("RMSE = %.3lf\n", rmse(original, inpainted, mask));
 
