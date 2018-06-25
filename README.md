@@ -49,6 +49,11 @@ Nesse método assumimos que apenas uma cor deve ser removida: a mais frequente. 
 
 Nesse método definimos um *threshold* e assumimos que todas as cores que ocorrem mais vezes do que esse *threshold* fazem parte da região de *inpainting*. Para essa etapa definimos o *threshold* como sendo 1% dos *pixels* da imagem, ou seja, se alguma cor ocorrer em mais do que 1% da imagem, ela é considerada "rabisco". Esse método não funciona tão bem quando existe rabiscos de apenas uma cor, mas é um método necessário para remover rabiscos de diferentes cores.
 
+## *Red*
+
+Extração especifica para remoção de objetos desenhando em vermelho
+
+
 # Algoritmos de *Inpainting*
 ## Gerchberg Papoulis
 O algoritmo Gerchberg-Papoulis é um algoritmo de *inpaiting* por difusão que funciona por meio de cortes nas frequencias obtidas pela Transformada Discreta de Fourier (DFT), zerando parte das frequências das imagens.
@@ -82,7 +87,7 @@ O *K* é definido automaticamente levando em consideração a "grossura" do rabi
 A medida de distância utilizada foi similar ao RMSE, mas calculado apenas entre *pixels* não-deteriorados. Vale dizer que para todo o projeto assumimos que os *pixels* fora da imagem são pretos (0, 0, 0).
 
 ### *Brute Force*
-Nesse algoritmo a busca pelo *pixel* *P* é feita em toda a imagem. Esse algoritmo obtém os melhores resultados em geral, mas seu tempo de execução é altíssimo e, portanto, apenas conseguimos rodar para a imagem dogo1.bmp (100x100) e dogo2.bmp (400x400).
+Nesse algoritmo a busca pelo *pixel* *P* é feita em toda a imagem. Esse algoritmo geralmente obtém os melhores resultados, mas seu tempo de execução é altíssimo e, portanto, apenas conseguimos rodar para a imagem dogo1.bmp (100x100) e dogo2.bmp (400x400).
 
 |<img src="./Project/images/deteriorated/dogo1.bmp"   width="200px" alt="dogo2"/>|<img src="./Project/images/inpainted/Brute Force/dogo1.bmp"   height="200px" alt="horse_car"/>|<img src="./Project/images/deteriorated/dogo2.bmp"   width="200px" alt="forbes"/>|<img src="./Project/images/inpainted/Brute Force/dogo2.bmp"   width="200px" alt="momo_fino"/>|
 |------------|------------|------------|------------|
@@ -97,7 +102,11 @@ Nesse algoritmo fazemos a suposição de que as janelas mais similares não est�
 
 ### *Smart Brute Force*
 
+Nesse algoritmo rodamos uma *Depth-First Search* (DFS) a partir de cada componente conexa de pixels deteriorados. Para o primeiro pixel deteriorado *Pd* de uma componente fazemos a busca pelas 50 janelas *K*x*K* mais similares em uma região 101x101 centrada em *Pd* e guardamos em uma lista de candidatos. Passamos essa lista para os vizinhos de *Pd* de tal forma que os vizinhos precisem apenas calcular a distância para 50 janelas na maior parte das vezes. Quando a janela mais similar ao *pixel* atual não for tão similar (sua distância é maior que um *threshold* que definimos como sendo 10.0), buscamos uma lista com os 50 melhores candidatos novamente. Por fim atribuímos a cada *pixel* deteriorado a média dos 5 *pixels* cujas janelas são as mais similares dentre os candidatos.
 
+A suposição feita para o desenvolvimento desse algoritmo se deve ao fato de que *pixels* deteriorados vizinhos devem ser similares entre si e, portanto, similares a uma mesma lista de candidatos.
+
+Podemos ver pela imagem horse_car.bmp que usar o *pixel* cuja janela *K*x*K* possui distância mínima não é sempre a melhor escolha. A média entre os 5 melhores candidatos resulta em um *inpainting* mais suave, removendo parte do ruído produzido pelos outros métodos de força bruta descritos.
 
 # Resultados
 
@@ -105,6 +114,12 @@ Os resultados obtidos com o algoritmo de força bruta por exemplos são melhores
 
 O algoritmo de Gerchberg Papoulis apresenta um *inpaiting* mais borrado que o de força bruta, porém sua execução é muito mais rápida. Para alguns casos a diferença visual é grande e bem perceptivel, como na imagem do Professor Moacir. No caso da imagem Forbes a diferença visual é mais sutil e quando vista de longe é difícil de perceber.
 
+|<img src="./Project/images/deteriorated/horse_car.bmp"   width="200px" alt="horse_car_deteriorated"/>|
+<img src="./Project/images/mask/horse_car.bmp"   width="200px" alt="horse_car_mask"/>|
+<img src="./Project/images/inpainted/Local Brute Force/horse_car.bmp"   width="200px" alt="horse_car_local"/>|
+<img src="./Project/images/inpainted/Smart Brute Force/horse_car.bmp"   width="200px" alt="horse_car_smart"/>|
+|------------|------------|------------|------------|
+| Imagem deteriorada | Máscara | Local Brute Force | Smart Brute Force |
 
 ## Comparação das imagens
 
@@ -117,7 +132,7 @@ Comparação das imagens:
 
 |<img src="./Project/images/inpainted/Local Brute Force/momo.bmp"   width="200px" alt="momo_inpainted_brute"/>|
 <img src="./Project/images/difference/Local Brute Force/momo.bmp"   width="200px" alt="momo_diff_brute"/>|
-<img src="./Project/images/inpainted/Gerchberg Papoulis/momo.bmp"   width="200px" alt="momo_inapinted_gerchberg"/>|
+<img src="./Project/images/inpainted/Gerchberg Papoulis/momo.bmp"   width="200px" alt="momo_inpainted_gerchberg"/>|
 <img src="./Project/images/difference/Gerchberg Papoulis/momo.bmp"   width="200px" alt="momo_diff_gerchberg"/>|
 |------------|------------|------------|------------|
 | Local Brute Force | Imagem da diferença Local Brute Force | Gerchberg Papoulis | Imagem da diferença Gerchberg Papoulis |
@@ -217,7 +232,7 @@ Comparação do RMSE e tempo de execução para cada algoritmo:
 
 Para verificar a funcionalidade dos algoritmos de *inpainting* implementados em objetos mais largos e em contextos diferentes, testamos a remoção de uma pessoa em frente a faixada de um zoológico. A partir da imagem original foi criada a imagem deteriorada, adicionando a cor vermelha em cima da pessoa a ser removida. Os resultados podem ser observados abaixo:
 
-|<img src="./Project/images/original/zoo.bmp"   width="300px" alt="zoo_original"/>|
+|<img src="./Project/images/other/zoo.bmp"   width="300px" alt="zoo_original"/>|
 <img src="./Project/images/deteriorated/zoo.bmp"   width="300px" alt="zoo_deteroprated"/>|
 <img src="./Project/images/inpainted/Local Brute Force/zoo.bmp"   width="300px" alt="zoo_inpainted_brute"/>|
 |------------|------------|------------|
@@ -226,7 +241,7 @@ Para verificar a funcionalidade dos algoritmos de *inpainting* implementados em 
 
 Também foi testado a remoção de irregularidades na pele de uma pessoa e a criação da imagem deteriorada para o *inpainting* foi feita criando circulos em volta das irregularidades a serem removidas. Os resultados podem ser observados abaixo:
 
-|<img src="./Project/images/original/forbes_profile.bmp"   width="300px" alt="forbes_profile_original"/>|
+|<img src="./Project/images/other/forbes_profile.bmp"   width="300px" alt="forbes_profile_original"/>|
 <img src="./Project/images/deteriorated/forbes_profile.bmp"   width="300px" alt="forbes_profile_deteroprated"/>|
 <img src="./Project/images/inpainted/Local Brute Force/forbes_profile.bmp"   width="300px" alt="forbes_profile_inpainted_brute"/>|
 |------------|------------|------------|
@@ -244,8 +259,11 @@ A compilação do código em C++ foi feita utilizando o cmake com o arquivo CMak
 
 A execução do código em **C++** é feita pelo comando:
 
-	./main <image_in.bmp> <image_out.bmp> <mask_extraction_algorithm> <inpainting_algorithm>
+	./main <image_in.bmp> <image_out.bmp> <mask_extraction_algorithm> <inpainting_algorithm> (compare)?
 
+É possivel também executar somente a compração, utilizando o comando:
+
+	./main compare <path/original.bmp> <path/inpainted.bmp> <path/mask.bmp>
 
 A execução do código em **Python** é feita pelo comando:
 
@@ -256,8 +274,9 @@ O código em **Python** só contém a implementação do algoritmo *Gerchberg Pa
 Os argumentos dos programas são:
  * <image_in.bmp> - Imagem de entrada.
  * <image_out.bmp> - Imagem de saída.
- * <mask_extraction_algorithm> - Algoritmo de extração da máscara (*most_frequent* ou *minimum_frequency*).
+ * <mask_extraction_algorithm> - Algoritmo de extração da máscara (*most_frequent*, *minimum_frequency* ou *red*).
  * <inpainting_algorithm> - Algoritmo de *inpainting* (*brute* ou *local*).
+ * (compare) - Realiza a compação entre a imagem original e o resultado (RMSE e imagem da diferença).
 
 # Próximos passos
 
