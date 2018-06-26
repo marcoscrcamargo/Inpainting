@@ -13,6 +13,8 @@
 
 Nessa etapa do trabalho estudamos e implementamos duas técnicas de *inpainting* para a remoção automática de rabiscos inseridos artificialmente em imagens. Para realizarmos a detecção automática da região que devemos fazer *inpainting* usamos do fato de que os rabiscos são feitos com cores contrastantes que ocorrem com alta frequência nas imagens.
 
+Também foi estudada uma abordagem de *inpainting* para a remoção de objetos em imagens. Para isso é necessário desenhar em cima do objeto a ser removido com um pincel duro e de cor vermelha (255, 0, 0).
+
 # Conjunto de imagens
 Parte do conjunto de imagens utilizado é apresentado abaixo. Essas quatro imagens servirão de exemplo para a execução dos algoritmos.
 
@@ -51,7 +53,7 @@ Nesse método definimos um *threshold* e assumimos que todas as cores que ocorre
 
 ## *Red*
 
-Extração especifica para remoção de objetos desenhando em vermelho
+Extração de máscara especifica para a remoção de objetos sobrepostos com a cor vermelho (255, 0, 0) utilizado para a aplicação extra do projeto.
 
 
 # Algoritmos de *Inpainting*
@@ -65,8 +67,8 @@ Considerando uma Máscara **M** que possui valor 0 nos locais em que a imagem é
 3. Para cada iteração k = 1, ..., T
 	+  *G_k* = DFT de *g_{k-1}*
 	+  Filtra *G_k* zerando coeficientes das frequências relativos a:
-		+  *G_k* >= 0.9 * max(*M*) 
-		+  *G_k* <= 0.01 * max(*G_k*) 
+		+  *G_k* >= 0.9 * max(*M*)
+		+  *G_k* <= 0.01 * max(*G_k*)
 	+  Convolução de *G_k* com um filtro de média *k x k*.
 	+  *g_k* = IDFT de *G_k*
 	+  Normalização de *G_k* entre 0 e 255.
@@ -121,114 +123,125 @@ Os resultados obtidos com o algoritmo de força bruta por exemplos são melhores
 
 O algoritmo de Gerchberg Papoulis apresenta um *inpaiting* mais borrado que o de força bruta, porém sua execução é muito mais rápida. Para alguns casos a diferença visual é grande e bem perceptivel, como na imagem do Professor Moacir. No caso da imagem Forbes a diferença visual é mais sutil e quando vista de longe é difícil de perceber.
 
-## Comparação das imagens
+## Remoção de rabiscos em imagens
 
 Para avaliar os resultados obtidos comparamos, nas imagens apresentadas abaixo, o resultado do algoritmo de força bruta e do Gerchberg Papoulis com a imagem da diferença ao lado de cada resultado. Em seguida avaliamos o tempo de execução de cada algoritmo e seu RMSE.
 
 ### Professor Moacir (desenho com bordas grossas)
-A foto do professor Moacir com o desenho de bordas grossas (momo.bmp) tem dimensão 280x280.
+
+A foto do professor Moacir com o desenho de bordas grossas (momo.bmp) tem dimensões 280x280.
 
 Comparação das imagens:
 
-|<img src="./Project/images/inpainted/Local Brute Force/momo.bmp"   width="200px" alt="momo_inpainted_brute"/>|
-<img src="./Project/images/difference/Local Brute Force/momo.bmp"   width="200px" alt="momo_diff_brute"/>|
+|<img src="./Project/images/inpainted/Smart Brute Force/momo.bmp"   width="200px" alt="momo_inpainted_brute"/>|
+<img src="./Project/images/difference/Smart Brute Force/momo.bmp"   width="200px" alt="momo_diff_brute"/>|
 <img src="./Project/images/inpainted/Gerchberg Papoulis/momo.bmp"   width="200px" alt="momo_inpainted_gerchberg"/>|
 <img src="./Project/images/difference/Gerchberg Papoulis/momo.bmp"   width="200px" alt="momo_diff_gerchberg"/>|
 |------------|------------|------------|------------|
-| Local Brute Force | Imagem da diferença Local Brute Force | Gerchberg Papoulis | Imagem da diferença Gerchberg Papoulis |
+| Smart Brute Force | Imagem da diferença Smart Brute Force | Gerchberg Papoulis | Imagem da diferença Gerchberg Papoulis |
 
 Comparação do RMSE e tempo de execução para cada algoritmo:
 
 | Algoritmo | RMSE | Tempo de execução |
 |-----------|------|-------------------|
-|Gerchberg Papoulis| xx.xx |00m05s|
+|Gerchberg Papoulis| 45.094 |00m05s|
 |Brute Force|23.721|30m24s|
 |Local Brute Force|23.456|03m23s|
-|Smart Brute Force|??|??m??s|
+|Smart Brute Force|21.352|01m57s|
 
 ### Professor Moacir (desenho com bordas finas)
 
+A foto do professor Moacir com o desenho de bordas finas (momo_fino.bmp) tem dimensões 280x280.
+
 Comparação das imagens:
 
-|<img src="./Project/images/inpainted/Local Brute Force/momo_fino.bmp"   width="200px" alt="momo_fino_inpainted_brute"/>|
-<img src="./Project/images/difference/Local Brute Force/momo_fino.bmp"   width="200px" alt="momo_fino_diff_brute"/>|
+|<img src="./Project/images/inpainted/Smart Brute Force/momo_fino.bmp"   width="200px" alt="momo_fino_inpainted_brute"/>|
+<img src="./Project/images/difference/Smart Brute Force/momo_fino.bmp"   width="200px" alt="momo_fino_diff_brute"/>|
 <img src="./Project/images/inpainted/Gerchberg Papoulis/momo_fino.bmp"   width="200px" alt="momo_fino_inapinted_gerchberg"/>|
 <img src="./Project/images/difference/Gerchberg Papoulis/momo_fino.bmp"   width="200px" alt="momo_fino_diff_gerchberg"/>|
 |------------|------------|------------|------------|
-| Local Brute Force | Imagem da diferença Local Brute Force | Gerchberg Papoulis | Imagem da diferença Gerchberg Papoulis |
+| Smart Brute Force | Imagem da diferença Smart Brute Force | Gerchberg Papoulis | Imagem da diferença Gerchberg Papoulis |
 
 Comparação do RMSE e tempo de execução para cada algoritmo:
 
 | Algoritmo | RMSE | Tempo de execução |
 |-----------|------|-------------------|
-|Gerchberg Papoulis| ?? |??|
-|Brute Force|??|??|
-|Local Brute Force|??|??|
-|Smart Brute Force|??|??|
+|Gerchberg Papoulis|30.238|00m05s|
+|Brute Force|13.735|06m50s|
+|Local Brute Force|14.350|00m47s|
+|Smart Brute Force|12.567|00m24s|
 
-
-### Forbes
-
-Comparação das imagens:
-
-|<img src="./Project/images/inpainted/Local Brute Force/forbes.bmp"   width="200px" alt="forbes_inpainted_brute"/>|
-<img src="./Project/images/difference/Local Brute Force/forbes.bmp"   width="200px" alt="forbes_diff_brute"/>|
-<img src="./Project/images/inpainted/Gerchberg Papoulis/forbes.bmp"   width="200px" alt="forbes_inapinted_gerchberg"/>|
-<img src="./Project/images/difference/Gerchberg Papoulis/forbes.bmp"   width="200px" alt="forbes_diff_gerchberg"/>|
-|------------|------------|------------|------------|
-| Local Brute Force | Imagem da diferença Local Brute Force | Gerchberg Papoulis | Imagem da diferença Gerchberg Papoulis |
-
-Comparação do RMSE e tempo de execução para cada algoritmo:
-
-| Algoritmo | RMSE | Tempo de execução |
-|-----------|------|-------------------|
-|Gerchberg Papoulis| ?? |??|
-|Brute Force|??|??|
-|Local Brute Force|??|??|
-|Smart Brute Force|??|??|
 
 ### Cachorro
 
+A imagem do cachorro retirada da internet (dogo2.bmp) tem dimensões 400x400.
+
 Comparação das imagens:
 
-|<img src="./Project/images/inpainted/Local Brute Force/dogo2.bmp"   width="200px" alt="dogo2_inpainted_brute"/>|
-<img src="./Project/images/difference/Local Brute Force/dogo2.bmp"   width="200px" alt="dogo2_diff_brute"/>|
+|<img src="./Project/images/inpainted/Smart Brute Force/dogo2.bmp"   width="200px" alt="dogo2_inpainted_brute"/>|
+<img src="./Project/images/difference/Smart Brute Force/dogo2.bmp"   width="200px" alt="dogo2_diff_brute"/>|
 <img src="./Project/images/inpainted/Gerchberg Papoulis/dogo2.bmp"   width="200px" alt="dogo2_inapinted_gerchberg"/>|
 <img src="./Project/images/difference/Gerchberg Papoulis/dogo2.bmp"   width="200px" alt="dogo2_diff_gerchberg"/>|
 |------------|------------|------------|------------|
-| Local Brute Force | Imagem da diferença Local Brute Force | Gerchberg Papoulis | Imagem da diferença Gerchberg Papoulis |
+| Smart Brute Force | Imagem da diferença Smart Brute Force | Gerchberg Papoulis | Imagem da diferença Gerchberg Papoulis |
 
 Comparação do RMSE e tempo de execução para cada algoritmo:
 
 | Algoritmo | RMSE | Tempo de execução |
 |-----------|------|-------------------|
-|Gerchberg Papoulis| ?? |??|
-|Brute Force|??|??|
-|Local Brute Force|??|??|
-|Smart Brute Force|??|??|
+|Gerchberg Papoulis|23.039|00m09s|
+|Brute Force|13.222|32m19s|
+|Local Brute Force|12.456|01m50s|
+|Smart Brute Force|11.384|00m36s|
 
 
 ### Texto
 
+A imagem do carro de cabalos (horse_car.bmp) tem dimensões 438x297, e pelo tamanho da mascara obtida ser muito grande o tempo de execução do algoritmo de brute force seria muito alto, por isso não foi executado.
+
 Comparação das imagens:
 
-|<img src="./Project/images/inpainted/Local Brute Force/horse_car.bmp"   width="200px" alt="horse_car_inpainted_brute"/>|
-<img src="./Project/images/difference/Local Brute Force/horse_car.bmp"   width="200px" alt="horse_car_diff_brute"/>|
+|<img src="./Project/images/inpainted/Smart Brute Force/horse_car.bmp"   width="200px" alt="horse_car_inpainted_brute"/>|
+<img src="./Project/images/difference/Smart Brute Force/horse_car.bmp"   width="200px" alt="horse_car_diff_brute"/>|
 <img src="./Project/images/inpainted/Gerchberg Papoulis/horse_car.bmp"   width="200px" alt="horse_car_inapinted_gerchberg"/>|
 <img src="./Project/images/difference/Gerchberg Papoulis/horse_car.bmp"   width="200px" alt="horse_car_diff_gerchberg"/>|
 |------------|------------|------------|------------|
-| Local Brute Force | Imagem da diferença Local Brute Force | Gerchberg Papoulis | Imagem da diferença Gerchberg Papoulis |
+| Smart Brute Force | Imagem da diferença Smart Brute Force | Gerchberg Papoulis | Imagem da diferença Gerchberg Papoulis |
 
 Comparação do RMSE e tempo de execução para cada algoritmo:
 
 | Algoritmo | RMSE | Tempo de execução |
 |-----------|------|-------------------|
-|Gerchberg Papoulis| ?? |??|
-|Brute Force|??|??|
-|Local Brute Force|??|??|
-|Smart Brute Force|??|??|
+|Gerchberg Papoulis|20.856|00m09s|
+|Local Brute Force|25.752|10m11s|
+|Smart Brute Force|20.614|07m48s|
 
-## Outros exemplos
+
+
+### Forbes
+
+A imagem do forbes (forbes.bmp) tem dimensões 961x1280, e pelo seu tamanho ser muito grande o tempo de execução do algoritmo de brute force seria muito alto, por isso não foi executado.
+
+Comparação das imagens:
+
+|<img src="./Project/images/inpainted/Smart Brute Force/forbes.bmp"   width="200px" alt="forbes_inpainted_brute"/>|
+<img src="./Project/images/difference/Smart Brute Force/forbes.bmp"   width="200px" alt="forbes_diff_brute"/>|
+<img src="./Project/images/inpainted/Gerchberg Papoulis/forbes.bmp"   width="200px" alt="forbes_inapinted_gerchberg"/>|
+<img src="./Project/images/difference/Gerchberg Papoulis/forbes.bmp"   width="200px" alt="forbes_diff_gerchberg"/>|
+|------------|------------|------------|------------|
+| Smart Brute Force | Imagem da diferença Smart Brute Force | Gerchberg Papoulis | Imagem da diferença Gerchberg Papoulis |
+
+Comparação do RMSE e tempo de execução para cada algoritmo:
+
+| Algoritmo | RMSE | Tempo de execução |
+|-----------|------|-------------------|
+|Gerchberg Papoulis|20.856|01m31s|
+|Local Brute Force|09.140|19m07s|
+|Smart Brute Force|08.533|06m10s|
+
+
+
+## Remoção de objetos em imagens
 
 Para verificar a funcionalidade dos algoritmos de *inpainting* implementados em objetos mais largos e em contextos diferentes, testamos a remoção de uma pessoa em frente a faixada de um zoológico. A partir da imagem original foi criada a imagem deteriorada, adicionando a cor vermelha em cima da pessoa a ser removida. Os resultados podem ser observados abaixo:
 
