@@ -13,7 +13,7 @@
 
 Nessa etapa do trabalho estudamos e implementamos duas técnicas de *inpainting* para a remoção automática de rabiscos inseridos artificialmente em imagens. Para realizarmos a detecção automática da região que devemos fazer *inpainting* usamos do fato de que os rabiscos são feitos com cores contrastantes que ocorrem com alta frequência nas imagens.
 
-Também foi estudada uma abordagem de *inpainting* para a remoção de objetos em imagens. Para isso é necessário desenhar em cima do objeto a ser removido com um pincel duro e de cor vermelha (255, 0, 0).
+Também foi estudada uma abordagem de *inpainting* para a remoção de objetos em imagens. Para isso é necessário desenhar em cima do objeto a ser removido com um pincel duro com uma cor contrastante como, por exemplo, o vermelho (255, 0, 0).
 
 # Conjunto de imagens
 Parte do conjunto de imagens utilizado é apresentado abaixo. Essas quatro imagens servirão de exemplo para a execução dos algoritmos.
@@ -23,22 +23,22 @@ As imagens abaixo estão em sua forma original.
 
 |<img src="./Project/images/original/dogo2.bmp"   width="200px" alt="dogo2"/>|<img src="./Project/images/original/horse_car.bmp"   height="200px" alt="horse_car"/>|<img src="./Project/images/original/forbes.bmp"   width="200px" alt="forbes"/>|<img src="./Project/images/original/momo_fino.bmp"   width="200px" alt="momo_fino"/>|
 |------------|------------|------------|------------|
-| Cachorro (retirada da internet) | Texto em foto (retirada de um [artigo](http://www.inf.ufrgs.br/~oliveira/pubs_files/inpainting.pdf)) | Forbes | Professor Moacir |
+| Cachorro ([retirada da internet](https://pbs.twimg.com/profile_images/948761950363664385/Fpr2Oz35_400x400.jpg)) | Texto em foto (retirada de um [artigo](http://www.inf.ufrgs.br/~oliveira/pubs_files/inpainting.pdf)) | Forbes | Professor Moacir |
 
 ## Imagens Deterioradas
 As imagens abaixo foram rabiscadas artificialmente. A única imagem que não inserimos rabiscos foi a segunda imagem, que foi retirada de um [artigo](http://www.inf.ufrgs.br/~oliveira/pubs_files/inpainting.pdf).
 
 |<img src="./Project/images/deteriorated/dogo2.bmp"   width="200px" alt="dogo2"/>|<img src="./Project/images/deteriorated/horse_car.bmp"   height="200px" alt="horse_car"/>|<img src="./Project/images/deteriorated/forbes.bmp"   width="200px" alt="forbes"/>|<img src="./Project/images/deteriorated/momo_fino.bmp"   width="200px" alt="momo_fino"/>|
 |------------|------------|------------|------------|
-| Cachorro (retirada da internet) | Texto em foto (retirada de um [artigo](http://www.inf.ufrgs.br/~oliveira/pubs_files/inpainting.pdf)) | Forbes | Professor Moacir |
+| Cachorro ([retirada da internet](https://pbs.twimg.com/profile_images/948761950363664385/Fpr2Oz35_400x400.jpg)) | Texto em foto (retirada de um [artigo](http://www.inf.ufrgs.br/~oliveira/pubs_files/inpainting.pdf)) | Forbes | Professor Moacir |
 
-# Obtenção da máscara
+# Algoritmos de extração da máscara
 
 O primeiro passo para realizar *inpainting* é definir a região deteriorada. Para isso implementamos dois métodos simples para extrair a máscara automaticamente. Para essa etapa do trabalho queremos realizar *inpainting* em cores específicas, ou seja, assumimos como sendo parte da região deteriorada todos os *pixels* que possuem certas cortes determinadas pelos métodos descritos a seguir.
 
 O primeiro passo de ambos os métodos é calcular o número de ocorrências de cada tripla de cor RGB. Optamos por ignorar cores muito próximas do branco absoluto (255, 255, 255) pois alguns dos experimentos foram feitos com imagens com excesso de luz. Ignoramos então as cores que possuem valor maior ou igual a 250 nos três canais.
 
-Vale notar que ambos os métodos podem ser melhorados para que a máscara obtida represente não só algumas cores pré-determinadas pelos métodos, mas que represente também a "penumbra" que muitas ferramentas de edição inserem nas bordas dos traços. Para isso basta extraírmos a máscara usando os métodos abaixo e depois preencher todos os *pixels* não preenchidos adjacentes a um ou mais *pixels* preenchidos que possuem o mesmo tom (canal H da representação de cor HSL).
+Vale notar que os métodos podem ser melhorados para que a máscara obtida represente não só algumas cores pré-determinadas pelos métodos, mas que represente também a "penumbra" que muitas ferramentas de edição inserem nas bordas dos traços. Para isso podemos extrair a máscara usando os métodos abaixo e depois preencher todos os *pixels* não preenchidos adjacentes a um ou mais *pixels* preenchidos que possuem um tom parecido, utilizando uma certa medida de distância. Para esse projeto tentamos usar uma medida de distância usando os canais H e S do espaço de cores HSV, mas, como não obtivemos muita precisão, optamos por usar apenas riscos "duros" para focar na parte principal do projeto: o Inpainting.
 
 |<img src="./Project/images/deteriorated/momo.bmp"   width="200px" alt="momo"/>|<img src="./Project/images/masks/momo.bmp"   width="200px" alt="momo"/>|
 |:-----------------------------------:|:-----------------------------------:|
@@ -53,7 +53,7 @@ Nesse método definimos um *threshold* e assumimos que todas as cores que ocorre
 
 ## *Red*
 
-Extração de máscara especifica para a remoção de objetos sobrepostos com a cor vermelho (255, 0, 0) utilizado para a aplicação extra do projeto.
+Nesse método a máscara será composta por todos os pixels vermelhos (255, 0, 0). Esse método é importante para melhorar a precisão da extração da máscara para a aplicação extra do projeto de remover objetos indesejados. Para isso basta o usuário pintar de vermelho (255, 0, 0) os objetos que deseja remover da imagem.
 
 
 # Algoritmos de *Inpainting*
@@ -89,11 +89,11 @@ O *K* é definido automaticamente levando em consideração a "grossura" do rabi
 A medida de distância utilizada foi similar ao RMSE, mas calculado apenas entre *pixels* não-deteriorados. Vale dizer que para todo o projeto assumimos que os *pixels* fora da imagem são pretos (0, 0, 0).
 
 ### *Brute Force*
-Nesse algoritmo a busca pelo *pixel* *P* é feita em toda a imagem. Esse algoritmo geralmente obtém os melhores resultados, mas seu tempo de execução é altíssimo e, portanto, apenas conseguimos rodar para a imagem dogo1.bmp (100x100) e dogo2.bmp (400x400).
+Nesse algoritmo a busca pelo *pixel* *P* é feita em toda a imagem. Seu tempo de execução é altíssimo e, portanto, apenas conseguimos rodar para as imagens dogo1.bmp (100x100), dogo2.bmp (400x400), momo_fino.bmp (280x280) e momo.bmp (280x280).
 
-|<img src="./Project/images/deteriorated/dogo1.bmp"   width="200px" alt="dogo2"/>|<img src="./Project/images/inpainted/Brute Force/dogo1.bmp"   height="200px" alt="horse_car"/>|<img src="./Project/images/deteriorated/dogo2.bmp"   width="200px" alt="forbes"/>|<img src="./Project/images/inpainted/Brute Force/dogo2.bmp"   width="200px" alt="momo_fino"/>|
+|<img src="./Project/images/inpainted/Brute Force/dogo1.bmp"   width="200px" alt="dogo1"/>|<img src="./Project/images/inpainted/Brute Force/dogo2.bmp"   height="200px" alt="dogo2"/>|<img src="./Project/images/inpainted/Brute Force/momo_fino.bmp"   width="200px" alt="momo_fino"/>|<img src="./Project/images/inpainted/Brute Force/momo.bmp"   width="200px" alt="momo"/>|
 |------------|------------|------------|------------|
-| Cachorro 100x100 deteriorado | Cachorro 100x100 reconstruído | Cachorro 400x400 deteriorado | Cachorro 400x400 reconstruído |
+| Cachorro 100x100 reconstruído | Cachorro 400x400 reconstruído | Moacir com rabiscos finos reconstruído | Moacir com rabiscos grossos reconstruído |
 
 ### *Local Brute Force*
 Nesse algoritmo fazemos a suposição de que as janelas mais similares não estão muito longe da região deteriorada, portanto a busca pelo *pixel* *P* é feita apenas em uma região 101x101 centrada em *Pd*. Isso permite que façamos *inpainting* em imagens maiores em tempo hábil.
@@ -119,14 +119,14 @@ Podemos ver pela imagem horse_car.bmp que usar o *pixel* cuja janela *K*x*K* pos
 
 # Resultados
 
-A avaliação dos resultados foi feita visualmente por meio da imagem da diferença entre a foto original e as resultantes dos algoritmos de *inpainting*, e metricamente pela raiz do erro quadratico médio (RMSE), calculado apenas nos pixels da região deteriorada (pixels da máscara).
+A avaliação dos resultados foi feita visualmente por meio da imagem da diferença entre a foto original e as resultantes dos algoritmos de *inpainting*, e metricamente pela raiz do erro quadrático médio (RMSE), calculado apenas nos pixels da região deteriorada (pixels da máscara).
 
 
 ## Remoção de rabiscos em imagens
 
 Para a abordagem de remoção de rabiscos é comparado o resultado do *Smart Brute Force* (melhor resultado obtido dentre os três de força bruta) e do *Gerchberg Papoulis*. É possível notar melhores resultados vindo do algoritmo *Smart Brute Force*, já que o *Gerchberg Papoulis* gera regiões mais borradas, porém o tempo de execução do *Gerchberg Papoulis* é bem menor se comparado aos demais algoritmos.
 
-Para cada imagem abaixo são apresentados os comparativos visuais e metricos, e também o tempo de execução de cada algoritmo.
+Para cada imagem abaixo são apresentados os comparativos visuais e métricos, e também o tempo de execução de cada algoritmo.
 <!-- Para alguns casos a diferença visual é grande e bem perceptivel, como na imagem do Professor Moacir. No caso da imagem Forbes a diferença visual é mais sutil e quando vista de longe é difícil de perceber. -->
 
 ### Professor Moacir (desenho com bordas grossas)
@@ -259,7 +259,7 @@ Em cada imagem é mostrada a imagem original, imagem com adição da máscara em
 ### Remoção de irregularidades na pele
 
 |<img src="./Project/images/other/forbes_profile.bmp"   width="300px" alt="forbes_profile_original"/>|
-<img src="./Project/images/deteriorated/forbes_profile.bmp"   width="300px" alt="forbes_profile_deteroprated"/>|
+<img src="./Project/images/deteriorated/forbes_profile.bmp"   width="300px" alt="forbes_profile_deteriorated"/>|
 <img src="./Project/images/inpainted/Smart Brute Force/forbes_profile.bmp"   width="300px" alt="forbes_profile_inpainted_brute"/>|
 |------------|------------|------------|
 | Imagem Original | Imagem deteriorada | Smart Brute Force |
@@ -267,10 +267,10 @@ Em cada imagem é mostrada a imagem original, imagem com adição da máscara em
 ### Remoção de desenho em tinta sobre a pele
 
 |<img src="./Project/images/other/gabi_star.bmp"   width="300px" alt="gabi_star_original"/>|
-<img src="./Project/images/deteriorated/gabi_star.bmp"   width="300px" alt="gabi_star_deteroprated"/>|
+<img src="./Project/images/deteriorated/gabi_star.bmp"   width="300px" alt="gabi_star_deteriorated"/>|
 <img src="./Project/images/inpainted/Smart Brute Force/gabi_star.bmp"   width="300px" alt="gabi_star_inpainted_brute"/>|
 |------------|------------|------------|
-| Imagem Original | Imagem deteriorada | Smart Brute Force |
+| Imagem original | Imagem deteriorada | Smart Brute Force |
 
 ### Remoção de um colar
 
@@ -278,13 +278,13 @@ Em cada imagem é mostrada a imagem original, imagem com adição da máscara em
 <img src="./Project/images/deteriorated/team.bmp"   width="300px" alt="team_deteroprated"/>|
 <img src="./Project/images/inpainted/Smart Brute Force/team.bmp"   width="300px" alt="team_inpainted_brute"/>|
 |------------|------------|------------|
-| Imagem Original | Imagem deteriorada | Smart Brute Force |
+| Imagem original | Imagem deteriorada | Smart Brute Force |
 
 # Instruções para execução do código
 
 O algoritmo de *Gerchberg Papoulis* foi implementado em python, enquanto os algoritmos de força bruta foram implementados em C++. É necessário ter o [OpenCV](https://docs.opencv.org/2.4/doc/tutorials/introduction/linux_install/linux_install.html) instalado para a execução do código. As imagens utilizadas estavam no formato Bitmap (.bmp).
 
-A imagem de entrada deve estar na pasta project/images/deteriorated/, a máscara será salva em project/images/masks/ e a imagem de saída na pasta project/images/deteriorated/<inpaiting_algorithm>/.
+A imagem de entrada deve estar na pasta project/images/deteriorated/, a máscara será salva em project/images/masks/ e a imagem de saída na pasta project/images/deteriorated/<inpainting_algorithm>/.
 
 A compilação do código em C++ foi feita utilizando o cmake com o arquivo CMakeLists.txt, então para gerar o Makefile e compilar o executável é preciso executar os comandos dentro da pasta Project:
 
@@ -296,19 +296,19 @@ A execução do código em **C++** é feita pelo comando:
 
 	./main <image_in.bmp> <image_out.bmp> <mask_extraction_algorithm> <inpainting_algorithm> (compare)?
 
-É possivel também executar somente a compração, utilizando o comando:
+É possivel também executar somente a comparação, utilizando o comando:
 
 	./main compare <path/original.bmp> <path/inpainted.bmp> <path/mask.bmp>
 
 A execução do código em **Python** é feita pelo comando:
 
-	python3 main.py <image_in.bmp> <image_out.bmp> <mask_extraction_algorithm>
+	python3 main.py <image_in.bmp> <image_out.bmp> <mask_extraction_algorithm> (compare)?
 
 O código em **Python** só contém a implementação do algoritmo *Gerchberg Papoulis*, por isso não é necessário escolher o algoritmo de *inpainting*.
 
 Os argumentos dos programas são:
- * <image_in.bmp> - Imagem de entrada.
- * <image_out.bmp> - Imagem de saída.
+ * <image_in.bmp> - Nome da imagem de entrada.
+ * <image_out.bmp> - Nome da imagem de saída.
  * <mask_extraction_algorithm> - Algoritmo de extração da máscara (*most_frequent*, *minimum_frequency* ou *red*).
- * <inpainting_algorithm> - Algoritmo de *inpainting* (*brute* ou *local*).
- * (compare) - Realiza a compação entre a imagem original e o resultado (RMSE e imagem da diferença).
+ * <inpainting_algorithm> - Algoritmo de *inpainting* (*brute*, *local*, *smart* ou *dynamic*).
+ * (compare) - Opcional. Realiza a comparação entre a imagem original, se houver, e a imagem restaurada produzindo o RMSE e a imagem da diferença.
