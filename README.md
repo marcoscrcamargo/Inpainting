@@ -119,13 +119,15 @@ Podemos ver pela imagem horse_car.bmp que usar o *pixel* cuja janela *K*x*K* pos
 
 # Resultados
 
-Os resultados obtidos com o algoritmo de força bruta por exemplos são melhores comparados ao algoritmo de Gerchberg Papoulis, como é possível observar pela imagem da diferença entre as fotos originais e as resultantes dos algoritmos e pela raiz do erro quadratico médio (RMSE) apresentados abaixo. O RMSE foi calculado utilizando somente os pixels da região deteriorada (pixels da máscara).
+A avaliação dos resultados foi feita visualmente por meio da imagem da diferença entre a foto original e as resultantes dos algoritmos de *inpainting*, e metricamente pela raiz do erro quadratico médio (RMSE), calculado apenas nos pixels da região deteriorada (pixels da máscara).
 
-O algoritmo de Gerchberg Papoulis apresenta um *inpaiting* mais borrado que o de força bruta, porém sua execução é muito mais rápida. Para alguns casos a diferença visual é grande e bem perceptivel, como na imagem do Professor Moacir. No caso da imagem Forbes a diferença visual é mais sutil e quando vista de longe é difícil de perceber.
 
 ## Remoção de rabiscos em imagens
 
-Para avaliar os resultados obtidos comparamos, nas imagens apresentadas abaixo, o resultado do algoritmo de força bruta e do Gerchberg Papoulis com a imagem da diferença ao lado de cada resultado. Em seguida avaliamos o tempo de execução de cada algoritmo e seu RMSE.
+Para a abordagem de remoção de rabiscos é comparado o resultado do *Smart Brute Force* (melhor resultado obtido dentre os três de força bruta) e do *Gerchberg Papoulis*. É possível notar melhores resultados vindo do algoritmo *Smart Brute Force*, já que o *Gerchberg Papoulis* gera regiões mais borradas, porém o tempo de execução do *Gerchberg Papoulis* é bem menor se comparado aos demais algoritmos.
+
+Para cada imagem abaixo são apresentados os comparativos visuais e metricos, e também o tempo de execução de cada algoritmo.
+<!-- Para alguns casos a diferença visual é grande e bem perceptivel, como na imagem do Professor Moacir. No caso da imagem Forbes a diferença visual é mais sutil e quando vista de longe é difícil de perceber. -->
 
 ### Professor Moacir (desenho com bordas grossas)
 
@@ -243,25 +245,45 @@ Comparação do RMSE e tempo de execução para cada algoritmo:
 
 ## Remoção de objetos em imagens
 
-Para verificar a funcionalidade dos algoritmos de *inpainting* implementados em objetos mais largos e em contextos diferentes, testamos a remoção de uma pessoa em frente a faixada de um zoológico. A partir da imagem original foi criada a imagem deteriorada, adicionando a cor vermelha em cima da pessoa a ser removida. Os resultados podem ser observados abaixo:
+Para verificar a funcionalidade dos algoritmos de *inpainting* implementados para a remoção de objetos mais largos e em contextos diferentes, foram realizados os testes abaixo.
+Em cada imagem é mostrada a imagem original, imagem com adição da máscara em vermelho (imagem deteriorada) e o resultado do *Smart Brute Force*.
+
+### Remoção de pessoa em frente a faixada de zoológico
 
 |<img src="./Project/images/other/zoo.bmp"   width="300px" alt="zoo_original"/>|
 <img src="./Project/images/deteriorated/zoo.bmp"   width="300px" alt="zoo_deteroprated"/>|
-<img src="./Project/images/inpainted/Local Brute Force/zoo.bmp"   width="300px" alt="zoo_inpainted_brute"/>|
+<img src="./Project/images/inpainted/Smart Brute Force/zoo.bmp"   width="300px" alt="zoo_inpainted_brute"/>|
 |------------|------------|------------|
-| Imagem Original | Imagem deteriorada | Local Brute Force |
+| Imagem Original | Imagem deteriorada | Smart Brute Force |
 
-
-Também foi testado a remoção de irregularidades na pele de uma pessoa e a criação da imagem deteriorada para o *inpainting* foi feita criando circulos em volta das irregularidades a serem removidas. Os resultados podem ser observados abaixo:
+### Remoção de irregularidades na pele
 
 |<img src="./Project/images/other/forbes_profile.bmp"   width="300px" alt="forbes_profile_original"/>|
 <img src="./Project/images/deteriorated/forbes_profile.bmp"   width="300px" alt="forbes_profile_deteroprated"/>|
-<img src="./Project/images/inpainted/Local Brute Force/forbes_profile.bmp"   width="300px" alt="forbes_profile_inpainted_brute"/>|
+<img src="./Project/images/inpainted/Smart Brute Force/forbes_profile.bmp"   width="300px" alt="forbes_profile_inpainted_brute"/>|
 |------------|------------|------------|
-| Imagem Original | Imagem deteriorada | Local Brute Force |
+| Imagem Original | Imagem deteriorada | Smart Brute Force |
 
+### Remoção de desenho em tinta sobre a pele
+
+|<img src="./Project/images/other/gabi_star.bmp"   width="300px" alt="gabi_star_original"/>|
+<img src="./Project/images/deteriorated/gabi_star.bmp"   width="300px" alt="gabi_star_deteroprated"/>|
+<img src="./Project/images/inpainted/Smart Brute Force/gabi_star.bmp"   width="300px" alt="gabi_star_inpainted_brute"/>|
+|------------|------------|------------|
+| Imagem Original | Imagem deteriorada | Smart Brute Force |
+
+### Remoção de um colar
+
+|<img src="./Project/images/other/team.bmp"   width="300px" alt="team_original"/>|
+<img src="./Project/images/deteriorated/team.bmp"   width="300px" alt="team_deteroprated"/>|
+<img src="./Project/images/inpainted/Smart Brute Force/team.bmp"   width="300px" alt="team_inpainted_brute"/>|
+|------------|------------|------------|
+| Imagem Original | Imagem deteriorada | Smart Brute Force |
 
 # Instruções para execução do código
+
+O algoritmo de *Gerchberg Papoulis* foi implementado em python, enquanto os algoritmos de força bruta foram implementados em C++. É necessário ter o [OpenCV](https://docs.opencv.org/2.4/doc/tutorials/introduction/linux_install/linux_install.html) instalado para a execução do código. As imagens utilizadas estavam no formato Bitmap (.bmp).
+
 A imagem de entrada deve estar na pasta project/images/deteriorated/, a máscara será salva em project/images/masks/ e a imagem de saída na pasta project/images/deteriorated/<inpaiting_algorithm>/.
 
 A compilação do código em C++ foi feita utilizando o cmake com o arquivo CMakeLists.txt, então para gerar o Makefile e compilar o executável é preciso executar os comandos dentro da pasta Project:
@@ -290,14 +312,3 @@ Os argumentos dos programas são:
  * <mask_extraction_algorithm> - Algoritmo de extração da máscara (*most_frequent*, *minimum_frequency* ou *red*).
  * <inpainting_algorithm> - Algoritmo de *inpainting* (*brute* ou *local*).
  * (compare) - Realiza a compação entre a imagem original e o resultado (RMSE e imagem da diferença).
-
-# Próximos passos
-
-Os próximos passos para o projeto incluem:
-
- * Melhorar a extração automática das máscaras.
- * Implementação de uma versão mais otimizada do algoritmo de *Inpainting* por exemplos (*Smart Brute Force*).
- * Experimentos com as diferentes possíveis medidas de distância entre janelas *K*x*K*.
- * Visualização da diferença entre as imagem originais e as imagens reconstruídas.
- * Análise do RMSE entre as imagens originais e as imagem reconstruídas.
-
