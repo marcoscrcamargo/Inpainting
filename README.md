@@ -89,11 +89,11 @@ O *K* é definido automaticamente levando em consideração a "grossura" do rabi
 A medida de distância utilizada foi similar ao RMSE, mas calculado apenas entre *pixels* não-deteriorados. Vale dizer que para todo o projeto assumimos que os *pixels* fora da imagem são pretos (0, 0, 0).
 
 ### *Brute Force*
-Nesse algoritmo a busca pelo *pixel* *P* é feita em toda a imagem. Esse algoritmo geralmente obtém os melhores resultados, mas seu tempo de execução é altíssimo e, portanto, apenas conseguimos rodar para a imagem dogo1.bmp (100x100) e dogo2.bmp (400x400).
+Nesse algoritmo a busca pelo *pixel* *P* é feita em toda a imagem. Seu tempo de execução é altíssimo e, portanto, apenas conseguimos rodar para as imagens dogo1.bmp (100x100), dogo2.bmp (400x400), momo_fino.bmp (280x280) e momo.bmp (280x280).
 
-|<img src="./Project/images/deteriorated/dogo1.bmp"   width="200px" alt="dogo2"/>|<img src="./Project/images/inpainted/Brute Force/dogo1.bmp"   height="200px" alt="horse_car"/>|<img src="./Project/images/deteriorated/dogo2.bmp"   width="200px" alt="forbes"/>|<img src="./Project/images/inpainted/Brute Force/dogo2.bmp"   width="200px" alt="momo_fino"/>|
+|<img src="./Project/images/inpainted/Brute Force/dogo1.bmp"   width="200px" alt="dogo1"/>|<img src="./Project/images/inpainted/Brute Force/dogo2.bmp"   height="200px" alt="dogo2"/>|<img src="./Project/images/inpainted/Brute Force/momo_fino.bmp"   width="200px" alt="momo_fino"/>|<img src="./Project/images/inpainted/Brute Force/momo.bmp"   width="200px" alt="momo"/>|
 |------------|------------|------------|------------|
-| Cachorro 100x100 deteriorado | Cachorro 100x100 reconstruído | Cachorro 400x400 deteriorado | Cachorro 400x400 reconstruído |
+| Cachorro 100x100 reconstruído | Cachorro 400x400 reconstruído | Moacir com rabiscos finos reconstruído | Moacir com rabiscos grossos reconstruído |
 
 ### *Local Brute Force*
 Nesse algoritmo fazemos a suposição de que as janelas mais similares não estão muito longe da região deteriorada, portanto a busca pelo *pixel* *P* é feita apenas em uma região 101x101 centrada em *Pd*. Isso permite que façamos *inpainting* em imagens maiores em tempo hábil.
