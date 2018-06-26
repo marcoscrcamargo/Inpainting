@@ -8,6 +8,7 @@ import sys
 RATIO = 0.01
 MOST_FREQUENT = 0
 MINIMUM_FREQUENCY = 1
+RED = 2
 ORIGINAL_PATH = "./images/original/"
 DETERIORATED_PATH = "./images/deteriorated/"
 INPAINTED_PATH = "./images/inpainted/Gerchberg Papoulis/"
@@ -17,6 +18,10 @@ MASKS_PATH = "./images/masks/"
 # Função que retorna se o pixel é branco.
 def white(p):
 	return p[0] >= 250 and p[1] >= 250 and p[2] >= 250
+
+# Função que retorna se o pixel é vermelho puro.
+def red(p):
+	return p[0] == 255 and p[1] == 0 and p[2] == 0
 
 # Retorna a frequência das cores de uma imagem.
 def rgb_frequency(f):
@@ -46,40 +51,52 @@ def most_frequent(freq):
 
 # Extrai a máscara a partir de uma imagem rabiscada.
 def extract_mask(f, mode):
-	print("Counting frequency...")
-
-	# Contando a frequência de cores da imagem.
-	freq = rgb_frequency(f)
-
-	print("Painting mask...")
-
-	# Alocando a máscara.
-	mask = np.zeros((f.shape[0], f.shape[1]), np.uint8)
-	
-	if mode == MOST_FREQUENT:
-		# Recuperando a cor mais frequente.
-		p = most_frequent(freq)
-
-		# Pintando.
-		for x in range(f.shape[0]):
-			for y in range(f.shape[1]):
-				rgb = (f[x][y][0], f[x][y][1], f[x][y][2])
-
-				# Pinta se o pixel for da cor mais frequente.
-				if rgb == p:
-					mask[x][y] = 255
-
-	elif mode == MINIMUM_FREQUENCY:
-		threshold = int(RATIO * (f.shape[0] * f.shape[1]))
+	if mode == RED:
+		print("Painting mask...")
 
 		# Painting.
 		for x in range(f.shape[0]):
 			for y in range(f.shape[1]):
 				rgb = (f[x][y][0], f[x][y][1], f[x][y][2])
 
-				# Pinta se a frequência da cor desse pixel for muito alta.
-				if not white(rgb) and freq[rgb] > threshold:
+				# Pinta se o pixel for vermelho puro.
+				if red(rgb):
 					mask[x][y] = 255
+	else:
+		print("Counting frequency...")
+
+		# Contando a frequência de cores da imagem.
+		freq = rgb_frequency(f)
+
+		print("Painting mask...")
+
+		# Alocando a máscara.
+		mask = np.zeros((f.shape[0], f.shape[1]), np.uint8)
+		
+		if mode == MOST_FREQUENT:
+			# Recuperando a cor mais frequente.
+			p = most_frequent(freq)
+
+			# Pintando.
+			for x in range(f.shape[0]):
+				for y in range(f.shape[1]):
+					rgb = (f[x][y][0], f[x][y][1], f[x][y][2])
+
+					# Pinta se o pixel for da cor mais frequente.
+					if rgb == p:
+						mask[x][y] = 255
+
+		elif mode == MINIMUM_FREQUENCY:
+			threshold = int(RATIO * (f.shape[0] * f.shape[1]))
+
+			# Painting.
+			for x in range(f.shape[0]):
+				for y in range(f.shape[1]):
+					rgb = (f[x][y][0], f[x][y][1], f[x][y][2])
+
+					# Pinta se a frequência da cor desse pixel for muito alta.
+					if not white(rgb) and freq[rgb] > threshold:
+						mask[x][y] = 255
 
 	return mask
 
@@ -224,6 +241,8 @@ def main():
 		mask = extract_mask(deteriorated, MOST_FREQUENT)
 	elif sys.argv[3] == "minimum_frequency":
 		mask = extract_mask(deteriorated, MINIMUM_FREQUENCY)
+	elif sys.argv[3] == "red":
+		mask = extract_mask(deteriorated, RED)
 	else:
 		assert(False)
 

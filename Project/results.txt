@@ -51,6 +51,26 @@ Smart Brute Force:
 	horse_car.bmp (438x297):
 		RMSE: 20.614
 		Time: 07m48s
+
+Local Dynamic Brute Force:
+	dogo1.bmp (100x100):
+		RMSE: 06.646
+		Time: 00m03s
+	dogo2.bmp (400x400):
+		RMSE: 12.014
+		Time: 00m52s
+	momo.bmp (280x280):
+		RMSE: 21.288
+		Time: 01m14s
+	momo_fino.bmp (280x280):
+		RMSE: 13.644
+		Time: 00m34s
+	forbes.bmp (961x1280):
+		RMSE: 06.964
+		Time: 07m21s
+	horse_car.bmp (438x297):
+		RMSE: 23.660
+		Time: 04m38s
 	
 Gerchberg Papoulis:
 	dogo1.bmp (100x100):
@@ -73,11 +93,17 @@ Gerchberg Papoulis:
 		Time: 00m09s
 
 Smart Brute Force for assisted removal:
-	forbes_profile.bmp:
-		Time: 01m42s
-	zoo.bmp:
-		Time: 
-	team.bmp:
-		Time: 91m12s
-	gabi_star:
-		Time: 02m11s
+	forbes_profile.bmp: 01m42s
+	zoo.bmp: 11m47s
+	team.bmp: 18m40s
+	gabi_star: 02m11s
+	mike: 73m06s
+	praia: 77m31s
+
+Local Dynamic Brute Force for assisted removal:
+	forbes_profile.bmp: 02m43s
+	zoo.bmp: 02m15s
+	team.bmp: 01m42s
+	gabi_star: 00m31s
+	mike: 11m47s
+	praia: 11m53s

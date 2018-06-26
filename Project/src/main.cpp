@@ -29,6 +29,8 @@ using namespace cv;
 #define LOCAL_DIFFERENCE_PATH "./images/difference/Local Brute Force/"
 #define SMART_INPAINTED_PATH "./images/inpainted/Smart Brute Force/"
 #define SMART_DIFFERENCE_PATH "./images/difference/Smart Brute Force/"
+#define DYNAMIC_INPAINTED_PATH "./images/inpainted/Local Dynamic Brute Force/"
+#define DYNAMIC_DIFFERENCE_PATH "./images/difference/Local Dynamic Brute Force/"
 #define MASKS_PATH "./images/masks/"
 
 struct KWindow{
@@ -79,7 +81,7 @@ void fill_blur(Mat &, Mat &);
 Mat extract_mask(Mat &, int);
 
 /* Função que extrai o tamanho ideal da janela para o Brute Force com uma Multi-Source BFS. */
-int extract_window_size(Mat &);
+int extract_ideal_window_size(Mat &);
 
 /* Retorna a distância (medida de similaridade) entre duas janelas KxK centradas em (xi, yi) e em (xf, yf). */
 double window_distance(Mat &, Mat &, int, int, int, int, int);
@@ -92,6 +94,12 @@ Mat local_brute_force(Mat &, Mat &);
 
 /* Função que faz um Brute Force mantendo uma lista das janelas mais similares e passando adiante para os pixels vizinhos. */
 Mat smart_brute_force(Mat &, Mat &);
+
+/* Função que faz um Brute Force Local com K dinâmico e usando a média entre as melhores janelas. */
+Mat local_dynamic_brute_force(Mat &, Mat &);
+
+/* Retorna a média dos pixels da priority_queue */
+Vec3b pixel_mean(Mat &, std::priority_queue<KWindow> &);
 
 /* Extracts a single channel from an image. */
 Mat extract_channel(Mat &, int);
@@ -345,10 +353,10 @@ Mat extract_mask(Mat &deteriorated, int mode){
 	return mask;
 }
 
-int extract_window_size(Mat &mask){
+std::vector<std::vector<int> > extract_window_sizes(Mat &mask){
 	std::vector<std::vector<int> > dist;
 	std::queue<std::pair<int, int> > q;
-	int ans, x, y;
+	int x, y;
 
 	// Alocando matriz de distâncias.
 	dist.resize(mask.rows);
@@ -393,7 +401,22 @@ int extract_window_size(Mat &mask){
 		}
 	}
 
-	// Inicializando o "raio".
+	// Atualizando os valores para representar o "diâmetro" + 3.
+	for (x = 0; x < mask.rows; x++){
+		for (y = 0; y < mask.cols; y++){
+			dist[x][y] = 2 * dist[x][y] + 3;
+		}
+	}
+
+	return dist;
+}
+
+int extract_ideal_window_size(Mat &mask){
+	std::vector<std::vector<int> > dist;
+	int ans, x, y;
+
+	// Alocando matriz de distâncias e incializando o "raio".
+	dist = extract_window_sizes(mask);
 	ans = 0;
 
 	// Recuperando a distância máxima.
@@ -404,7 +427,7 @@ int extract_window_size(Mat &mask){
 	}
 
 	// Retornando o "diâmetro" + 3.
-	return 2 * ans + 3;
+	return ans;
 }
 
 double window_distance(Mat &deteriorated, Mat &mask, int xi, int yi, int xf, int yf, int k){
@@ -481,7 +504,7 @@ Mat brute_force(Mat &deteriorated, Mat &mask){
 	inpainted = Mat(deteriorated.rows, deteriorated.cols, CV_8UC3);
 
 	// Obtendo as dimensões da janela ideal para o Brute Force.
-	k = extract_window_size(mask);
+	k = extract_ideal_window_size(mask);
 
 	printf("k = %d\n", k);
 
@@ -533,7 +556,7 @@ Mat local_brute_force(Mat &deteriorated, Mat &mask){
 	inpainted = Mat(deteriorated.rows, deteriorated.cols, CV_8UC3);
 
 	// Obtendo as dimensões da janela ideal para o Brute Force.
-	k = extract_window_size(mask);
+	k = extract_ideal_window_size(mask);
 
 	printf("k = %d\n", k);
 
@@ -564,6 +587,86 @@ Mat local_brute_force(Mat &deteriorated, Mat &mask){
 						}
 					}
 				}
+			}
+			else{
+				// Se o pixel (bad_x, bad_y) for bom, basta copiar da imagem deteriorated para a imagem final.
+				inpainted.at<Vec3b>(bad_x, bad_y) = deteriorated.at<Vec3b>(bad_x, bad_y);
+			}
+		}
+	}
+
+	// Retornando a imagem final.
+	return inpainted;
+}
+
+Vec3b pixel_mean(Mat &deteriorated, std::priority_queue<KWindow> &pq){
+	double r, g, b;
+	int x, y, n;
+	Vec3b p;
+
+	b = g = r = 0.0;
+	n = (int)pq.size();
+
+	// Para cada pixel.
+	while (!pq.empty()){
+		x = pq.top().x;
+		y = pq.top().y;
+		pq.pop();
+
+		// Somando o valor de seus canais.
+		b += (double)deteriorated.at<Vec3b>(x, y)[0];
+		g += (double)deteriorated.at<Vec3b>(x, y)[1];
+		r += (double)deteriorated.at<Vec3b>(x, y)[2];
+	}
+
+	// Tirando a média e arredondando.
+	p[0] = round(b / (double)n);
+	p[1] = round(g / (double)n);
+	p[2] = round(r / (double)n);
+
+	return p;
+}
+
+Mat local_dynamic_brute_force(Mat &deteriorated, Mat &mask){
+	std::vector<std::vector<int> > k;
+	std::priority_queue<KWindow> pq;
+	int x, y, bad_x, bad_y;
+	Mat inpainted;
+	double dist;
+
+	// Inicializando a imagem final.
+	inpainted = Mat(deteriorated.rows, deteriorated.cols, CV_8UC3);
+
+	// Obtendo as dimensões das janelas ideais para o Brute Force.
+	k = extract_window_sizes(mask);
+
+	// Para cada pixel ruim (bad_x, bad_y).
+	for (bad_x = 0; bad_x < deteriorated.rows; bad_x++){
+		printf("Inpainting line %d\n", bad_x);
+		
+		for (bad_y = 0; bad_y < deteriorated.cols; bad_y++){
+			// Se o pixel for ruim.
+			if (mask.at<uchar>(bad_x, bad_y) != 0){
+				// Para cada pixel (x, y) em uma área quadrada definida pelo raio "RADIUS".
+				for (x = max(0, bad_x - RADIUS); x < min(deteriorated.rows, bad_x + RADIUS + 1); x++){
+					for (y = max(0, bad_y - RADIUS); y < min(deteriorated.cols, bad_y + RADIUS + 1); y++){
+						// Se o pixel for bom.
+						if (mask.at<uchar>(x, y) == 0){
+							// Recuperando a distância entre a janela centrada em (bad_x, bad_y) e a janela centrada em (x, y).
+							dist = window_distance(deteriorated, mask, bad_x, bad_y, x, y, k[bad_x][bad_y]);
+
+							pq.push(KWindow(x, y, dist));
+
+							// Queremos apenas os ELITE_SIZE melhores.
+							if ((int)pq.size() > ELITE_SIZE){
+								pq.pop();
+							}
+						}
+					}
+				}
+
+				// Atribuindo a média dos ELITE_SIZE melhores.
+				inpainted.at<Vec3b>(bad_x, bad_y) = pixel_mean(deteriorated, pq);
 			}
 			else{
 				// Se o pixel (bad_x, bad_y) for bom, basta copiar da imagem deteriorated para a imagem final.
@@ -710,7 +813,7 @@ Mat smart_brute_force(Mat &deteriorated, Mat &mask){
 	inpainted = Mat(deteriorated.rows, deteriorated.cols, CV_8UC3);
 
 	// Obtendo as dimensões da janela ideal para o Brute Force.
-	k = extract_window_size(mask);
+	k = extract_ideal_window_size(mask);
 
 	printf("k = %d\n", k);
 
@@ -800,7 +903,7 @@ Mat gerchberg_papoulis(Mat &deteriorated, Mat &mask, int T){
 	mean = Mat::zeros(deteriorated.rows, deteriorated.cols, CV_32FC1);
 
 	// Obtendo o tamanho ideal para o filtro.
-	k = extract_window_size(mask);
+	k = extract_ideal_window_size(mask);
 
 	// Preenchendo o filtro.
 	for (x = 0; x < k; x++){
@@ -926,7 +1029,7 @@ int main(int argc, char *argv[]){
 		printf("Compare usage: ./main compare <path/original.bmp> <path/inpainted.bmp> <path/mask.bmp>\n");
 		printf("Inpainting usage: ./main <image_in.bmp> <image_out.bmp> <mask_extraction_algorithm> <inpainting_algorithm> (compare)?\n");
 		printf("<mask_extraction_algorithm> - {most_frequent, minimum_frequency, red}\n");
-		printf("<inpainting_algorithm> - {brute, local}\n");
+		printf("<inpainting_algorithm> - {brute, local, smart, dynamic}\n");
 		return -1;
 	}
 
@@ -1048,6 +1151,25 @@ int main(int argc, char *argv[]){
 			// Escrevendo a diferença em um arquivo.
 			printf("Writing difference to: %s\n", (SMART_DIFFERENCE_PATH + std::string(argv[2])).c_str());
 			imwrite(SMART_DIFFERENCE_PATH + std::string(argv[2]), difference);
+		}
+	}
+	else if (!strcmp(argv[4], "dynamic")){
+		// Roda o Local Brute Force e salva na pasta correspondente.
+		inpainted = local_dynamic_brute_force(deteriorated, mask);
+		printf("Writing inpainted image by Local Dynamic Brute Force to: %s\n", (DYNAMIC_INPAINTED_PATH + std::string(argv[2])).c_str());
+		imwrite(DYNAMIC_INPAINTED_PATH + std::string(argv[2]), inpainted);
+
+		// Faz uma comparação da imagem original com a reconstruída.
+		if (argc == 6 and !strcmp(argv[5], "compare")  and original.data){
+			// Imprimindo o RMSE apenas na região da máscara.
+			printf("RMSE = %.3lf\n", rmse(original, inpainted, mask));
+
+			// Extraindo a diferença entre a imagem original e a reconstruída.
+			difference = extract_difference(original, inpainted);
+
+			// Escrevendo a diferença em um arquivo.
+			printf("Writing difference to: %s\n", (DYNAMIC_DIFFERENCE_PATH + std::string(argv[2])).c_str());
+			imwrite(DYNAMIC_DIFFERENCE_PATH + std::string(argv[2]), difference);
 		}
 	}
 	else if (!strcmp(argv[4], "papoulis")){
