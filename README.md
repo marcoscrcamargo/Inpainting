@@ -53,7 +53,7 @@ Nesse método definimos um *threshold* e assumimos que todas as cores que ocorre
 
 ## *Red*
 
-Extração de máscara especifica para a remoção de objetos sobrepostos com a cor vermelho (255, 0, 0) utilizado para a aplicação extra do projeto.
+Nesse método a máscara será composta por todos os pixels vermelhos (255, 0, 0). Esse método é importante para melhorar a precisão da extração da máscara para a aplicação extra do projeto de remover objetos indesejados. Para isso basta o usuário pintar de vermelho (255, 0, 0) os objetos que deseja remover da imagem.
 
 
 # Algoritmos de *Inpainting*
