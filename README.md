@@ -16,7 +16,7 @@ Nesse projeto estudamos e implementamos técnicas de *inpainting* para a remoç�
 Aplicamos os métodos utilizados para a remoção de objetos em imagens também. Para isso é necessário desenhar em cima do objeto a ser removido com um pincel duro com uma cor contrastante como, por exemplo, o vermelho (255, 0, 0).
 
 # Conjunto de imagens
-Parte do conjunto de imagens utilizado é apresentado abaixo. Todas as imagens utilizadas estão no formato Bitmap (.bmp).
+Parte do conjunto de imagens utilizado é apresentado abaixo. Todas as imagens utilizadas estão no formato Bitmap (.bmp) e estão organizadas na pasta *images/*.
 
 ## Imagens Originais
 As imagens abaixo estão em sua forma original.
@@ -106,7 +106,9 @@ Nesse algoritmo fazemos a suposição de que as janelas mais similares não est�
 ### *Local Dynamic Brute Force*
 Aprimorando um pouco a ideia do Brute Force Local, percebemos que atribuir a média entre os *pixels* cuja janela *K*x*K* mais se assemelham a janela do *pixel* *Pd* reduz o RMSE e resulta, em geral, em restaurações mais suaves. Usamos os 5 mais semelhantes para imagens menores e os 10 mais semelhantes para imagens maiores.
 
-Além disso, ao começarmos a tentar remover rabiscos mais grossos ou objetos maiores observamos que poderíamos usar um valor de *K* dinâmico, ou seja, um valor de *K* para cada *pixel* deteriorado *Pd* com o objetivo de obter janelas mais representativas e reduzir o tempo de execução. Esse método se mostrou especialmente útil em máscaras mais grossas, ou seja, máscaras que produzem um valor de *K* elevado nos outros métodos. Seu tempo de execução é mais baixo pois o *K* escolhido para as bordas é menor do que o *K* escolhido para o centro de regiões deterioradas.
+Além disso, ao começarmos a tentar remover rabiscos mais grossos ou objetos maiores observamos que poderíamos usar um valor de *K* dinâmico, ou seja, um valor de *K* para cada *pixel* deteriorado *Pd* com o objetivo de obter janelas mais representativas e reduzir o tempo de execução. Esse método se mostrou especialmente útil em máscaras mais grossas, ou seja, máscaras que produzem um valor de *K* elevado nos outros métodos.
+
+A imagem abaixo é um bom exemplo da utilidade do *K* dinâmico, pois podemos ver que as regiões "deterioradas" são "grossas". Para as bordas dessas regiões o *K* usado é menor, o que reduz o tempo de execução.
 
 |<img src="./Project/images/other/forbes_profile.bmp"   width="200px" alt="forbes"/>|<img src="./Project/images/deteriorated/forbes_profile.bmp"   width="200px" alt="forbes"/>|<img src="./Project/images/masks/forbes_profile.bmp"   width="200px" alt="forbes"/>|<img src="./Project/images/inpainted/Local Dynamic Brute Force/forbes_profile.bmp"   width="200px" alt="forbes"/>|
 |------------|------------|------------|------------|
@@ -251,7 +253,29 @@ O algoritmo Local Dynamic Brute Force obteve o melhor resultado com 6.964 de RMS
 
 ## Remoção de objetos em imagens
 
-Abaixo estão os resultados das tentativas de remoção de objetos de imagens. Para cada imagem é apresentada a imagem original a imagem com adição de vermelho (255, 0, 0) por cima da região indesejada e o resultado mais satisfatório obtido por algum dos algoritmos.
+Abaixo estão os resultados do uso de *Inpainting* para a remoção de objetos de imagens. Os tempos de execução para cada algoritmo estão apresentados abaixo:
+
+### Local Dynamic Brute Force
+| Imagem | Tempo |
+| :---: | :---: |
+| forbes_profile.bmp | 02m43s |
+| gabi_star.bmp | 00m31s |
+| team.bmp | 01m42s |
+| mike.bmp | 11m47s |
+| praia.bmp | 11m53s |
+| zoo.bmp | 02m15s |
+
+### Smart Brute Force
+| Imagem | Tempo |
+| :---: | :---: |
+| forbes_profile.bmp | 01m42s |
+| gabi_star | 02m11s |
+| team.bmp | 18m40s |
+| mike.bmp | 73m06s |
+| praia.bmp | 77m31s |
+| zoo.bmp | 11m47s |
+
+Para cada imagem é apresentada a imagem original a imagem com adição de vermelho (255, 0, 0) por cima da região indesejada e o resultado mais satisfatório obtido por algum dos algoritmos.
 
 ### Remoção de marcas na pele 934x1280 (forbes_profile.bmp)
 
@@ -307,7 +331,7 @@ Obtivemos ótimos resultados com os algoritmos de *Inpainting* por exemplos para
 
 # Instruções para execução do código
 
-O algoritmo de *Gerchberg Papoulis* foi implementado em Python 3 com Numpy e ImageIO, enquanto os algoritmos de *Inpainting* por exemplos foram implementados em C++ com [OpenCV](https://docs.opencv.org/2.4/doc/tutorials/introduction/linux_install/linux_install.html).
+O algoritmo de *Gerchberg Papoulis* foi implementado em Python 3 com Numpy e ImageIO, enquanto os algoritmos de *Inpainting* por exemplos foram implementados em C++ com [OpenCV](https://docs.opencv.org/2.4/doc/tutorials/introduction/linux_install/linux_install.html) para obter tempos de execução menores.
 
 A imagem de entrada deve estar na pasta project/images/deteriorated/, a máscara será salva em project/images/masks/ e a imagem de saída na pasta project/images/deteriorated/<inpainting_algorithm>/.
 
@@ -337,3 +361,9 @@ Os argumentos são:
  * <mask_extraction_algorithm> - Algoritmo de extração da máscara (*most_frequent*, *minimum_frequency* ou *red*).
  * <inpainting_algorithm> - Algoritmo de *inpainting* (*brute*, *local*, *dynamic* ou *smart*).
  * (compare) - Opcional. Realiza a comparação entre a imagem original, se houver, e a imagem restaurada produzindo o RMSE e a imagem da diferença.
+ 
+Se quisermos, por exemplo, executar o Local Brute Force para remover rabiscos de múltiplas cores da imagem *dogo2.bmp* e obter uma avaliação dos resultados (RMSE e imagem da diferença) basta colocar a imagem na pasta *images/deteriorated/* e executar o comando:
+
+	./main dogo2.bmp dogo2.bmp minimum_frequency local compare
+
+Após a execução a máscara é salva na pasta *images/masks/*, a imagem restaurada é salva na pasta *images/inpainted/Local Brute Force/* e a imagem da diferença é salva na pasta *images/difference/Local Brute Force/*.
