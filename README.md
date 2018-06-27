@@ -110,7 +110,7 @@ Além disso, ao começarmos a tentar remover rabiscos mais grossos ou objetos ma
 
 |<img src="./Project/images/other/forbes_profile.bmp"   width="200px" alt="forbes"/>|<img src="./Project/images/deteriorated/forbes_profile.bmp"   width="200px" alt="forbes"/>|
 |<img src="./Project/images/masks/forbes_profile.bmp"   width="200px" alt="forbes"/>|<img src="./Project/images/inpainted/Local Dynamic Brute Force/forbes_profile.bmp"   width="200px" alt="forbes"/>|
-|------------|------------|
+|------------|------------|------------|------------|
 | Forbes-Perfil 934x1280 original | Forbes-Perfil 934x1280 "deteriorado" | Forbes-Perfil 934x1280 máscara | Forbes-Perfil 934x1280 restaurado |
 
 ### *Smart Brute Force*
@@ -130,14 +130,18 @@ Podemos ver pela imagem *horse_car.bmp* que usar o *pixel* cuja janela *K*x*K* p
 
 # Resultados
 
-A avaliação dos resultados foi feita visualmente por meio da imagem da diferença entre a foto original e as resultantes dos algoritmos de *inpainting*, e metricamente pela raiz do erro quadrático médio (RMSE), calculado apenas nos pixels da região deteriorada (pixels da máscara).
+A avaliação dos resultados foi feita visualmente e pela raiz do erro quadrático médio (RMSE), calculado apenas nos pixels da região deteriorada (pixels da máscara). Além disso foram geradas imagens representando a diferença entre as imagens originais e as imagens restauradas.
 
 ## Remoção de rabiscos em imagens
 
-Para a abordagem de remoção de rabiscos é comparado o resultado do *Smart Brute Force* (melhor resultado obtido dentre os três de força bruta) e do *Gerchberg Papoulis*. É possível notar melhores resultados vindo do algoritmo *Smart Brute Force*, já que o *Gerchberg Papoulis* gera regiões mais borradas, porém o tempo de execução do *Gerchberg Papoulis* é bem menor se comparado aos demais algoritmos.
+Em geral observamos que os melhores resultados vieram do algoritmo *Smart Brute Force* enquanto os piores resultados vieram do *Gerchberg Papoulis*, visto que esse gera regiões visivelmente mais borradas (apesar de possuir o tempo de execução mais baixo) principalmente para imagens com vários detalhes como rostos.
 
-Para cada imagem abaixo são apresentados os comparativos visuais e métricos, e também o tempo de execução de cada algoritmo.
-<!-- Para alguns casos a diferença visual é grande e bem perceptivel, como na imagem do Professor Moacir. No caso da imagem Forbes a diferença visual é mais sutil e quando vista de longe é difícil de perceber. -->
+A tabela abaixo sumariza os resultados obtidos na remoção dos rabiscos.
+
+| X    | <td colspan=2>Gerchberg Papoulis</td> | <td colspan=2>Brute Force</td> |
+| X    | RMSE                 | Tempo          | RMSE          | Tempo          |
+
+Em seguida apresentamos resultados para algumas imagens com comparativos visuais e métricos, além do tempo de execução de cada algoritmo.
 
 ### Professor Moacir (desenho com bordas grossas)
 
