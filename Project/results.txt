@@ -31,6 +31,26 @@ Local Brute Force:
 	horse_car.bmp (438x297):
 		RMSE: 25.752
 		Time: 10m11s
+		
+Local Dynamic Brute Force:
+	dogo1.bmp (100x100):
+		RMSE: 06.646
+		Time: 00m03s
+	dogo2.bmp (400x400):
+		RMSE: 12.014
+		Time: 00m52s
+	momo.bmp (280x280):
+		RMSE: 21.288
+		Time: 01m14s
+	momo_fino.bmp (280x280):
+		RMSE: 13.644
+		Time: 00m34s
+	forbes.bmp (961x1280):
+		RMSE: 06.964
+		Time: 07m21s
+	horse_car.bmp (438x297):
+		RMSE: 23.660
+		Time: 04m38s
 
 Smart Brute Force:
 	dogo1.bmp (100x100):
@@ -51,26 +71,6 @@ Smart Brute Force:
 	horse_car.bmp (438x297):
 		RMSE: 20.614
 		Time: 07m48s
-
-Local Dynamic Brute Force:
-	dogo1.bmp (100x100):
-		RMSE: 06.646
-		Time: 00m03s
-	dogo2.bmp (400x400):
-		RMSE: 12.014
-		Time: 00m52s
-	momo.bmp (280x280):
-		RMSE: 21.288
-		Time: 01m14s
-	momo_fino.bmp (280x280):
-		RMSE: 13.644
-		Time: 00m34s
-	forbes.bmp (961x1280):
-		RMSE: 06.964
-		Time: 07m21s
-	horse_car.bmp (438x297):
-		RMSE: 23.660
-		Time: 04m38s
 	
 Gerchberg Papoulis:
 	dogo1.bmp (100x100):
