@@ -367,3 +367,5 @@ Se quisermos, por exemplo, executar o Local Brute Force para remover rabiscos de
 	./main dogo2.bmp dogo2.bmp minimum_frequency local compare
 
 Após a execução a máscara é salva na pasta *images/masks/*, a imagem restaurada é salva na pasta *images/inpainted/Local Brute Force/* e a imagem da diferença é salva na pasta *images/difference/Local Brute Force/*.
+
+OBS.: Apesar do cálculo do RMSE e da imagem da diferença não terem significado para a avaliação dos resultados *para a aplicação de remoção de objetos* ainda é possível fazê-los usando a diretiva *compare*.
