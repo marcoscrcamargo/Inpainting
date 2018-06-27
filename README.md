@@ -16,7 +16,7 @@ Nesse projeto estudamos e implementamos técnicas de *inpainting* para a remoç�
 Aplicamos os métodos utilizados para a remoção de objetos em imagens também. Para isso é necessário desenhar em cima do objeto a ser removido com um pincel duro com uma cor contrastante como, por exemplo, o vermelho (255, 0, 0).
 
 # Conjunto de imagens
-Parte do conjunto de imagens utilizado é apresentado abaixo.
+Parte do conjunto de imagens utilizado é apresentado abaixo. Todas as imagens utilizadas estão no formato Bitmap (.bmp).
 
 ## Imagens Originais
 As imagens abaixo estão em sua forma original.
@@ -301,9 +301,13 @@ Abaixo estão os resultados das tentativas de remoção de objetos de imagens. P
 |------------|------------|------------|
 | Original | "Deteriorada" | Smart Brute Force |
 
+Obtivemos ótimos resultados com os algoritmos de *Inpainting* por exemplos para a remoção de rabiscos e de objetos maiores. Apesar disso  percebemos que esses algoritmos não lidam muito bem com contornos e texturas (como podemos reparar pela imagem da praia) como os métodos descritos nesse [artigo do Bertalmio](http://www.dtic.upf.edu/~mbertalmio/bertalmi.pdf).
+
+É notável a importância de algoritmos e códigos eficientes para reduzir o tempo de execução dos métodos de *Inpainting* por exemplos. Podemos concluir que os resultados foram satisfatórios e que a maioria dos objetivos foram cumpridos, com exceção da extração de máscaras de imagens com rabiscos com cores não "duras".
+
 # Instruções para execução do código
 
-O algoritmo de *Gerchberg Papoulis* foi implementado em python, enquanto os algoritmos de força bruta foram implementados em C++. É necessário ter o [OpenCV](https://docs.opencv.org/2.4/doc/tutorials/introduction/linux_install/linux_install.html) instalado para a execução do código. As imagens utilizadas estavam no formato Bitmap (.bmp).
+O algoritmo de *Gerchberg Papoulis* foi implementado em Python 3 com Numpy e ImageIO, enquanto os algoritmos de *Inpainting* por exemplos foram implementados em C++ com [OpenCV](https://docs.opencv.org/2.4/doc/tutorials/introduction/linux_install/linux_install.html).
 
 A imagem de entrada deve estar na pasta project/images/deteriorated/, a máscara será salva em project/images/masks/ e a imagem de saída na pasta project/images/deteriorated/<inpainting_algorithm>/.
 
@@ -325,11 +329,11 @@ A execução do código em **Python** é feita pelo comando:
 
 	python3 main.py <image_in.bmp> <image_out.bmp> <mask_extraction_algorithm> (compare)?
 
-O código em **Python** só contém a implementação do algoritmo *Gerchberg Papoulis*, por isso não é necessário escolher o algoritmo de *inpainting*.
+O código em **Python** contém apenas a implementação do algoritmo *Gerchberg Papoulis*, por isso não é necessário escolher o algoritmo de *inpainting*.
 
-Os argumentos dos programas são:
+Os argumentos são:
  * <image_in.bmp> - Nome da imagem de entrada.
  * <image_out.bmp> - Nome da imagem de saída.
  * <mask_extraction_algorithm> - Algoritmo de extração da máscara (*most_frequent*, *minimum_frequency* ou *red*).
- * <inpainting_algorithm> - Algoritmo de *inpainting* (*brute*, *local*, *smart* ou *dynamic*).
+ * <inpainting_algorithm> - Algoritmo de *inpainting* (*brute*, *local*, *dynamic* ou *smart*).
  * (compare) - Opcional. Realiza a comparação entre a imagem original, se houver, e a imagem restaurada produzindo o RMSE e a imagem da diferença.
