@@ -108,8 +108,7 @@ Aprimorando um pouco a ideia do Brute Force Local, percebemos que atribuir a mé
 
 Além disso, ao começarmos a tentar remover rabiscos mais grossos ou objetos maiores observamos que poderíamos usar um valor de *K* dinâmico, ou seja, um valor de *K* para cada *pixel* deteriorado *Pd* com o objetivo de obter janelas mais representativas e reduzir o tempo de execução. Esse método se mostrou especialmente útil em máscaras mais grossas, ou seja, máscaras que produzem um valor de *K* elevado nos outros métodos. Seu tempo de execução é mais baixo pois o *K* escolhido para as bordas é menor do que o *K* escolhido para o centro de regiões deterioradas.
 
-|<img src="./Project/images/other/forbes_profile.bmp"   width="200px" alt="forbes"/>|<img src="./Project/images/deteriorated/forbes_profile.bmp"   width="200px" alt="forbes"/>|
-|<img src="./Project/images/masks/forbes_profile.bmp"   width="200px" alt="forbes"/>|<img src="./Project/images/inpainted/Local Dynamic Brute Force/forbes_profile.bmp"   width="200px" alt="forbes"/>|
+|<img src="./Project/images/other/forbes_profile.bmp"   width="200px" alt="forbes"/>|<img src="./Project/images/deteriorated/forbes_profile.bmp"   width="200px" alt="forbes"/>|<img src="./Project/images/masks/forbes_profile.bmp"   width="200px" alt="forbes"/>|<img src="./Project/images/inpainted/Local Dynamic Brute Force/forbes_profile.bmp"   width="200px" alt="forbes"/>|
 |------------|------------|------------|------------|
 | Forbes-Perfil 934x1280 original | Forbes-Perfil 934x1280 "deteriorado" | Forbes-Perfil 934x1280 máscara | Forbes-Perfil 934x1280 restaurado |
 
@@ -175,7 +174,7 @@ As tabelas abaixo sumarizam os resultados obtidos na remoção dos rabiscos para
 | :---: | :---: | :---: |
 | dogo1.bmp (100x100) | 06.646 | 00m03s |
 | dogo2.bmp (400x400) | 12.014 | 00m52s |
-| momo.bmp (280x280) | 21.102 | 02m55s |
+| momo.bmp (280x280) | 21.288 | 01m14s |
 | momo_fino.bmp (280x280) | 13.644 | 00m34s |
 | horse_car.bmp (438x297) | 23.660 | 04m38s |
 | forbes.bmp (961x1280) | 06.964 | 07m21s |
@@ -185,7 +184,7 @@ As tabelas abaixo sumarizam os resultados obtidos na remoção dos rabiscos para
 | :---: | :---: | :---: |
 | dogo1.bmp (100x100) | 07.198 | 00m03s | 
 | dogo2.bmp (400x400) | 11.384 | 00m36s | 
-| momo.bmp (280x280) | 21.352 | 01m57s | 
+| momo.bmp (280x280) | 21.102 | 02m55s | 
 | momo_fino.bmp (280x280) | 12.567 | 00m24s | 
 | horse_car.bmp (438x297) | 20.614 | 07m48s | 
 | forbes.bmp (961x1280) | 08.533 | 06m10s | 
@@ -204,7 +203,7 @@ Em seguida apresentamos alguns dos melhores resultados com comparativos visuais.
 
 ### Cachorro 100x100 (dogo1.bmp)
 
-O algoritmo Local Dynamic Brute Force obteve um melhor resultado com 6.646 de RMSE e um tempo de execução de 3 segundos.
+O algoritmo Local Dynamic Brute Force obteve o melhor resultado com 6.646 de RMSE e um tempo de execução de 3 segundos.
 
 |<img src="./Project/images/original/dogo1.bmp"   width="200px" alt="dogo1_original"/>|<img src="./Project/images/deteriorated/dogo1.bmp"   width="200px" alt="dogo1_deteriorated"/>|<img src="./Project/images/inpainted/Local Dynamic Brute Force/dogo1.bmp"   width="200px" alt="dogo1_dynamic"/>|<img src="./Project/images/difference/Local Dynamic Brute Force/dogo1.bmp"   width="200px" alt="dogo1_diff"/>|
 |------------|------------|------------|------------|
@@ -212,19 +211,43 @@ O algoritmo Local Dynamic Brute Force obteve um melhor resultado com 6.646 de RM
 
 ### Cachorro 400x400 (dogo2.bmp)
 
-O algoritmo Smart Brute Force obteve um melhor resultado com 11.384 de RMSE e um tempo de execução de 36 segundos.
+O algoritmo Smart Brute Force obteve o melhor resultado com 11.384 de RMSE e um tempo de execução de 36 segundos.
 
-|<img src="./Project/images/original/dogo2.bmp"   width="200px" alt="dogo2_original"/>|<img src="./Project/images/deteriorated/dogo2.bmp"   width="200px" alt="dogo2_deteriorated"/>|<img src="./Project/images/inpainted/Local Dynamic Brute Force/dogo2.bmp"   width="200px" alt="dogo2_dynamic"/>|<img src="./Project/images/difference/Local Dynamic Brute Force/dogo2.bmp"   width="200px" alt="dogo2_diff"/>|
+|<img src="./Project/images/original/dogo2.bmp"   width="200px" alt="dogo2_original"/>|<img src="./Project/images/deteriorated/dogo2.bmp"   width="200px" alt="dogo2_deteriorated"/>|<img src="./Project/images/inpainted/Smart Brute Force/dogo2.bmp"   width="200px" alt="dogo2_smart"/>|<img src="./Project/images/difference/Smart Brute Force/dogo2.bmp"   width="200px" alt="dogo2_diff"/>|
 |------------|------------|------------|------------|
 | Original | Deteriorada | Restaurada | Diferença |
 
 ### Moacir 280x280 (momo.bmp) - Rabiscos Grossos
 
+O algoritmo Smart Brute Force obteve o melhor resultado com 21.102 de RMSE e um tempo de execução de 2 minutos e 55 segundos.
+
+|<img src="./Project/images/original/momo.bmp"   width="200px" alt="momo_original"/>|<img src="./Project/images/deteriorated/momo.bmp"   width="200px" alt="momo_deteriorated"/>|<img src="./Project/images/inpainted/Smart Brute Force/momo.bmp"   width="200px" alt="momo_smart"/>|<img src="./Project/images/difference/Smart Brute Force/momo.bmp"   width="200px" alt="momo_diff"/>|
+|------------|------------|------------|------------|
+| Original | Deteriorada | Restaurada | Diferença |
+
 ### Moacir 280x280 (momo_fino.bmp) - Rabiscos Finos
+
+O algoritmo Smart Brute Force obteve o melhor resultado com 12.567 de RMSE e um tempo de execução 24 segundos.
+
+|<img src="./Project/images/original/momo_fino.bmp"   width="200px" alt="momo_fino_original"/>|<img src="./Project/images/deteriorated/momo_fino.bmp"   width="200px" alt="momo_fino_deteriorated"/>|<img src="./Project/images/inpainted/Smart Brute Force/momo_fino.bmp"   width="200px" alt="momo_fino_smart"/>|<img src="./Project/images/difference/Smart Brute Force/momo_fino.bmp"   width="200px" alt="momo_fino_diff"/>|
+|------------|------------|------------|------------|
+| Original | Deteriorada | Restaurada | Diferença |
 
 ### Charrete 438x297 (horse_car.bmp)
 
+O algoritmo Smart Brute Force obteve o melhor resultado com 20.614 de RMSE e um tempo de execução 7 minutos e 48 segundos.
+
+|<img src="./Project/images/original/horse_car.bmp"   width="200px" alt="horse_car_original"/>|<img src="./Project/images/deteriorated/horse_car.bmp"   width="200px" alt="horse_car_deteriorated"/>|<img src="./Project/images/inpainted/Smart Brute Force/horse_car.bmp"   width="200px" alt="horse_car_smart"/>|<img src="./Project/images/difference/Smart Brute Force/horse_car.bmp"   width="200px" alt="horse_car_diff"/>|
+|------------|------------|------------|------------|
+| Original | Deteriorada | Restaurada | Diferença |
+
 ### Forbes 961x1280 (forbes.bmp)
+
+O algoritmo Local Dynamic Brute Force obteve o melhor resultado com 6.964 de RMSE e um tempo de execução 7 minutos e 21 segundos.
+
+|<img src="./Project/images/original/forbes.bmp"   width="200px" alt="forbes_original"/>|<img src="./Project/images/deteriorated/forbes.bmp"   width="200px" alt="forbes_deteriorated"/>|<img src="./Project/images/inpainted/Local Dynamic Brute Force/forbes.bmp"   width="200px" alt="forbes_dynamic"/>|<img src="./Project/images/difference/Local Dynamic Brute Force/forbes.bmp"   width="200px" alt="forbes_diff"/>|
+|------------|------------|------------|------------|
+| Original | Deteriorada | Restaurada | Diferença |
 
 ## Remoção de objetos em imagens
 
