@@ -202,27 +202,11 @@ As tabelas abaixo sumarizam os resultados obtidos na remoção dos rabiscos para
 
 Em seguida apresentamos alguns dos melhores resultados com comparativos visuais.
 
-### Professor Moacir (desenho com bordas grossas)
+### Cachorro 100x100 (dogo1.bmp)
 
-A foto do professor Moacir com o desenho de bordas grossas (momo.bmp) tem dimensões 280x280.
-
-Comparação das imagens:
-
-|<img src="./Project/images/inpainted/Smart Brute Force/momo.bmp"   width="200px" alt="momo_inpainted_brute"/>|
-<img src="./Project/images/difference/Smart Brute Force/momo.bmp"   width="200px" alt="momo_diff_brute"/>|
-<img src="./Project/images/inpainted/Gerchberg Papoulis/momo.bmp"   width="200px" alt="momo_inpainted_gerchberg"/>|
-<img src="./Project/images/difference/Gerchberg Papoulis/momo.bmp"   width="200px" alt="momo_diff_gerchberg"/>|
+|<img src="./Project/images/original/dogo1.bmp"   width="200px" alt="dogo1_original"/>|<img src="./Project/images/deteriorated/dogo1.bmp"   width="200px" alt="dogo1_deteriorated"/>|<img src="./Project/images/masks/dogo1.bmp"   width="200px" alt="dogo1_mask"/>|<img src="./Project/images/inpainted/Local Dynamic Brute Force/dogo1.bmp"   width="200px" alt="dogo1_dynamic"/>|
 |------------|------------|------------|------------|
-| Smart Brute Force | Imagem da diferença Smart Brute Force | Gerchberg Papoulis | Imagem da diferença Gerchberg Papoulis |
-
-Comparação do RMSE e tempo de execução para cada algoritmo:
-
-| Algoritmo | RMSE | Tempo de execução |
-|-----------|------|-------------------|
-|Gerchberg Papoulis| 45.094 |00m05s|
-|Brute Force|23.721|30m24s|
-|Local Brute Force|23.456|03m23s|
-|Smart Brute Force|21.352|01m57s|
+| Original | Deteriorada | Máscara | Local Dynamic Brute Force |
 
 ### Professor Moacir (desenho com bordas finas)
 
