@@ -94,16 +94,16 @@ Gerchberg Papoulis:
 
 Smart Brute Force for assisted removal:
 	forbes_profile.bmp: 01m42s
-	zoo.bmp: 11m47s
+	gabi_star.bmp: 02m11s
 	team.bmp: 18m40s
-	gabi_star: 02m11s
-	mike: 73m06s
-	praia: 77m31s
+	mike.bmp: 73m06s
+	praia.bmp: 77m31s
+	zoo.bmp: 11m47s
 
 Local Dynamic Brute Force for assisted removal:
 	forbes_profile.bmp: 02m43s
-	zoo.bmp: 02m15s
+	gabi_star.bmp: 00m31s
 	team.bmp: 01m42s
-	gabi_star: 00m31s
-	mike: 11m47s
-	praia: 11m53s
+	mike.bmp: 11m47s
+	praia.bmp: 11m53s
+	zoo.bmp: 02m15s
