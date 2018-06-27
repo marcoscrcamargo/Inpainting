@@ -138,8 +138,12 @@ Em geral observamos que os melhores resultados vieram do algoritmo *Smart Brute 
 
 A tabela abaixo sumariza os resultados obtidos na remoção dos rabiscos.
 
-| X    | <td colspan=2>Gerchberg Papoulis</td> | <td colspan=2>Brute Force</td> |
-| X    | RMSE                 | Tempo          | RMSE          | Tempo          |
+| Brute Force | RMSE | Tempo|
+| :---: | :---: | :---: |
+| dogo1.bmp (100x100) | 08.340 | 00m07s |
+| dogo2.bmp (400x400) | 13.222 | 32m19s |
+| momo.bmp (280x280) | 23.721 | 30m24s |
+| momo_fino.bmp (280x280) | 13.735 | 06m50s |
 
 Em seguida apresentamos resultados para algumas imagens com comparativos visuais e métricos, além do tempo de execução de cada algoritmo.
 
