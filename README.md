@@ -204,9 +204,15 @@ Em seguida apresentamos alguns dos melhores resultados com comparativos visuais.
 
 ### Cachorro 100x100 (dogo1.bmp)
 
-|<img src="./Project/images/original/dogo1.bmp"   width="200px" alt="dogo1_original"/>|<img src="./Project/images/deteriorated/dogo1.bmp"   width="200px" alt="dogo1_deteriorated"/>|<img src="./Project/images/masks/dogo1.bmp"   width="200px" alt="dogo1_mask"/>|<img src="./Project/images/inpainted/Local Dynamic Brute Force/dogo1.bmp"   width="200px" alt="dogo1_dynamic"/>|
+|<img src="./Project/images/original/dogo1.bmp"   width="200px" alt="dogo1_original"/>|<img src="./Project/images/deteriorated/dogo1.bmp"   width="200px" alt="dogo1_deteriorated"/>|<img src="./Project/images/inpainted/Local Dynamic Brute Force/dogo1.bmp"   width="200px" alt="dogo1_dynamic"/>|<img src="./Project/images/difference/Local Dynamic Brute Force/dogo1.bmp"   width="200px" alt="dogo1_diff"/>|
 |------------|------------|------------|------------|
-| Original | Deteriorada | Máscara | Local Dynamic Brute Force |
+| Original | Deteriorada | Restaurada | Diferença |
+
+### Cachorro 400x400 (dogo2.bmp)
+
+|<img src="./Project/images/original/dogo2.bmp"   width="200px" alt="dogo2_original"/>|<img src="./Project/images/deteriorated/dogo2.bmp"   width="200px" alt="dogo2_deteriorated"/>|<img src="./Project/images/inpainted/Local Dynamic Brute Force/dogo2.bmp"   width="200px" alt="dogo2_dynamic"/>|<img src="./Project/images/difference/Local Dynamic Brute Force/dogo2.bmp"   width="200px" alt="dogo2_diff"/>|
+|------------|------------|------------|------------|
+| Original | Deteriorada | Restaurada | Diferença |
 
 ### Professor Moacir (desenho com bordas finas)
 
