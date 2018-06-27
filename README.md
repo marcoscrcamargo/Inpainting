@@ -110,7 +110,7 @@ Além disso, ao começarmos a tentar remover rabiscos mais grossos ou objetos ma
 
 A imagem abaixo é um bom exemplo da utilidade do *K* dinâmico, pois podemos ver que as regiões "deterioradas" são "grossas". Para as bordas dessas regiões o *K* usado é menor, o que reduz o tempo de execução.
 
-|<img src="./Project/images/other/forbes_profile.bmp"   width="200px" alt="forbes"/>|<img src="./Project/images/deteriorated/forbes_profile.bmp"   width="200px" alt="forbes"/>|<img src="./Project/images/masks/forbes_profile.bmp"   width="200px" alt="forbes"/>|<img src="./Project/images/inpainted/Local Dynamic Brute Force/forbes_profile.bmp"   width="200px" alt="forbes"/>|
+|<img src="./Project/images/original/forbes_profile.bmp"   width="200px" alt="forbes"/>|<img src="./Project/images/deteriorated/forbes_profile.bmp"   width="200px" alt="forbes"/>|<img src="./Project/images/masks/forbes_profile.bmp"   width="200px" alt="forbes"/>|<img src="./Project/images/inpainted/Local Dynamic Brute Force/forbes_profile.bmp"   width="200px" alt="forbes"/>|
 |------------|------------|------------|------------|
 | Forbes-Perfil 934x1280 original | Forbes-Perfil 934x1280 "deteriorado" | Forbes-Perfil 934x1280 máscara | Forbes-Perfil 934x1280 restaurado |
 
@@ -279,7 +279,7 @@ Para cada imagem é apresentada a imagem original a imagem com adição de verme
 
 ### Remoção de marcas na pele 934x1280 (forbes_profile.bmp)
 
-|<img src="./Project/images/other/forbes_profile.bmp"   width="300px" alt="forbes_profile_original"/>|
+|<img src="./Project/images/original/forbes_profile.bmp"   width="300px" alt="forbes_profile_original"/>|
 <img src="./Project/images/deteriorated/forbes_profile.bmp"   width="300px" alt="forbes_profile_deteriorated"/>|
 <img src="./Project/images/inpainted/Local Dynamic Brute Force/forbes_profile.bmp"   width="300px" alt="forbes_profile_inpainted_brute"/>|
 |------------|------------|------------|
@@ -287,7 +287,7 @@ Para cada imagem é apresentada a imagem original a imagem com adição de verme
 
 ### Remoção do PI 972x648 (gabi_star.bmp)
 
-|<img src="./Project/images/other/gabi_star.bmp"   width="300px" alt="gabi_star_original"/>|
+|<img src="./Project/images/original/gabi_star.bmp"   width="300px" alt="gabi_star_original"/>|
 <img src="./Project/images/deteriorated/gabi_star.bmp"   width="300px" alt="gabi_star_deteriorated"/>|
 <img src="./Project/images/inpainted/Smart Brute Force/gabi_star.bmp"   width="300px" alt="gabi_star_smart"/>|
 |------------|------------|------------|
@@ -295,7 +295,7 @@ Para cada imagem é apresentada a imagem original a imagem com adição de verme
 
 ### Remoção do colar 810x540 (team.bmp)
 
-|<img src="./Project/images/other/team.bmp"   width="300px" alt="team_original"/>|
+|<img src="./Project/images/original/team.bmp"   width="300px" alt="team_original"/>|
 <img src="./Project/images/deteriorated/team.bmp"   width="300px" alt="team_deteriorated"/>|
 <img src="./Project/images/inpainted/Smart Brute Force/team.bmp"   width="300px" alt="team_smart"/>|
 |------------|------------|------------|
@@ -303,7 +303,7 @@ Para cada imagem é apresentada a imagem original a imagem com adição de verme
 
 ### Remoção da tatuagem no rosto 769x1024 (mike.bmp)
 
-|<img src="./Project/images/other/mike.bmp"   width="300px" alt="mike_original"/>|
+|<img src="./Project/images/original/mike.bmp"   width="300px" alt="mike_original"/>|
 <img src="./Project/images/deteriorated/mike.bmp"   width="300px" alt="mike_deteriorated"/>|
 <img src="./Project/images/inpainted/Smart Brute Force/mike.bmp"   width="300px" alt="mike_smart"/>|
 |------------|------------|------------|
@@ -311,7 +311,7 @@ Para cada imagem é apresentada a imagem original a imagem com adição de verme
 
 ### Remoção das bicicletas da praia 1210x1613 (praia.bmp)
 
-|<img src="./Project/images/other/praia.bmp"   width="300px" alt="praia_original"/>|
+|<img src="./Project/images/original/praia.bmp"   width="300px" alt="praia_original"/>|
 <img src="./Project/images/deteriorated/praia.bmp"   width="300px" alt="praia_deteriorated"/>|
 <img src="./Project/images/inpainted/Smart Brute Force/praia.bmp"   width="300px" alt="praia_smart"/>|
 |------------|------------|------------|
@@ -319,7 +319,7 @@ Para cada imagem é apresentada a imagem original a imagem com adição de verme
 
 ### Remoção da pessoa em frente ao zoológico 625x394 ([zoo.bmp](https://github.com/fivemok/image-inpainting))
 
-|<img src="./Project/images/other/zoo.bmp"   width="300px" alt="zoo_original"/>|
+|<img src="./Project/images/original/zoo.bmp"   width="300px" alt="zoo_original"/>|
 <img src="./Project/images/deteriorated/zoo.bmp"   width="300px" alt="zoo_deteriorated"/>|
 <img src="./Project/images/inpainted/Smart Brute Force/zoo.bmp"   width="300px" alt="zoo_smart"/>|
 |------------|------------|------------|
