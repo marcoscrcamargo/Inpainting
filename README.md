@@ -167,8 +167,8 @@ As tabelas abaixo sumarizam os resultados obtidos na remoção dos rabiscos para
 | dogo2.bmp (400x400) | 12.456 | 01m50s |
 | momo.bmp (280x280) | 23.456 | 03m23s |
 | momo_fino.bmp (280x280) | 14.350 | 00m47s |
-| forbes.bmp (961x1280) | 09.140 | 19m07s |
 | horse_car.bmp (438x297) | 25.752 | 10m11s |
+| forbes.bmp (961x1280) | 09.140 | 19m07s |
 
 ### Local Dynamic Brute Force
 | Imagem | RMSE | Tempo |
@@ -177,8 +177,8 @@ As tabelas abaixo sumarizam os resultados obtidos na remoção dos rabiscos para
 | dogo2.bmp (400x400) | 12.014 | 00m52s |
 | momo.bmp (280x280) | 21.288 | 01m14s |
 | momo_fino.bmp (280x280) | 13.644 | 00m34s |
-| forbes.bmp (961x1280) | 06.964 | 07m21s |
 | horse_car.bmp (438x297) | 23.660 | 04m38s |
+| forbes.bmp (961x1280) | 06.964 | 07m21s |
 
 ### Smart Brute Force
 | Imagem | RMSE | Tempo |
@@ -187,8 +187,8 @@ As tabelas abaixo sumarizam os resultados obtidos na remoção dos rabiscos para
 | dogo2.bmp (400x400) | 11.384 | 00m36s | 
 | momo.bmp (280x280) | 21.352 | 01m57s | 
 | momo_fino.bmp (280x280) | 12.567 | 00m24s | 
-| forbes.bmp (961x1280) | 08.533 | 06m10s | 
 | horse_car.bmp (438x297) | 20.614 | 07m48s | 
+| forbes.bmp (961x1280) | 08.533 | 06m10s | 
 
 ### Gerchberg Papoulis
 | Imagem | RMSE | Tempo |
@@ -197,12 +197,14 @@ As tabelas abaixo sumarizam os resultados obtidos na remoção dos rabiscos para
 | dogo2.bmp (400x400) | 23.039 | 00m09s |
 | momo.bmp (280x280) | 45.094 | 00m05s |
 | momo_fino.bmp (280x280) | 30.238 | 00m05s |
-| forbes.bmp (961x1280) | 20.856 | 01m31s |
 | horse_car.bmp (438x297) | 43.221 | 00m09s |
+| forbes.bmp (961x1280) | 20.856 | 01m31s |
 
 Em seguida apresentamos alguns dos melhores resultados com comparativos visuais.
 
 ### Cachorro 100x100 (dogo1.bmp)
+
+O algoritmo Local Dynamic Brute Force obteve um melhor resultado com 6.646 de RMSE e um tempo de execução de 3 segundos.
 
 |<img src="./Project/images/original/dogo1.bmp"   width="200px" alt="dogo1_original"/>|<img src="./Project/images/deteriorated/dogo1.bmp"   width="200px" alt="dogo1_deteriorated"/>|<img src="./Project/images/inpainted/Local Dynamic Brute Force/dogo1.bmp"   width="200px" alt="dogo1_dynamic"/>|<img src="./Project/images/difference/Local Dynamic Brute Force/dogo1.bmp"   width="200px" alt="dogo1_diff"/>|
 |------------|------------|------------|------------|
@@ -210,138 +212,71 @@ Em seguida apresentamos alguns dos melhores resultados com comparativos visuais.
 
 ### Cachorro 400x400 (dogo2.bmp)
 
+O algoritmo Smart Brute Force obteve um melhor resultado com 11.384 de RMSE e um tempo de execução de 36 segundos.
+
 |<img src="./Project/images/original/dogo2.bmp"   width="200px" alt="dogo2_original"/>|<img src="./Project/images/deteriorated/dogo2.bmp"   width="200px" alt="dogo2_deteriorated"/>|<img src="./Project/images/inpainted/Local Dynamic Brute Force/dogo2.bmp"   width="200px" alt="dogo2_dynamic"/>|<img src="./Project/images/difference/Local Dynamic Brute Force/dogo2.bmp"   width="200px" alt="dogo2_diff"/>|
 |------------|------------|------------|------------|
 | Original | Deteriorada | Restaurada | Diferença |
 
-### Professor Moacir (desenho com bordas finas)
+### Moacir 280x280 (momo.bmp) - Rabiscos Grossos
 
-A foto do professor Moacir com o desenho de bordas finas (momo_fino.bmp) tem dimensões 280x280.
+### Moacir 280x280 (momo_fino.bmp) - Rabiscos Finos
 
-Comparação das imagens:
+### Charrete 438x297 (horse_car.bmp)
 
-|<img src="./Project/images/inpainted/Smart Brute Force/momo_fino.bmp"   width="200px" alt="momo_fino_inpainted_brute"/>|
-<img src="./Project/images/difference/Smart Brute Force/momo_fino.bmp"   width="200px" alt="momo_fino_diff_brute"/>|
-<img src="./Project/images/inpainted/Gerchberg Papoulis/momo_fino.bmp"   width="200px" alt="momo_fino_inapinted_gerchberg"/>|
-<img src="./Project/images/difference/Gerchberg Papoulis/momo_fino.bmp"   width="200px" alt="momo_fino_diff_gerchberg"/>|
-|------------|------------|------------|------------|
-| Smart Brute Force | Imagem da diferença Smart Brute Force | Gerchberg Papoulis | Imagem da diferença Gerchberg Papoulis |
-
-Comparação do RMSE e tempo de execução para cada algoritmo:
-
-| Algoritmo | RMSE | Tempo de execução |
-|-----------|------|-------------------|
-|Gerchberg Papoulis|30.238|00m05s|
-|Brute Force|13.735|06m50s|
-|Local Brute Force|14.350|00m47s|
-|Smart Brute Force|12.567|00m24s|
-
-
-### Cachorro
-
-A imagem do cachorro retirada da internet (dogo2.bmp) tem dimensões 400x400.
-
-Comparação das imagens:
-
-|<img src="./Project/images/inpainted/Smart Brute Force/dogo2.bmp"   width="200px" alt="dogo2_inpainted_brute"/>|
-<img src="./Project/images/difference/Smart Brute Force/dogo2.bmp"   width="200px" alt="dogo2_diff_brute"/>|
-<img src="./Project/images/inpainted/Gerchberg Papoulis/dogo2.bmp"   width="200px" alt="dogo2_inapinted_gerchberg"/>|
-<img src="./Project/images/difference/Gerchberg Papoulis/dogo2.bmp"   width="200px" alt="dogo2_diff_gerchberg"/>|
-|------------|------------|------------|------------|
-| Smart Brute Force | Imagem da diferença Smart Brute Force | Gerchberg Papoulis | Imagem da diferença Gerchberg Papoulis |
-
-Comparação do RMSE e tempo de execução para cada algoritmo:
-
-| Algoritmo | RMSE | Tempo de execução |
-|-----------|------|-------------------|
-|Gerchberg Papoulis|23.039|00m09s|
-|Brute Force|13.222|32m19s|
-|Local Brute Force|12.456|01m50s|
-|Smart Brute Force|11.384|00m36s|
-
-
-### Texto
-
-A imagem do carro de cabalos (horse_car.bmp) tem dimensões 438x297, e pelo tamanho da mascara obtida ser muito grande o tempo de execução do algoritmo de brute force seria muito alto, por isso não foi executado.
-
-Comparação das imagens:
-
-|<img src="./Project/images/inpainted/Smart Brute Force/horse_car.bmp"   width="200px" alt="horse_car_inpainted_brute"/>|
-<img src="./Project/images/difference/Smart Brute Force/horse_car.bmp"   width="200px" alt="horse_car_diff_brute"/>|
-<img src="./Project/images/inpainted/Gerchberg Papoulis/horse_car.bmp"   width="200px" alt="horse_car_inapinted_gerchberg"/>|
-<img src="./Project/images/difference/Gerchberg Papoulis/horse_car.bmp"   width="200px" alt="horse_car_diff_gerchberg"/>|
-|------------|------------|------------|------------|
-| Smart Brute Force | Imagem da diferença Smart Brute Force | Gerchberg Papoulis | Imagem da diferença Gerchberg Papoulis |
-
-Comparação do RMSE e tempo de execução para cada algoritmo:
-
-| Algoritmo | RMSE | Tempo de execução |
-|-----------|------|-------------------|
-|Gerchberg Papoulis|20.856|00m09s|
-|Local Brute Force|25.752|10m11s|
-|Smart Brute Force|20.614|07m48s|
-
-
-
-### Forbes
-
-A imagem do forbes (forbes.bmp) tem dimensões 961x1280, e pelo seu tamanho ser muito grande o tempo de execução do algoritmo de brute force seria muito alto, por isso não foi executado.
-
-Comparação das imagens:
-
-|<img src="./Project/images/inpainted/Smart Brute Force/forbes.bmp"   width="200px" alt="forbes_inpainted_brute"/>|
-<img src="./Project/images/difference/Smart Brute Force/forbes.bmp"   width="200px" alt="forbes_diff_brute"/>|
-<img src="./Project/images/inpainted/Gerchberg Papoulis/forbes.bmp"   width="200px" alt="forbes_inapinted_gerchberg"/>|
-<img src="./Project/images/difference/Gerchberg Papoulis/forbes.bmp"   width="200px" alt="forbes_diff_gerchberg"/>|
-|------------|------------|------------|------------|
-| Smart Brute Force | Imagem da diferença Smart Brute Force | Gerchberg Papoulis | Imagem da diferença Gerchberg Papoulis |
-
-Comparação do RMSE e tempo de execução para cada algoritmo:
-
-| Algoritmo | RMSE | Tempo de execução |
-|-----------|------|-------------------|
-|Gerchberg Papoulis|20.856|01m31s|
-|Local Brute Force|09.140|19m07s|
-|Smart Brute Force|08.533|06m10s|
-
-
+### Forbes 961x1280 (forbes.bmp)
 
 ## Remoção de objetos em imagens
 
-Para verificar a funcionalidade dos algoritmos de *inpainting* implementados para a remoção de objetos mais largos e em contextos diferentes, foram realizados os testes abaixo.
-Em cada imagem é mostrada a imagem original, imagem com adição da máscara em vermelho (imagem deteriorada) e o resultado do *Smart Brute Force*.
+Abaixo estão os resultados das tentativas de remoção de objetos de imagens. Para cada imagem é apresentada a imagem original a imagem com adição de vermelho (255, 0, 0) por cima da região indesejada e o resultado mais satisfatório obtido por algum dos algoritmos.
 
-### Remoção de pessoa em frente a faixada de zoológico
-
-|<img src="./Project/images/other/zoo.bmp"   width="300px" alt="zoo_original"/>|
-<img src="./Project/images/deteriorated/zoo.bmp"   width="300px" alt="zoo_deteroprated"/>|
-<img src="./Project/images/inpainted/Smart Brute Force/zoo.bmp"   width="300px" alt="zoo_inpainted_brute"/>|
-|------------|------------|------------|
-| Imagem Original | Imagem deteriorada | Smart Brute Force |
-
-### Remoção de irregularidades na pele
+### Remoção de marcas na pele 934x1280 (forbes_profile.bmp)
 
 |<img src="./Project/images/other/forbes_profile.bmp"   width="300px" alt="forbes_profile_original"/>|
 <img src="./Project/images/deteriorated/forbes_profile.bmp"   width="300px" alt="forbes_profile_deteriorated"/>|
-<img src="./Project/images/inpainted/Smart Brute Force/forbes_profile.bmp"   width="300px" alt="forbes_profile_inpainted_brute"/>|
+<img src="./Project/images/inpainted/Local Dynamic Brute Force/forbes_profile.bmp"   width="300px" alt="forbes_profile_inpainted_brute"/>|
 |------------|------------|------------|
-| Imagem Original | Imagem deteriorada | Smart Brute Force |
+| Original | "Deteriorada" | Local Dynamic Brute Force |
 
-### Remoção de desenho em tinta sobre a pele
+### Remoção do PI 972x648 (gabi_star.bmp)
 
 |<img src="./Project/images/other/gabi_star.bmp"   width="300px" alt="gabi_star_original"/>|
 <img src="./Project/images/deteriorated/gabi_star.bmp"   width="300px" alt="gabi_star_deteriorated"/>|
-<img src="./Project/images/inpainted/Smart Brute Force/gabi_star.bmp"   width="300px" alt="gabi_star_inpainted_brute"/>|
+<img src="./Project/images/inpainted/Smart Brute Force/gabi_star.bmp"   width="300px" alt="gabi_star_smart"/>|
 |------------|------------|------------|
-| Imagem original | Imagem deteriorada | Smart Brute Force |
+| Original | "Deteriorada" | Smart Brute Force |
 
-### Remoção de um colar
+### Remoção do colar 810x540 (team.bmp)
 
 |<img src="./Project/images/other/team.bmp"   width="300px" alt="team_original"/>|
-<img src="./Project/images/deteriorated/team.bmp"   width="300px" alt="team_deteroprated"/>|
-<img src="./Project/images/inpainted/Smart Brute Force/team.bmp"   width="300px" alt="team_inpainted_brute"/>|
+<img src="./Project/images/deteriorated/team.bmp"   width="300px" alt="team_deteriorated"/>|
+<img src="./Project/images/inpainted/Smart Brute Force/team.bmp"   width="300px" alt="team_smart"/>|
 |------------|------------|------------|
-| Imagem original | Imagem deteriorada | Smart Brute Force |
+| Original | "Deteriorada" | Smart Brute Force |
+
+### Remoção da tatuagem no rosto 769x1024 (mike.bmp)
+
+|<img src="./Project/images/other/mike.bmp"   width="300px" alt="mike_original"/>|
+<img src="./Project/images/deteriorated/mike.bmp"   width="300px" alt="mike_deteriorated"/>|
+<img src="./Project/images/inpainted/Smart Brute Force/mike.bmp"   width="300px" alt="mike_smart"/>|
+|------------|------------|------------|
+| Original | "Deteriorada" | Smart Brute Force |
+
+### Remoção das bicicletas da praia 1210x1613 (praia.bmp)
+
+|<img src="./Project/images/other/praia.bmp"   width="300px" alt="praia_original"/>|
+<img src="./Project/images/deteriorated/praia.bmp"   width="300px" alt="praia_deteriorated"/>|
+<img src="./Project/images/inpainted/Smart Brute Force/praia.bmp"   width="300px" alt="praia_smart"/>|
+|------------|------------|------------|
+| Original | "Deteriorada" | Smart Brute Force |
+
+### Remoção da pessoa em frente ao zoológico 625x394 ([zoo.bmp](https://github.com/fivemok/image-inpainting))
+
+|<img src="./Project/images/other/zoo.bmp"   width="300px" alt="zoo_original"/>|
+<img src="./Project/images/deteriorated/zoo.bmp"   width="300px" alt="zoo_deteriorated"/>|
+<img src="./Project/images/inpainted/Smart Brute Force/zoo.bmp"   width="300px" alt="zoo_smart"/>|
+|------------|------------|------------|
+| Original | "Deteriorada" | Smart Brute Force |
 
 # Instruções para execução do código
 
