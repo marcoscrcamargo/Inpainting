@@ -362,10 +362,16 @@ Os argumentos são:
  * <inpainting_algorithm> - Algoritmo de *inpainting* (*brute*, *local*, *dynamic* ou *smart*).
  * (compare) - Opcional. Realiza a comparação entre a imagem original, se houver, e a imagem restaurada produzindo o RMSE e a imagem da diferença.
  
-Se quisermos, por exemplo, executar o Local Brute Force para remover rabiscos de múltiplas cores da imagem *dogo2.bmp* e obter uma avaliação dos resultados (RMSE e imagem da diferença) basta colocar a imagem na pasta *images/deteriorated/* e executar o comando:
+Por exemplo, se quisermos executar o Local Brute Force para remover rabiscos de múltiplas cores da imagem *dogo2.bmp* e obter uma avaliação dos resultados (RMSE e imagem da diferença) basta colocar a imagem na pasta *images/deteriorated/* e executar o comando:
 
 	./main dogo2.bmp dogo2.bmp minimum_frequency local compare
 
-Após a execução a máscara é salva na pasta *images/masks/*, a imagem restaurada é salva na pasta *images/inpainted/Local Brute Force/* e a imagem da diferença é salva na pasta *images/difference/Local Brute Force/*.
+Após a execução a máscara é salva em *images/masks/dogo2.bmp*, a imagem restaurada é salva em *images/inpainted/Local Brute Force/dogo2.bmp* e a imagem da diferença é salva em *images/difference/Local Brute Force/dogo2.bmp*.
+
+Outro exemplo seria executar o Local Dynamic Brute Force para remover marcas na pele na imagem *forbes_profile.bmp*. Para isso podemos pintar as marcas de pele com a cor vermelho (255, 0, 0), colocar essa imagem na pasta *images/deteriorated/* e executar o comando:
+
+	./main forbes_profile.bmp forbes_profile.bmp red dynamic
+	
+Após a execução a máscara é salva em *images/masks/forbes_profile.bmp* e a imagem sem as marcas de pele é salva em *images/inpainted/Local Dynamic Brute Force/forbes_profile.bmp*.
 
 OBS.: Apesar do cálculo do RMSE e da imagem da diferença não terem significado para a avaliação dos resultados *para a aplicação de remoção de objetos* ainda é possível fazê-los usando a diretiva *compare*.
