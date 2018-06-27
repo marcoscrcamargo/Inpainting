@@ -175,7 +175,7 @@ As tabelas abaixo sumarizam os resultados obtidos na remoção dos rabiscos para
 | :---: | :---: | :---: |
 | dogo1.bmp (100x100) | 06.646 | 00m03s |
 | dogo2.bmp (400x400) | 12.014 | 00m52s |
-| momo.bmp (280x280) | 21.288 | 01m14s |
+| momo.bmp (280x280) | 21.102 | 02m55s |
 | momo_fino.bmp (280x280) | 13.644 | 00m34s |
 | horse_car.bmp (438x297) | 23.660 | 04m38s |
 | forbes.bmp (961x1280) | 06.964 | 07m21s |
