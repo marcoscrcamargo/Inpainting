@@ -18,7 +18,7 @@ using namespace cv;
 #define MAX_WINDOW_DISTANCE 256.0 * sqrt(3.0) // Distância máxima entre duas janelas.
 #define WINDOW_DISTANCE_THRESHOLD 5.0 // Distância máxima entre duas janelas para recalcular tudo no Smart Brute Force.
 #define WINDOW_LIST_SIZE 50 // Tamanho da lista de janelas.
-#define ELITE_SIZE 5 // Quantidade de pixels similares para fazer a média.
+#define ELITE_SIZE 10 // Quantidade de pixels similares para fazer a média.
 
 /* Caminhos das pastas com as imagens. */
 #define ORIGINAL_PATH "./images/original/"

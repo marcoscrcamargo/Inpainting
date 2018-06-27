@@ -60,8 +60,8 @@ Smart Brute Force:
 		RMSE: 11.384
 		Time: 00m36s
 	momo.bmp (280x280):
-		RMSE: 21.352
-		Time: 01m57s
+		RMSE: 21.102
+		Time: 02m55s
 	momo_fino.bmp (280x280):
 		RMSE: 12.567
 		Time: 00m24s
