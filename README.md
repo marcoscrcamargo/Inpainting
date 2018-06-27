@@ -136,14 +136,50 @@ A avaliação dos resultados foi feita visualmente e pela raiz do erro quadráti
 
 Em geral observamos que os melhores resultados vieram do algoritmo *Smart Brute Force* enquanto os piores resultados vieram do *Gerchberg Papoulis*, visto que esse gera regiões visivelmente mais borradas (apesar de possuir o tempo de execução mais baixo) principalmente para imagens com vários detalhes como rostos.
 
-A tabela abaixo sumariza os resultados obtidos na remoção dos rabiscos.
+As tabelas abaixo sumarizam os resultados obtidos na remoção dos rabiscos para cada algoritmo.
 
-| Brute Force | RMSE | Tempo|
+| Brute Force | RMSE | Tempo |
 | :---: | :---: | :---: |
 | dogo1.bmp (100x100) | 08.340 | 00m07s |
 | dogo2.bmp (400x400) | 13.222 | 32m19s |
 | momo.bmp (280x280) | 23.721 | 30m24s |
 | momo_fino.bmp (280x280) | 13.735 | 06m50s |
+
+| Local Brute Force | RMSE | Tempo |
+| :---: | :---: | :---: |
+| dogo1.bmp (100x100) | 08.340 | 00m05s |
+| dogo2.bmp (400x400) | 12.456 | 01m50s |
+| momo.bmp (280x280) | 23.456 | 03m23s |
+| momo_fino.bmp (280x280) | 14.350 | 00m47s |
+| forbes.bmp (961x1280) | 09.140 | 19m07s |
+| horse_car.bmp (438x297) | 25.752 | 10m11s |
+
+| Local Dynamic Brute Force | RMSE | Tempo |
+| :---: | :---: | :---: |
+| dogo1.bmp (100x100) | 06.646 | 00m03s |
+| dogo2.bmp (400x400) | 12.014 | 00m52s |
+| momo.bmp (280x280) | 21.288 | 01m14s |
+| momo_fino.bmp (280x280) | 13.644 | 00m34s |
+| forbes.bmp (961x1280) | 06.964 | 07m21s |
+| horse_car.bmp (438x297) | 23.660 | 04m38s |
+
+| Smart Brute Force | RMSE | Tempo |
+| :---: | :---: | :---: |
+| dogo1.bmp (100x100) | 07.198 | 00m03s | 
+| dogo2.bmp (400x400) | 11.384 | 00m36s | 
+| momo.bmp (280x280) | 21.352 | 01m57s | 
+| momo_fino.bmp (280x280) | 12.567 | 00m24s | 
+| forbes.bmp (961x1280) | 08.533 | 06m10s | 
+| horse_car.bmp (438x297) | 20.614 | 07m48s | 
+	
+| Gerchberg Papoulis | RMSE | Tempo |
+| :---: | :---: | :---: |
+| dogo1.bmp (100x100) | 29.460 | 00m01s |
+| dogo2.bmp (400x400) | 23.039 | 00m09s |
+| momo.bmp (280x280) | 45.094 | 00m05s |
+| momo_fino.bmp (280x280) | 30.238 | 00m05s |
+| forbes.bmp (961x1280) | 20.856 | 01m31s |
+| horse_car.bmp (438x297) | 43.221 | 00m09s |
 
 Em seguida apresentamos resultados para algumas imagens com comparativos visuais e métricos, além do tempo de execução de cada algoritmo.
 
