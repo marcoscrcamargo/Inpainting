@@ -13,7 +13,7 @@
 
 Nesse projeto estudamos e implementamos técnicas de *inpainting* para a remoção automática de rabiscos inseridos artificialmente em imagens. Para realizarmos a detecção automática da região que devemos fazer *inpainting* usamos do fato de que os rabiscos são feitos com cores contrastantes que ocorrem com alta frequência nas imagens.
 
-Aplicamos também os métodos utilizados para a remoção de objetos em imagens. Para isso é necessário desenhar em cima do objeto a ser removido com um pincel duro com uma cor contrastante como, por exemplo, o vermelho (255, 0, 0).
+Aplicamos os métodos utilizados para a remoção de objetos em imagens também. Para isso é necessário desenhar em cima do objeto a ser removido com um pincel duro com uma cor contrastante como, por exemplo, o vermelho (255, 0, 0).
 
 # Conjunto de imagens
 Parte do conjunto de imagens utilizado é apresentado abaixo.
@@ -130,22 +130,38 @@ Podemos ver pela imagem *horse_car.bmp* que usar o *pixel* cuja janela *K*x*K* p
 
 # Resultados
 
-A avaliação dos resultados foi feita visualmente e pela raiz do erro quadrático médio (RMSE), calculado apenas nos pixels da região deteriorada (pixels da máscara). Além disso foram geradas imagens representando a diferença entre as imagens originais e as imagens restauradas.
+Para o problema de remoção de rabiscos a avaliação dos resultados foi feita, além de visualmente, pela raiz do erro quadrático médio (RMSE) calculado apenas nos pixels da região deteriorada e a partir de imagens geradas representando a diferença entre as imagens originais e as imagens restauradas. Quanto ao problema de remoção de objetos indesejados a avaliação se deu apenas visualmente.
 
 ## Remoção de rabiscos em imagens
 
-Em geral observamos que os melhores resultados vieram do algoritmo *Smart Brute Force* enquanto os piores resultados vieram do *Gerchberg Papoulis*, visto que esse gera regiões visivelmente mais borradas (apesar de possuir o tempo de execução mais baixo) principalmente para imagens com vários detalhes como rostos.
+Em geral observamos que os melhores resultados vieram do algoritmo *Smart Brute Force* enquanto os piores resultados vieram do *Gerchberg Papoulis*, visto que esse gera regiões visivelmente mais borradas (apesar de possuir o tempo de execução mais baixo) principalmente para imagens com vários detalhes como rostos. Podemos ver a diferença dos resultados entre esses dois algoritmos na imagem do Professor Moacir (momo.bmp) de dimensões 280x280:
+
+|<img src="./Project/images/inpainted/Smart Brute Force/momo.bmp"   width="200px" alt="momo_inpainted_brute"/>|
+<img src="./Project/images/difference/Smart Brute Force/momo.bmp"   width="200px" alt="momo_diff_brute"/>|
+<img src="./Project/images/inpainted/Gerchberg Papoulis/momo.bmp"   width="200px" alt="momo_inpainted_gerchberg"/>|
+<img src="./Project/images/difference/Gerchberg Papoulis/momo.bmp"   width="200px" alt="momo_diff_gerchberg"/>|
+|------------|------------|------------|------------|
+| Smart Brute Force | Imagem da diferença Smart Brute Force | Gerchberg Papoulis | Imagem da diferença Gerchberg Papoulis |
+
+Comparação do RMSE e do tempo de execução para esses algoritmos:
+
+| Algoritmo | RMSE | Tempo |
+| :---: | :---: | :---: |
+|Smart Brute Force|21.352|01m57s|
+|Gerchberg Papoulis| 45.094 |00m05s|
 
 As tabelas abaixo sumarizam os resultados obtidos na remoção dos rabiscos para cada algoritmo.
 
-| Brute Force | RMSE | Tempo |
+### Brute Force
+| Imagem | RMSE | Tempo |
 | :---: | :---: | :---: |
 | dogo1.bmp (100x100) | 08.340 | 00m07s |
 | dogo2.bmp (400x400) | 13.222 | 32m19s |
 | momo.bmp (280x280) | 23.721 | 30m24s |
 | momo_fino.bmp (280x280) | 13.735 | 06m50s |
 
-| Local Brute Force | RMSE | Tempo |
+### Local Brute Force
+| Imagem | RMSE | Tempo |
 | :---: | :---: | :---: |
 | dogo1.bmp (100x100) | 08.340 | 00m05s |
 | dogo2.bmp (400x400) | 12.456 | 01m50s |
@@ -154,7 +170,8 @@ As tabelas abaixo sumarizam os resultados obtidos na remoção dos rabiscos para
 | forbes.bmp (961x1280) | 09.140 | 19m07s |
 | horse_car.bmp (438x297) | 25.752 | 10m11s |
 
-| Local Dynamic Brute Force | RMSE | Tempo |
+### Local Dynamic Brute Force
+| Imagem | RMSE | Tempo |
 | :---: | :---: | :---: |
 | dogo1.bmp (100x100) | 06.646 | 00m03s |
 | dogo2.bmp (400x400) | 12.014 | 00m52s |
@@ -163,7 +180,8 @@ As tabelas abaixo sumarizam os resultados obtidos na remoção dos rabiscos para
 | forbes.bmp (961x1280) | 06.964 | 07m21s |
 | horse_car.bmp (438x297) | 23.660 | 04m38s |
 
-| Smart Brute Force | RMSE | Tempo |
+### Smart Brute Force
+| Imagem | RMSE | Tempo |
 | :---: | :---: | :---: |
 | dogo1.bmp (100x100) | 07.198 | 00m03s | 
 | dogo2.bmp (400x400) | 11.384 | 00m36s | 
@@ -171,8 +189,9 @@ As tabelas abaixo sumarizam os resultados obtidos na remoção dos rabiscos para
 | momo_fino.bmp (280x280) | 12.567 | 00m24s | 
 | forbes.bmp (961x1280) | 08.533 | 06m10s | 
 | horse_car.bmp (438x297) | 20.614 | 07m48s | 
-	
-| Gerchberg Papoulis | RMSE | Tempo |
+
+### Gerchberg Papoulis
+| Imagem | RMSE | Tempo |
 | :---: | :---: | :---: |
 | dogo1.bmp (100x100) | 29.460 | 00m01s |
 | dogo2.bmp (400x400) | 23.039 | 00m09s |
@@ -181,7 +200,7 @@ As tabelas abaixo sumarizam os resultados obtidos na remoção dos rabiscos para
 | forbes.bmp (961x1280) | 20.856 | 01m31s |
 | horse_car.bmp (438x297) | 43.221 | 00m09s |
 
-Em seguida apresentamos resultados para algumas imagens com comparativos visuais e métricos, além do tempo de execução de cada algoritmo.
+Em seguida apresentamos alguns dos melhores resultados com comparativos visuais.
 
 ### Professor Moacir (desenho com bordas grossas)
 
