@@ -16,7 +16,7 @@ Nesse projeto estudamos e implementamos técnicas de *inpainting* para a remoç�
 Aplicamos também os métodos utilizados para a remoção de objetos em imagens. Para isso é necessário desenhar em cima do objeto a ser removido com um pincel duro com uma cor contrastante como, por exemplo, o vermelho (255, 0, 0).
 
 # Conjunto de imagens
-Parte do conjunto de imagens utilizado é apresentado abaixo. Essas quatro imagens servirão de exemplo para a execução dos algoritmos.
+Parte do conjunto de imagens utilizado é apresentado abaixo.
 
 ## Imagens Originais
 As imagens abaixo estão em sua forma original.
@@ -55,7 +55,6 @@ Nesse método definimos um *threshold* e assumimos que todas as cores que ocorre
 
 Nesse método a máscara será composta por todos os pixels vermelhos (255, 0, 0). Esse método é importante para melhorar a precisão da extração da máscara para a aplicação extra do projeto de remover objetos indesejados. Para isso basta o usuário pintar de vermelho (255, 0, 0) os objetos que deseja remover da imagem.
 
-
 # Algoritmos de *Inpainting*
 ## Gerchberg Papoulis
 O algoritmo Gerchberg-Papoulis é um algoritmo de *inpaiting* por difusão que funciona por meio de cortes nas frequencias obtidas pela Transformada Discreta de Fourier (DFT), zerando parte das frequências das imagens.
@@ -76,6 +75,8 @@ Considerando uma Máscara **M** que possui valor 0 nos locais em que a imagem é
 		+  *g_k* = (1 - M/255) * *g_0* + (M/255) * *g_k*
 
 Ao final do processo é obtida a imagem *G_k* restaurada.
+
+Abaixo estão alguns dos resultados do algoritmo.
 
 |<img src="./Project/images/inpainted/Gerchberg Papoulis/dogo2.bmp"   width="200px" alt="dogo2"/>|<img src="./Project/images/inpainted/Gerchberg Papoulis/horse_car.bmp"   height="200px" alt="horse_car"/>|<img src="./Project/images/inpainted/Gerchberg Papoulis/forbes.bmp"   width="200px" alt="forbes"/>|<img src="./Project/images/inpainted/Gerchberg Papoulis/momo_fino.bmp"   width="200px" alt="momo_fino"/>|
 |------------|------------|------------|------------|
@@ -107,9 +108,10 @@ Aprimorando um pouco a ideia do Brute Force Local, percebemos que atribuir a mé
 
 Além disso, ao começarmos a tentar remover rabiscos mais grossos ou objetos maiores observamos que poderíamos usar um valor de *K* dinâmico, ou seja, um valor de *K* para cada *pixel* deteriorado *Pd* com o objetivo de obter janelas mais representativas e reduzir o tempo de execução. Esse método se mostrou especialmente útil em máscaras mais grossas, ou seja, máscaras que produzem um valor de *K* elevado nos outros métodos. Seu tempo de execução é mais baixo pois o *K* escolhido para as bordas é menor do que o *K* escolhido para o centro de regiões deterioradas.
 
-|<img src="./Project/images/deteriorated/forbes.bmp"   width="200px" alt="forbes"/>|<img src="./Project/images/inpainted/Local Dynamic Brute Force/forbes.bmp"   width="200px" alt="forbes"/>|
+|<img src="./Project/images/other/forbes_profile.bmp"   width="200px" alt="forbes"/>|<img src="./Project/images/deteriorated/forbes_profile.bmp"   width="200px" alt="forbes"/>|
+|<img src="./Project/images/masks/forbes_profile.bmp"   width="200px" alt="forbes"/>|<img src="./Project/images/inpainted/Local Dynamic Brute Force/forbes_profile.bmp"   width="200px" alt="forbes"/>|
 |------------|------------|
-| Forbes 961x1280 deteriorado | Forbes 961x1280 reconstruído |
+| Forbes-Perfil 934x1280 original | Forbes-Perfil 934x1280 "deteriorado" | Forbes-Perfil 934x1280 máscara | Forbes-Perfil 934x1280 restaurado |
 
 ### *Smart Brute Force*
 
@@ -129,7 +131,6 @@ Podemos ver pela imagem *horse_car.bmp* que usar o *pixel* cuja janela *K*x*K* p
 # Resultados
 
 A avaliação dos resultados foi feita visualmente por meio da imagem da diferença entre a foto original e as resultantes dos algoritmos de *inpainting*, e metricamente pela raiz do erro quadrático médio (RMSE), calculado apenas nos pixels da região deteriorada (pixels da máscara).
-
 
 ## Remoção de rabiscos em imagens
 
